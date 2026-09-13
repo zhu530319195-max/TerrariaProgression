@@ -44,17 +44,14 @@ Terraria/tModLoader 独立角色成长系统。
 - `docs/PROGRESSION_DESIGN_v0.1.md` — 等级、经验、数值天赋与世界能力总设计
 - `docs/FUNCTIONAL_TALENTS_v0.1.md` — 功能天赋正式目录、Registry、Scanner 与兼容策略
 
-当前阶段：**P1-A 0.2.1 数值天赋与高缩放页面优化**，0.2.0 的升级、启停、回退、换世界／重启保存已通过用户实机测试；本次优化 200% UI 缩放下的页面布局。包含 21 项数值天赋；P1 剩余目录、P2/P3 尚未完成。已合并的 P0 保留原有经验规则与角色成长。
+当前阶段：**P2-A 0.4.1 功能天赋测试版**。P1 的 PR #4、#5 已通过用户验收并合并。新增八项一次解锁功能、多段跳、方块破坏效率及每级天赋点配置。
 
-- **按 P 打开天赋页**（可在控制设置中改键），也可输入 `/tptalents`。
-- 支持升级、回退一级、整项／分类／全部退款、启停。关闭不退款。
-- 旧 P0 角色自动读取，保存为新版 v2；升级前备份角色，新存档不可交给旧 P0 读取。
-- [P1 中文安装与测试步骤](docs/P1_TEST_GUIDE_zh-CN.md)
-- [P1 工程、网络、已实现项目与后续范围](docs/P1_IMPLEMENTATION.md)
-- [P1 验证记录](docs/P1_VALIDATION.md)
-- [P0 验证记录及用户暂缓项目](docs/P0_VALIDATION.md)
-- 工程位于 `TerrariaProgression/`。目标：tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8。
-- `/tpstatus` 查看成长。新角色开启开发命令后 `/tpgivexp 1000`，应为 Lv.4、50/490 XP、3 个天赋点。
+- 按 P 或 `/tptalents` 打开页面，“功能能力”中查看分组与免费信息子开关。
+- 二元功能2点解锁；多段跳、方块破坏效率每级1点，当前强度可调。
+- 存档v3读取v1/v2；升级前备份角色，退回旧MOD需恢复旧备份。多人两端统一更新。
+- [P2-A 中文安装与测试](docs/P2A_TEST_GUIDE_zh-CN.md)
+- [P2-A 实现、验证与限制](docs/P2A_IMPLEMENTATION.md)
+- 目标：tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8。
 
 ## P1 补全测试版 0.3.0
 

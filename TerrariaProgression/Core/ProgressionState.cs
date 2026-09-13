@@ -6,23 +6,26 @@ namespace TerrariaProgression.Core;
 
 public sealed class ProgressionState
 {
-    public const int DataVersion = 2;
+    public const int DataVersion = 3;
     public BigInteger Level { get; internal set; } = 1;
     public BigInteger CurrentExperience { get; internal set; }
     public BigInteger TotalExperienceEarned { get; internal set; }
     public BigInteger AvailableTalentPoints { get; internal set; }
+    public BigInteger TotalTalentPointsEarned { get; internal set; }
     public BigInteger TotalSpentTalentPoints { get; internal set; }
     public Dictionary<string, TalentState> Talents { get; } = new(StringComparer.Ordinal);
 
-    public BigInteger Award(BigInteger units, BigInteger cap, int pointsPerLevel = 1)
+    public BigInteger Award(BigInteger units, BigInteger cap, BigInteger? pointsPerLevel = null)
     {
-        if (units < 0 || cap < 0 || pointsPerLevel < 0) throw new ArgumentOutOfRangeException();
+        var reward = pointsPerLevel ?? BigInteger.One;
+        if (units < 0 || cap < 0 || reward < 0) throw new ArgumentOutOfRangeException();
         CurrentExperience += units;
         TotalExperienceEarned += units;
         var levels = Experience.LevelsAffordable(Level, CurrentExperience, cap);
         CurrentExperience -= Experience.Cost(Level, levels, cap);
         Level += levels;
-        AvailableTalentPoints += levels * pointsPerLevel;
+        AvailableTalentPoints += levels * reward;
+        TotalTalentPointsEarned += levels * reward;
         return levels;
     }
 
@@ -64,6 +67,7 @@ public sealed class TalentState
     // occupy one run, while refunds still preserve the exact historical cost.
     public BigInteger TalentLevel { get; private set; }
     public bool Enabled { get; set; } = true;
+    public HashSet<string> DisabledEffects { get; } = new(StringComparer.Ordinal);
     private readonly List<PaidCostRun> costs = new();
     public IReadOnlyList<PaidCostRun> CostRuns => costs;
     public BigInteger InvestedPoints { get; private set; }

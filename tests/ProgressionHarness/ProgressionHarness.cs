@@ -57,6 +57,7 @@ public sealed partial class RuntimeChecks : ModSystem
             Main.player[i].GetModPlayer<ProgressionPlayer>().Initialize();
             Main.player[i].GetModPlayer<ProgressionPlayer>().SessionReady = true;
         }
+        Config.TalentPointsPerLevel = "1";
         Config.HpToXpMultiplier = 1;
         Config.StatueExperienceMultiplier = 0;
         Config.ExperienceRequirementCap = 50000;
@@ -216,7 +217,7 @@ public sealed partial class RuntimeChecks : ModSystem
         A.ApplyTalent(TalentOperation.DecreaseIntensity,"MeleeRange",TalentCategory.Combat,5);
         Check(Math.Abs(p.GetAdjustedItemScale(sword)-1.5*sword.scale)<.001 && A.State.Talents["MeleeRange"].TalentLevel==10,"active melee level 5 without refund");
         var tag = new TagCompound(); A.SaveData(tag); B.LoadData(tag);
-        Check(B.State.Talents["MeleeRange"].CurrentIntensity==5 && NumericTalents.ValidateImported(B.State),"active intensity survives real player save");
+        Check(B.State.Talents["MeleeRange"].CurrentIntensity==5 && TalentCatalog.ValidateImported(B.State),"active intensity survives real player save");
         var npc=Spawn(10000); npc.defense=0;
         foreach(var sample in new[]{ (100d,.9,200), (125d,.1,300), (125d,.5,200), (200d,.5,300), (300d,.5,400) }) {
             var m=npc.GetIncomingStrikeModifiers(DamageClass.Melee,1);
@@ -310,6 +311,7 @@ public sealed partial class RuntimeChecks : ModSystem
         for(int i=0;i<Main.maxItems;i++) Main.timeItemSlotCannotBeReusedFor[i]=0;
         RunCopperMining();
         RunP1Refinement();
+        RunP2();
     }
     private void RunCopperMining()
     {

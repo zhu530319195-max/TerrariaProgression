@@ -47,7 +47,29 @@ Mods: {
   "DecreaseIntensity": "Power -1",
   "IncreaseIntensity": "Power +1",
   "MaximumIntensity": "Maximum power",
-  "Intensity": "Active level: {0} (no refund)"
+  "Intensity": "Active level: {0} (no refund)",
+  "UnlockCost": "Unlock ({0} points)",
+  "UpgradeCost": "Upgrade +1 ({0} points)",
+  "Unlocked": "Unlocked",
+  "Locked": "Locked",
+  "UnlockDetail": "Status: {0}\nEffect: {1}\nOne-time cost: {2} points\nActually paid: {3} points\nRefund returns the actual paid cost.",
+  "GroupMovement": "Movement",
+  "GroupEnvironment": "Environment",
+  "GroupImmunity": "Immunity",
+  "GroupInformation": "Information",
+  "GroupTools": "Building / Tools",
+  "ChildTime": "Time",
+  "ChildDepth": "Depth",
+  "ChildCompass": "Compass",
+  "ChildWeather": "Weather",
+  "ChildMoon": "Moon",
+  "ChildFishing": "Fishing",
+  "ChildRadar": "Radar",
+  "ChildDps": "Dps",
+  "ChildRareCreatures": "RareCreatures",
+  "ChildOre": "Ore",
+  "ChildTreasure": "Treasure",
+  "ChildKillCount": "KillCount"
 }
     TalentNames: {
   "MaxLife": "Maximum life",
@@ -95,7 +117,17 @@ Mods: {
   "BuyDiscount": "Buy Discount",
   "ReforgeDiscount": "Reforge Discount",
   "ToolReach": "Tool Reach",
-  "BuildReach": "Build Reach"
+  "BuildReach": "Build Reach",
+  "NoFallDamage": "No Fall Damage",
+  "MultiJump": "Multi Jump",
+  "WaterWalking": "Water Walking",
+  "LavaWalking": "Lava Walking",
+  "UnderwaterBreathing": "Underwater Breathing",
+  "LavaImmunity": "Lava Immunity",
+  "HotTileImmunity": "Hot Tile Immunity",
+  "KnockbackImmunity": "Knockback Immunity",
+  "AllInformation": "All Information",
+  "ToolSpeed": "Tool Speed"
 }
     TalentHints: {
   "MaxLife": "+25 HP per level. Raising the maximum never heals; lowering it only clips current life.",
@@ -143,7 +175,17 @@ Mods: {
   "HeartRecovery": "Adds 10% healing from vanilla hearts and seasonal equivalents per level.",
   "StarRecovery": "Adds 10% restoration from vanilla mana stars and equivalents per level.",
   "ProjectileSpeed": "Adds 5% launch velocity per level. Projectile AI can override velocity.",
-  "Invulnerability": "Adds 1 frame to the applicable native hurt immunity timer per level."
+  "Invulnerability": "Adds 1 frame to the applicable native hurt immunity timer per level.",
+  "NoFallDamage": "Prevents native fall damage without duplicating equipment effects.",
+  "MultiJump": "Adds one extra midair jump per level, stacking with equipment jumps. Adjustable count. Release and press jump again. Native ground/grapple refresh restores uses; toggling midair does not.",
+  "WaterWalking": "Walk on water and honey; press down to sink. Does not grant lava walking or immunity.",
+  "LavaWalking": "Walk on lava under normal gravity; does not grant water walking or lava immunity. Lava contact can still hurt.",
+  "UnderwaterBreathing": "Pauses drowning without refilling breath. Disabling resumes from current breath; avoids special-seed air drowning.",
+  "LavaImmunity": "Prevents native lava damage. Does not grant lava walking or all debuff immunities.",
+  "HotTileImmunity": "Protects against native hot-tile contact, not every fire attack.",
+  "KnockbackImmunity": "Prevents native hit knockback. Disabling retains real equipment immunity.",
+  "AllInformation": "Unlocks 12 native information/treasure effects. Toggle each below at no cost. Disabling removes only talent contributions, not equipment or team information.",
+  "ToolSpeed": "Tool intervals divided by (1 + 0.2 x active level); level 10 is about 3x efficiency. Native picks, axes and hammers; preserves tool power, protection and placement speed. Minimum one frame."
 }
     Messages: {
       LootLimit: "Extra loot reached the roll budget or item capacity; some extra rewards were not generated. Adjust the roll budget in Mod Config. Levels and points are unchanged."
@@ -169,6 +211,7 @@ Mods: {
         BoostMounts: { Label: "Boost Mounts", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
         BoostPets: { Label: "Boost Pets", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
         BoostModItems: { Label: "Boost ModItems", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        TalentPointsPerLevel: { Label: "Talent points per level", Tooltip: "Enter a nonnegative whole number; default 1, no gameplay cap. 0 disables future awards. No retroactive changes. Invalid input falls back to 1." }
         HpToXpMultiplier: {
           Label: XP per maximum HP
           Tooltip: "NPC.lifeMax × this multiplier. Range 0.01–10.00."

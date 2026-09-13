@@ -34,12 +34,15 @@ public static class StateCodec
         WriteInteger(writer, state.TotalExperienceEarned);
         WriteInteger(writer, state.AvailableTalentPoints);
         WriteInteger(writer, state.TotalSpentTalentPoints);
+        WriteInteger(writer, state.TotalTalentPointsEarned);
         writer.Write(state.Talents.Count);
         foreach (var (id, talent) in state.Talents) {
             writer.Write(id);
             writer.Write(talent.Enabled);
             writer.Write(talent.CurrentIntensity.HasValue);
             if (talent.CurrentIntensity.HasValue) writer.Write(talent.CurrentIntensity.Value);
+            writer.Write(talent.DisabledEffects.Count);
+            foreach (string child in talent.DisabledEffects) writer.Write(child);
             writer.Write(talent.CostRuns.Count);
             foreach (var run in talent.CostRuns) {
                 WriteInteger(writer, run.Cost);
@@ -55,12 +58,13 @@ public static class StateCodec
         using var stream = new MemoryStream(bytes, writable: false);
         using var reader = new BinaryReader(stream);
         int version = reader.ReadInt32();
-        if (version is not (1 or ProgressionState.DataVersion)) throw new InvalidDataException($"Unsupported progression DataVersion {version}; use a compatible mod version. Data was not reset.");
+        if (version is not (1 or 2 or ProgressionState.DataVersion)) throw new InvalidDataException($"Unsupported progression DataVersion {version}; use a compatible mod version. Data was not reset.");
         var result = new ProgressionState {
             Level = ReadInteger(reader), CurrentExperience = ReadInteger(reader),
             TotalExperienceEarned = ReadInteger(reader), AvailableTalentPoints = ReadInteger(reader),
             TotalSpentTalentPoints = ReadInteger(reader)
         };
+        result.TotalTalentPointsEarned = version >= 3 ? ReadInteger(reader) : result.Level - 1;
         int count = reader.ReadInt32();
         if (count is < 0 or > 512) throw new InvalidDataException("Invalid talent count.");
         BigInteger spent = 0;
@@ -71,6 +75,14 @@ public static class StateCodec
             if (reader.ReadBoolean()) {
                 talent.CurrentIntensity = reader.ReadDecimal();
                 if (talent.CurrentIntensity < 0) throw new InvalidDataException("Invalid intensity.");
+            }
+            if (version >= 3) {
+                int children = reader.ReadInt32();
+                if (children is < 0 or > 64) throw new InvalidDataException("Invalid sub-effect count.");
+                for (int k = 0; k < children; k++) {
+                    string child = reader.ReadString();
+                    if (child.Length is 0 or > 128 || !talent.DisabledEffects.Add(child)) throw new InvalidDataException("Invalid sub-effect.");
+                }
             }
             int costs = reader.ReadInt32();
             if (costs is < 1 or > 10000) throw new InvalidDataException("Invalid paid-cost history.");
@@ -86,10 +98,13 @@ public static class StateCodec
         // Requirement configuration can change over a character's lifetime, so never
         // reconstruct levels from lifetime XP using today's cap.
         if (stream.Position != stream.Length || result.Level < 1 || spent != result.TotalSpentTalentPoints
-            || result.AvailableTalentPoints + spent != result.Level - 1
+            || result.AvailableTalentPoints + spent != result.TotalTalentPointsEarned
             || result.TotalExperienceEarned < result.CurrentExperience
             || result.TotalExperienceEarned - result.CurrentExperience < (result.Level - 1) * Experience.Scale)
             throw new InvalidDataException("Inconsistent progression snapshot.");
+        // Retired by user request in 0.4.1. Validate the original ledger first,
+        // then return its actual paid cost once; all save/network loads share this path.
+        result.RefundAll("AutoJump");
         return result;
     }
 }
