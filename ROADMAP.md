@@ -100,7 +100,7 @@ Architecture first:
 - All Information composite
 
 ### P2-B — Movement / building / fishing
-0.5.0 implementation covers nine new 2-point unlocks. Wall cling and wall slide are independently switchable; existing equipment takes priority. Unlimited flight conserves existing wing fuel and does not grant wings/speed or mount flight. Building helpers are native grid/ruler and auto paint with normal paint consumption. See `docs/P2B_IMPLEMENTATION.md`; user acceptance pending.
+0.5.0 implementation covers nine new 2-point unlocks. Wall cling and wall slide are independently switchable; existing equipment takes priority. Unlimited flight conserves existing wing fuel and does not grant wings/speed or mount flight. Building helpers are native grid/ruler and auto paint with normal paint consumption. See `docs/P2B_IMPLEMENTATION.md`; accepted by user and merged in PR #7.
 
 - Dash
 - Wall climb/slide
@@ -110,6 +110,7 @@ Architecture first:
 - Fishing-line protection / lava-fishing eligibility where reliable
 
 ### P2-C — Composite and combat-trigger effects
+0.6.0 implements the common 13-status immunity composite, stars, bees, panic speed and attack burn/poison. Two binary unlocks cost 2 points; four adjustable numeric effects cost 1 point per level. Retaliation grows damage at bounded native counts; attack debuffs last 2 seconds per level. See `docs/P2C_IMPLEMENTATION.md`; in-game acceptance pending.
 - Common status-immunity composite
 - Selected on-hit/on-hurt accessory effects
 - Selected attack-inflicted vanilla Debuffs

@@ -5,7 +5,7 @@ using System.Linq;
 namespace TerrariaProgression.Core;
 
 public enum FunctionalImplementation { NativeFlag, NativeSystem, AccessoryBridge, Custom, Composite }
-public enum FunctionalStackPolicy { SatisfyOnce, Add }
+public enum FunctionalStackPolicy { SatisfyOnce, Add, Multiply, Max }
 public enum FunctionalAuthority { ConfirmedPlayerState, LocalDisplay }
 public sealed record FunctionalTalent(TalentDefinition Definition, FunctionalImplementation ImplementationKind,
     string Group, FunctionalStackPolicy StackPolicy, FunctionalAuthority NetworkAuthority,
@@ -18,10 +18,23 @@ public static class FunctionalTalentRegistry
     public static readonly IReadOnlyList<string> InformationChildren = Array.AsReadOnly(new[] {
         "Time", "Depth", "Compass", "Weather", "Moon", "Fishing", "Radar", "Dps", "RareCreatures", "Ore", "Treasure", "KillCount"
     });
-    private static FunctionalTalent Unlock(string id, string group, FunctionalImplementation kind = FunctionalImplementation.NativeFlag) =>
-        new(new TalentDefinition(id, TalentCategory.Utility, 0, EffectUnit.Flag, DefaultCost: 2, MaxLevel: 1),
+    public static readonly IReadOnlyList<string> ImmunityChildren = Array.AsReadOnly(new[] {
+        "Poisoned", "Bleeding", "Slow", "Weak", "BrokenArmor", "Silenced", "Cursed",
+        "Confused", "Darkness", "Chilled", "Frozen", "Stoned", "OnFire"
+    });
+    private static FunctionalTalent Growing(string id, decimal perLevel, EffectUnit unit, FunctionalImplementation kind, FunctionalStackPolicy stack) =>
+        new(new TalentDefinition(id, TalentCategory.Combat, perLevel, unit, true), kind,
+            "Combat", stack, FunctionalAuthority.ConfirmedPlayerState, Array.Empty<string>(), CompatibilityGrade: kind == FunctionalImplementation.Custom ? "C" : "A");
+    private static FunctionalTalent Unlock(string id, string group, FunctionalImplementation kind = FunctionalImplementation.NativeFlag, TalentCategory category = TalentCategory.Utility) =>
+        new(new TalentDefinition(id, category, 0, EffectUnit.Flag, DefaultCost: 2, MaxLevel: 1),
             kind, group, FunctionalStackPolicy.SatisfyOnce, FunctionalAuthority.ConfirmedPlayerState, Array.Empty<string>());
     public static readonly IReadOnlyList<FunctionalTalent> All = Array.AsReadOnly(new[] {
+        Unlock("StatusImmunity", "Immunity", FunctionalImplementation.Composite) with { ChildEffects = ImmunityChildren },
+        Growing("StarRetaliation", 1, EffectUnit.Multiplier, FunctionalImplementation.Custom, FunctionalStackPolicy.Multiply),
+        Growing("BeeRetaliation", 1, EffectUnit.Multiplier, FunctionalImplementation.Custom, FunctionalStackPolicy.Multiply),
+        Unlock("PanicSpeed", "Combat", category: TalentCategory.Combat),
+        Growing("AttackBurn", 2, EffectUnit.Seconds, FunctionalImplementation.NativeSystem, FunctionalStackPolicy.Max),
+        Growing("AttackPoison", 2, EffectUnit.Seconds, FunctionalImplementation.NativeSystem, FunctionalStackPolicy.Max),
         Unlock("Dash", "Movement", FunctionalImplementation.NativeSystem),
         Unlock("WallClimb", "Movement", FunctionalImplementation.NativeSystem),
         Unlock("WallSlide", "Movement", FunctionalImplementation.NativeSystem),

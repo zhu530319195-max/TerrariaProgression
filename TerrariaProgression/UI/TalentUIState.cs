@@ -156,6 +156,8 @@ internal sealed class TalentUIState : UIState
         // Defaults have at most two decimal places, preserving huge integer levels.
         var hundredths = level * (int)(definition.PerLevel * 100);
         string value = hundredths < 1000000000000 ? ((decimal)hundredths / 100).ToString("0.##", CultureInfo.InvariantCulture) : Compact(hundredths / 100);
+        if (definition.Unit == EffectUnit.Multiplier) return Text("NativeDamageMultiplier", value);
+        if (definition.Unit == EffectUnit.Seconds) return Text("EffectSeconds", value);
         return "+" + value + (definition.Unit == EffectUnit.Percent ? "%" : definition.Unit == EffectUnit.PerSecond ? Text("PerSecond") : "");
     }
     private void Resize(float width, float height)
