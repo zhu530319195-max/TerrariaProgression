@@ -1,0 +1,88 @@
+# DECISIONS.md
+
+This file records accepted product/architecture decisions. New entries should be appended rather than silently rewriting history.
+
+## D001 — Independent progression module
+TerrariaProgression is developed independently from Xiaoyu visual replacement work. Visual sprites/hair/PlayerDrawLayer are out of scope for this repository.
+
+## D002 — Character-bound infinite level
+Progress is stored on the Terraria character, not the world. Initial level is 1 and there is no level cap.
+
+## D003 — No death/world transition penalty
+Death, changing worlds, and switching between singleplayer and multiplayer do not reduce level or experience.
+
+## D004 — XP derives from NPC maximum life
+Base kill XP uses `NPC.lifeMax`. Default conversion is 1.00 XP per max-HP point. The configurable range is 0.01–10.00.
+
+## D005 — Upgrade requirement curve and cap
+Base requirement for the next level is:
+
+`250 + 50 * (level - 1) + 10 * (level - 1)^2`
+
+The actual requirement is capped by a configurable per-level maximum. Default cap: 50,000 XP. Config value `0` means no cap.
+
+## D006 — Statue XP is configurable
+Statue-spawned NPC experience is controlled by a multiplier. A value of 0 disables XP; 1.0 means normal XP.
+
+## D007 — Town NPCs do not give XP by default
+Town NPC kills are excluded from normal experience to avoid trivial farming.
+
+## D008 — Multiplayer XP is not last-hit-only
+XP is allocated by meaningful participation/damage contribution. The server is authoritative for final settlement.
+
+## D009 — Level-up grants talent points
+Each level grants talent points. Default: 1 point per level. Large XP awards may produce multiple level-ups in one settlement.
+
+## D010 — Talent disable and refund are different operations
+Disabling a talent temporarily suppresses its effect without changing its level or invested points. Refunding lowers/reset levels and returns the points actually paid.
+
+## D011 — Free reversible respec
+Current design allows unlimited talent rollback/refund with no additional penalty. Exact paid costs must be stored so configuration changes cannot create refund exploits.
+
+## D012 — Six talent categories
+Approved categories: Base Stats; Recovery & Sustain; Combat; Economy & Resources; Utility/Accessory-like Abilities; Transcendent/World Interaction.
+
+## D013 — High-risk world abilities require server authority
+Area mining, vein mining, tree felling, terrain destruction, auto-replanting and similar world-changing effects must respect server-side control and protection rules.
+
+## D014 — Mod compatibility should be data/API driven
+Prefer standard tModLoader runtime properties and DamageClass/API behavior over hard-coded vanilla or third-party content lists, so modded NPCs/items work automatically when possible.
+
+## D015 — P1 values were initially left open
+The initial bootstrap catalog approved the talent categories conceptually while leaving exact P1 values for later design approval.
+
+## D016 — Numeric talents are infinitely repeatable
+Supersedes the finite-cap assumption in the initial catalog. Any talent with meaningful continuous numeric scaling defaults to unlimited levels (`MaxLevel = 0`). Pure binary functionality remains an unlock-type ability.
+
+## D017 — Lv.10 is the default strong-state balance target
+Default talent values are tuned so Lv.1–3 is immediately noticeable, Lv.5 is clearly stronger than vanilla, and focused investment to Lv.10 is already very strong. Levels above 10 continue to scale but are not required to preserve conventional vanilla balance.
+
+## D018 — Numeric talent prices do not grow with level by default
+Normal numeric talents use a fixed talent-point cost per level, normally 1 point. XP progression already supplies the long-term cost curve, so the default design does not add an additional escalating talent-price curve.
+
+## D019 — Approved P1 strength examples
+Current default numeric baseline includes: +25 max HP/level, +20 max MP/level, +4 defense/level, +5% movement speed/level, +1 HP/s fixed life regen/level, +2 MP/s fixed mana regen/level, +5% global damage/level, +3% attack speed/level, +2.5 percentage points crit/level, +5% crit multiplier/level, +3 armor penetration/level, +10% monster coins and resource quantity/level. Exact formulas for multiplicative reductions and loot probability are specified in `docs/PROGRESSION_DESIGN_v0.1.md`.
+
+## D020 — Strength ceiling and current active strength are separate
+For abilities that can become inconvenient or dangerous at high levels (multi-jump, area mining, vein mining, terrain destruction, etc.), talent level determines the maximum unlocked power while the player can separately choose a lower current active intensity or disable the effect entirely.
+
+## D021 — World-editing growth remains unlimited but performance may be capped per action
+Character talent levels are not capped for world-interaction abilities. Servers may independently enforce a per-action world-edit limit such as `MaxBlocksPerAction` for performance and safety. This is a runtime protection limit, not a progression cap.
+
+## D022 — Binary utility unlocks cost 2 talent points by default
+One-time functional unlock talents (`U` type), such as no fall damage, unlimited underwater breathing, water walking, lava immunity, accessory-like information functions, and status immunities, use a unified default unlock price of 2 talent points. This keeps utility abilities accessible and avoids unnecessary price tiers. Individual exceptions may only be introduced deliberately if a future ability is materially more powerful than the normal utility set.
+
+## D023 — Functional talents use an explicit registry rather than automatic accessory import
+All permanent utility/accessory-like powers are registered through `FunctionalTalentRegistry`. Each effect declares its implementation kind, stacking/conflict policy, network authority and compatibility status. Unknown accessories are never automatically exposed as purchasable talents.
+
+## D024 — Native APIs are preferred over accessory emulation
+Functional effects should use `NativeFlag` or `NativeSystem` whenever Terraria/tModLoader provides a stable state or subsystem. `AccessoryBridge` is reserved for explicitly whitelisted vanilla effects that cannot be represented cleanly otherwise. Complex cases use `Custom` implementations. Composite talents may combine already-registered child effects.
+
+## D025 — Accessory scanning is a developer discovery tool only
+`AccessoryTalentScanner` may enumerate registered accessories and report unmapped candidates, but it must not automatically generate behavior, spend talent points, run unknown third-party accessory logic, or infer final effects from tooltip text or reflection-based field differences.
+
+## D026 — Third-party accessory auto-import is experimental and off by default
+Any future third-party accessory bridge is opt-in/experimental (`ExperimentalImportedAccessories = false` by default). Formal support requires explicit mapping and test evidence. TerrariaProgression does not promise universal compatibility with arbitrary ModItem accessory logic.
+
+## D027 — Information and common status immunity are bundled utility unlocks
+To avoid menu bloat, vanilla-style information readouts are grouped under one 2-point `All Information` composite unlock with individually toggleable sub-effects. Common vanilla accessory-style debuff immunities are grouped under one 2-point status-immunity composite unlock, while knockback immunity remains a separate 2-point toggle because it materially changes combat feel.
