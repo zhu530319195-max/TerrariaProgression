@@ -20,11 +20,18 @@ Protocol 5; same version required. Server confirms talent operations and grants 
 
 ## Validation
 Local official MOD build: 0 errors, 0 warnings. Core: 2840 checks passed, including v1/v2 migration, historic reward conservation, huge/zero rewards, binary costs/refunds/caps, child state and jump intensity.
-Runtime harness adds actual native config/XP/save, equip/info/drowning hooks, jump lifecycle and real native tool interval checks (pick/axe/hammer), attack interval isolation and pick-power protection. Runtime results must be recorded from CI; local game launch is blocked by the environment's /proc access restriction, so local compilation is not called runtime success.
+Runtime harness adds actual native config/XP/save, equip/info/drowning hooks, jump lifecycle and real native tool interval checks (pick/axe/hammer), attack interval isolation and pick-power protection. Runtime evidence comes from GitHub CI; local game launch is blocked by the environment's /proc access restriction.
 
 Real keyboard input, lava-surface collision, 200% GUI rendering, two actual clients and arbitrary third-party compatibility still require in-game acceptance. P0 multiplayer/special bosses and P1 deferred crit/potion/fishing tests remain deferred.
 
 API reference: [official ExtraJump](https://docs.tmodloader.net/docs/stable/class_extra_jump.html), plus the pinned v2026.07.3.0 native assembly used by build and runtime tests.
 
 ## Authorization / handoff
-User explicitly authorized pushing `feat/p2a-functional-talents`, creating its PR and continuing automatic tests on 2026-09-13, with no merge. The earlier automatic-review block is resolved by this instruction. Runtime CI remains pending until actual run evidence is recorded below.
+User explicitly authorized pushing `feat/p2a-functional-talents`, creating its PR and continuing automatic tests on 2026-09-13, with no merge. The earlier automatic-review block is resolved by this instruction. PR #6 is open and must remain unmerged pending user acceptance/authorization.
+
+## Successful CI evidence
+[Run 34764075680](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34764075680), code commit `55569cf25cc237aeb5576357fd761e502c4ffaef`, passed official MOD/harness compilation (0 warnings/errors), 2840 core checks and **249 native runtime checks**. The run includes P0/P1 regressions, native ExtraJump start/consume/refresh, child toggles and protocol5 server checks, drowning disable/restore, and configured large/zero point rewards with native SaveData/LoadData.
+
+Native tool action intervals at ToolSpeed Lv10: copper pickaxe 15→5 frames, copper axe 21→7, wooden hammer wall hit 12→4. Ordinary attack interval unchanged, copper pickaxe still cannot break Lihzahrd brick, active ToolSpeed5 yields factor2. This validates native action intervals, not arbitrary custom channel-tool loops or rendered animation speed. No production-code fix was needed after the first CI run.
+
+This following commit only records the successful run. The final PR HEAD must also pass its triggered workflow; no automated test result substitutes for real GUI/controller/multiplayer acceptance.

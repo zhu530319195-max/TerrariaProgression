@@ -1,7 +1,7 @@
 # PROJECT_STATUS.md
 
 ## Current phase
-P2-A 0.4.0 on `feat/p2a-functional-talents`, based on main `30e4da33647afc3b4d25e9b7990bbacf8150b377`. User explicitly authorized P2-A after PR #4/#5 acceptance and merge. Implements the ten first functional entries, tool efficiency and configurable points per level. Local implementation committed; official MOD and harness builds pass (0 warnings/errors), 2840 core checks pass. User explicitly authorized pushing P2-A, creating its PR and continuing automatic tests on 2026-09-13. Runtime CI and in-game acceptance pending; do not merge.
+P2-A 0.4.0 on `feat/p2a-functional-talents`, based on main `30e4da33647afc3b4d25e9b7990bbacf8150b377`. User explicitly authorized P2-A after PR #4/#5 acceptance and merge. Implements the ten first functional entries, tool efficiency and configurable points per level. Local implementation committed; official MOD and harness builds pass (0 warnings/errors), 2840 core checks pass. User explicitly authorized pushing P2-A, creating its PR and continuing automatic tests on 2026-09-13. PR #6 is open. Code 55569cf25cc237aeb5576357fd761e502c4ffaef passed CI run 34764075680: 2840 core checks, 249 native runtime checks, official MOD/harness builds with 0 warnings/errors. User in-game acceptance pending; do not merge.
 
 ## Repository state
 - PR #1–#5 are merged. PR #4/#5 merged 2026-09-13 after explicit user instruction “验收通过，可以合并 PR #4、#5”. Earlier historical statements that they await merge are superseded.
@@ -94,7 +94,7 @@ The core progression rules, P1 default balance direction, utility unlock pricing
 - PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
 
 ## Next implementation task
-0.4.0 local test/source packages prepared. Next: push the authorized P2-A branch, create PR, run native CI, resolve any failures, then in-game acceptance. Do not begin P2-B/C or P3 until the current batch is reviewed. P2-A contains 47 numeric registry entries and 10 functional registry entries (nine binary unlocks and numeric MultiJump), 57 total.
+0.4.0 CI test/source packages prepared. Next: user in-game acceptance via PR #6 and docs/P2A_TEST_GUIDE_zh-CN.md. Do not begin P2-B/C or P3 until the current batch is reviewed. P2-A contains 47 numeric registry entries and 10 functional registry entries (nine binary unlocks and numeric MultiJump), 57 total.
 
 ## P1 merge authorization supersedes earlier notes
 The earlier acceptance sections above record history at the time of feedback. PR #4 and #5 were subsequently explicitly authorized and merged. Their tested code is the P2-A base.
