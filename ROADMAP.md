@@ -100,6 +100,8 @@ Architecture first:
 - All Information composite
 
 ### P2-B — Movement / building / fishing
+0.5.0 implementation covers nine new 2-point unlocks. Wall cling and wall slide are independently switchable; existing equipment takes priority. Unlimited flight conserves existing wing fuel and does not grant wings/speed or mount flight. Building helpers are native grid/ruler and auto paint with normal paint consumption. See `docs/P2B_IMPLEMENTATION.md`; user acceptance pending.
+
 - Dash
 - Wall climb/slide
 - Unlimited flight toggle

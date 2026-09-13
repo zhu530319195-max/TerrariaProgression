@@ -44,12 +44,15 @@ Terraria/tModLoader 独立角色成长系统。
 - `docs/PROGRESSION_DESIGN_v0.1.md` — 等级、经验、数值天赋与世界能力总设计
 - `docs/FUNCTIONAL_TALENTS_v0.1.md` — 功能天赋正式目录、Registry、Scanner 与兼容策略
 
-当前阶段：**P2-A 0.4.1 功能天赋测试版**。P1 的 PR #4、#5 已通过用户验收并合并。新增八项一次解锁功能、多段跳、方块破坏效率及每级天赋点配置。
+当前阶段：**P2-B 0.5.0 移动／建筑／钓鱼测试版**。PR #6（P2-A 0.4.1）已通过用户验收并合并。本批新增冲刺、攀墙、滑墙、无限飞行、冰面防滑、建筑标尺／格线、自动喷漆、钓线不断、熔岩钓鱼，共9项2点解锁，总目录65项。
 
 - 按 P 或 `/tptalents` 打开页面，“功能能力”中查看分组与免费信息子开关。
 - 二元功能2点解锁；多段跳、方块破坏效率每级1点，当前强度可调。
 - 存档v3读取v1/v2；升级前备份角色，退回旧MOD需恢复旧备份。多人两端统一更新。
-- [P2-A 中文安装与测试](docs/P2A_TEST_GUIDE_zh-CN.md)
+- [P2-B 中文安装与测试](docs/P2B_TEST_GUIDE_zh-CN.md)
+- [P2-B 实现、验证与限制](docs/P2B_IMPLEMENTATION.md)
+- 多人使用协议7，服务器与客户端都需更新至0.5.0。
+- [P2-A 中文安装与测试（历史）](docs/P2A_TEST_GUIDE_zh-CN.md)
 - [P2-A 实现、验证与限制](docs/P2A_IMPLEMENTATION.md)
 - 目标：tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8。
 

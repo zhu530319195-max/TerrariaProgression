@@ -107,3 +107,9 @@ Server reward settings affect future level gains only. Save v3 records lifetime 
 
 ## D034 — Retire AutoJump after acceptance feedback
 User confirmed all other P2-A functions tested successfully and requested cancellation of AutoJump. Remove the talent entirely and automatically refund actual paid points from existing validated saves, without changing real equipment behavior or other talents. Repeated loads must not duplicate refunds. This supersedes all earlier AutoJump catalog entries. No merge authorization in this feedback.
+
+## D035 — P2-A accepted and merged; P2-B scope approved
+User confirmed final 0.4.1 tests passed and authorized PR #6 merge, completed at bb36b53721db5f4a1758591b2406d6b0c88595d5. User then approved starting P2-B following the proposed movement/building/fishing scope, PR and automatic testing workflow; merge still follows explicit acceptance/authorization.
+
+## D036 — P2-B native effect boundaries
+Nine 2-point unlocks: Dash, WallClimb, WallSlide, UnlimitedFlight, IceTraction, BuildingRuler, AutoPaint, FishingLine, LavaFishing. Standard dash adds no hit damage or dodge and preserves equipment precedence and native cooldown. Cling and slide are independent toggles; native cling is the stronger mode and includes wall-jumping. Flight conserves existing wing fuel, never grants wings/speed, mount flight or an on-toggle refill; exhausted wings require native grounding/grapple refresh first. Grid/ruler and auto paint respect native builder buttons; paint consumes inventory supplies through the native placement flow. Lava fishing requires rod/bait and native pond conditions. No new world destruction or P2-C effects. Save v3 retained, protocol raised to 7 for the expanded catalog.

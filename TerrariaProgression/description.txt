@@ -1,1 +1,1 @@
-Independent, character-bound infinite progression with server XP settlement, 21 numeric talents and a talent panel. Press P or use /tptalents. Chinese and English supported.
+Independent character-bound infinite progression, 65 talents, server-confirmed purchases and configurable level rewards. P2-B adds movement, building and fishing utilities. Press P or use /tptalents. Chinese and English supported.
