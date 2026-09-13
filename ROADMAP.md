@@ -3,7 +3,7 @@
 ## P0 — Progression Core
 Goal: stable character-bound infinite leveling foundation.
 
-Implementation status: P0 0.1.0 exists on `feat/progression-core`; compilation/core checks passed, runtime and user acceptance remain separate gates. See the P0 test guide. P1–P3 remain unimplemented.
+Implementation status: P0 0.1.0 is in PR #2 (depends on #1); official compilation, 1,537 core assertions and 28 tModLoader runtime assertions passed. User in-game acceptance remains required. See the P0 test guide. P1–P3 remain unimplemented.
 
 - tModLoader project skeleton
 - `ModPlayer` progression data
