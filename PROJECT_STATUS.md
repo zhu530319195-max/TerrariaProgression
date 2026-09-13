@@ -5,16 +5,18 @@ P2-A 0.4.1 was accepted by the user and PR #6 merged into main at `bb36b53721db5
 
 P2-B 0.5.0 was accepted by the user and PR #7 merged at `a3ac45aeccb739b42bbcf3d317a7ced45075b539`. Final CI run 34766385691 passed 2884 core checks and 304 native checks. This acceptance supersedes earlier pending P2-B notes.
 
-P2-C 0.6.0 is implemented on `feat/p2c-combat-effects`, based on merged P2-B. The user requested this stage. It adds StatusImmunity (13 free child switches), StarRetaliation, BeeRetaliation, PanicSpeed, AttackBurn and AttackPoison. There are 47 numeric registry entries and 24 functional registry entries (five numeric), 71 total.
+P2-C 0.6.0 was accepted by the user and PR #8 merged at `936f076ab16d827dc99805155ee0e34ab5be73bb`. Final CI run 34768703007 passed 2919 core and 357 native checks. This supersedes all earlier pending P2-C notes.
+
+P2 completion batch 1 (0.7.0) on `feat/p2-completion` adds FlightTime, FlightSpeed, SwimSpeed, PlacementSpeed, WallPlacementSpeed, NightVision, SelfLight and DangerSense. The user approved continuing the proposed eight-feature batch. Five numeric entries cost 1/level and are adjustable; three binary entries cost 2 once. Catalog: 47 numeric-registry + 32 functional-registry entries (ten numeric), 79 total.
 
 ## Repository state
-- PR #1–#7 are merged. P2-C PR #8 is open and remains unmerged pending in-game acceptance and explicit authorization.
+- PR #1–#8 merged. Completion PR #9 remains unmerged until in-game acceptance and explicit authorization.
 - Target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
-- P2-C CI run 34768604104 on d8ea9d376638a65afc8106fefce7255373905e16 passed 2919 core checks and 357 native checks; both official builds reported zero warnings/errors. Final documentation-only follow-up validation is tracked in PR #8. Automatic checks are not game acceptance.
-- P0/P1 deferred real multiplayer, special bosses, potion sickness/fishing yield and tiered crit remain unaccepted/deferred.
-- Save v3 imports v1/v2; paid-cost ledger and idempotent retired AutoJump refund preserved. Back up characters before updating.
-- Protocol 8; all clients and server must update to 0.6.0. Purchases/toggles remain server-confirmed; hit/hurt effects use native owner-client flow and engine networking.
-- Implementation: `docs/P2C_IMPLEMENTATION.md`; Chinese tests: `docs/P2C_TEST_GUIDE_zh-CN.md`.
+- CI 34774979949 on 6a2c0b489dd406fa1f0aa97b6179be4e50eefe7b passed 2956 core and 398 native checks with zero compile warnings/errors. PR #9 records final validation including an additional buoyancy regression. Rendering and real multiplayer need in-game tests.
+- Save v3 imports v1/v2 and retains paid-cost refunds/retired AutoJump migration. Protocol 9 requires all peers on 0.7.0.
+- Real multiplayer, segmented/multi-stage bosses, potion duration/fishing yield and tiered crit remain previously deferred. No acceptance is implied for them.
+- Next after this batch: remaining P2 catalog candidates and scanner; P3 world operations remain future work. Independent jump height and dodge semantics still need a decision; cancelled AutoJump/world chest enhancement stay cancelled.
+- See `docs/P2Completion_IMPLEMENTATION.md` and `docs/P2Completion_TEST_GUIDE_zh-CN.md`.
 
 ## Confirmed core rules
 - Initial level: 1.
@@ -99,7 +101,7 @@ The core progression rules, P1 default balance direction, utility unlock pricing
 - PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
 
 ## Next implementation task
-Deliver P2-C player/source packages from passing PR #8 CI for six-feature in-game acceptance. Preserve P2-A/P2-B acceptance. P2-D scanner and P3 remain future tasks.
+Deliver the eight-feature P2 completion batch from passing CI for in-game acceptance. P2-D scanner and P3 remain future tasks.
 
 ## P1 merge authorization supersedes earlier notes
 The earlier acceptance sections above record history at the time of feedback. PR #4 and #5 were subsequently explicitly authorized and merged. Their tested code is the P2-A base.

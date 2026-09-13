@@ -25,10 +25,21 @@ public static class FunctionalTalentRegistry
     private static FunctionalTalent Growing(string id, decimal perLevel, EffectUnit unit, FunctionalImplementation kind, FunctionalStackPolicy stack) =>
         new(new TalentDefinition(id, TalentCategory.Combat, perLevel, unit, true), kind,
             "Combat", stack, FunctionalAuthority.ConfirmedPlayerState, Array.Empty<string>(), CompatibilityGrade: kind == FunctionalImplementation.Custom ? "C" : "A");
+    private static FunctionalTalent UtilityGrowth(string id, decimal amount, EffectUnit unit, string group, FunctionalStackPolicy stack, FunctionalImplementation kind = FunctionalImplementation.NativeSystem) =>
+        new(new TalentDefinition(id, TalentCategory.Utility, amount, unit, true), kind, group, stack,
+            FunctionalAuthority.ConfirmedPlayerState, Array.Empty<string>(), CompatibilityGrade: kind == FunctionalImplementation.Custom ? "C" : "A");
     private static FunctionalTalent Unlock(string id, string group, FunctionalImplementation kind = FunctionalImplementation.NativeFlag, TalentCategory category = TalentCategory.Utility) =>
         new(new TalentDefinition(id, category, 0, EffectUnit.Flag, DefaultCost: 2, MaxLevel: 1),
             kind, group, FunctionalStackPolicy.SatisfyOnce, FunctionalAuthority.ConfirmedPlayerState, Array.Empty<string>());
     public static readonly IReadOnlyList<FunctionalTalent> All = Array.AsReadOnly(new[] {
+        UtilityGrowth("FlightTime", 1, EffectUnit.Seconds, "Movement", FunctionalStackPolicy.Add),
+        UtilityGrowth("FlightSpeed", 5, EffectUnit.Percent, "Movement", FunctionalStackPolicy.Multiply),
+        UtilityGrowth("SwimSpeed", 10, EffectUnit.Percent, "Movement", FunctionalStackPolicy.Multiply, FunctionalImplementation.Custom),
+        UtilityGrowth("PlacementSpeed", 20, EffectUnit.Percent, "Tools", FunctionalStackPolicy.Multiply),
+        UtilityGrowth("WallPlacementSpeed", 20, EffectUnit.Percent, "Tools", FunctionalStackPolicy.Multiply),
+        Unlock("NightVision", "Environment") with { NetworkAuthority = FunctionalAuthority.LocalDisplay },
+        Unlock("SelfLight", "Environment", FunctionalImplementation.NativeSystem),
+        Unlock("DangerSense", "Environment") with { NetworkAuthority = FunctionalAuthority.LocalDisplay },
         Unlock("StatusImmunity", "Immunity", FunctionalImplementation.Composite) with { ChildEffects = ImmunityChildren },
         Growing("StarRetaliation", 1, EffectUnit.Multiplier, FunctionalImplementation.Custom, FunctionalStackPolicy.Multiply),
         Growing("BeeRetaliation", 1, EffectUnit.Multiplier, FunctionalImplementation.Custom, FunctionalStackPolicy.Multiply),
