@@ -87,6 +87,11 @@ public sealed partial class RuntimeChecks
         A.ApplyTalent(TalentOperation.Enable, "DropChance", TalentCategory.Economy, 1);
         ClearItems(); solver.TryDropping(bagInfo);
         Check(Count(ItemID.Wood) + Count(ItemID.StoneBlock) == 6, "crate retry wrapper supports three independent draws and doubled contents");
+        ClearItems(); p.OpenBossBag(ItemID.KingSlimeBossBag);
+        Check(Count(ItemID.NinjaHood) + Count(ItemID.NinjaShirt) + Count(ItemID.NinjaPants) == 12,
+            "actual King Slime bag: two armor picks per draw, three draws, doubled contents");
+        Check(Count(ItemID.SlimeGun) + Count(ItemID.SlimeHook) == 6,
+            "actual King Slime weapon pool keeps independent options across three draws");
         var tag = new TagCompound(); A.SaveData(tag); B.LoadData(tag);
         Check(B.State.Talents["DropChance"].TalentLevel == 20 && B.State.Talents["BagQuantity"].TalentLevel == 10 && NumericTalents.ValidateImported(B.State),
             "legacy drop ID and new bag talent round trip through native save");

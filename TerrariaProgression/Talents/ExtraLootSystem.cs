@@ -32,7 +32,9 @@ public sealed class ExtraLootSystem : ModSystem
         try {
             orig(resolver, info); // Original event exactly once, including unknown rules.
             if (depth != 1 || previous || !OwnerCanRoll(info)) return;
-            var requested = TalentMath.ExtraRolls(ExtendedTalentPlayer.Level(info.player, "DropChance"), info.rng.NextDouble());
+            var level = ExtendedTalentPlayer.Level(info.player, "DropChance");
+            if (level <= 0) return;
+            var requested = TalentMath.ExtraRolls(level, info.rng.NextDouble());
             int limit = ModContent.GetInstance<ProgressionConfig>().MaxExtraLootRollsPerEvent;
             if (requested > limit) WarnLimit();
             int rolls = (int)System.Numerics.BigInteger.Min(requested, limit);
@@ -66,12 +68,12 @@ public sealed class ExtraLootSystem : ModSystem
     {
         Type type = rule.GetType();
         if (type.Assembly != typeof(CommonDrop).Assembly) return false;
-        return type.Name is "CommonDrop" or "CommonDropNotScalingWithLuck" or "ItemDropWithConditionRule" or
-            "LeadingConditionRule" or "OneFromOptionsDropRule" or "OneFromOptionsNotScalingWithLuckDropRule" or
-            "FewFromOptionsDropRule" or "FewFromOptionsNotScalingWithLuckDropRule" or
-            "DropBasedOnExpertMode" or "DropBasedOnMasterMode" or "DropBasedOnExpertModeAndMasterMode" or
-            "OneFromRulesRule" or "AlwaysAtleastOneSuccessDropRule" or "SequentialRulesNotScalingWithLuckRule" or
-            "DropNothing" or "DropLocalPerClientAndResetsNPCMoneyTo0" or "DropPerPlayerOnThePlayer";
+        return type.Name is nameof(CommonDrop) or nameof(CommonDropNotScalingWithLuck) or nameof(ItemDropWithConditionRule) or
+            nameof(LeadingConditionRule) or nameof(OneFromOptionsDropRule) or nameof(OneFromOptionsNotScaledWithLuckDropRule) or
+            nameof(FewFromOptionsDropRule) or nameof(FewFromOptionsNotScaledWithLuckDropRule) or
+            nameof(DropBasedOnExpertMode) or nameof(DropBasedOnMasterMode) or
+            nameof(OneFromRulesRule) or nameof(AlwaysAtleastOneSuccessDropRule) or nameof(SequentialRulesNotScalingWithLuckRule) or
+            nameof(CoinsRule) or nameof(DropNothing) or nameof(DropLocalPerClientAndResetsNPCMoneyTo0) or nameof(DropPerPlayerOnThePlayer);
     }
     internal static bool HasRoom(int required = 1)
     {
