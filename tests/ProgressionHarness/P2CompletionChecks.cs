@@ -77,6 +77,10 @@ public sealed partial class RuntimeChecks
             Check(p.position==start+Vector2.One,"swim multiplier excludes "+liquid);
         }
         p.lavaWet=p.honeyWet=p.shimmerWet=false;
+        p.position=start;p.velocity=new Vector2(32,0);p.canFloatInWater=true;p.controlDown=false;
+        p.WaterCollision(false,false);
+        Check(Math.Abs(p.velocity.Y+.4f)<.001 && p.velocity.X==32,"subdivided swimming applies native floating buoyancy exactly once");
+        p.canFloatInWater=false;p.velocity=new Vector2(2,2);
         p.grapCount=1; p.position=start; p.WaterCollision(false,false);
         Check(p.position==start+Vector2.One,"swimming excludes grapple movement"); p.grapCount=0;
         for(int dy=-2;dy<6;dy++) Main.tile[x+2,y+dy].ResetToType(TileID.Stone);

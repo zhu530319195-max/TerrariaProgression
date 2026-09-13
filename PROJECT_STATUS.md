@@ -10,9 +10,9 @@ P2-C 0.6.0 was accepted by the user and PR #8 merged at `936f076ab16d827dc998051
 P2 completion batch 1 (0.7.0) on `feat/p2-completion` adds FlightTime, FlightSpeed, SwimSpeed, PlacementSpeed, WallPlacementSpeed, NightVision, SelfLight and DangerSense. The user approved continuing the proposed eight-feature batch. Five numeric entries cost 1/level and are adjustable; three binary entries cost 2 once. Catalog: 47 numeric-registry + 32 functional-registry entries (ten numeric), 79 total.
 
 ## Repository state
-- PR #1–#8 merged. Completion PR must remain unmerged until in-game acceptance and explicit authorization.
+- PR #1–#8 merged. Completion PR #9 remains unmerged until in-game acceptance and explicit authorization.
 - Target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
-- Official local MOD/harness compilation completed; final automatic validation and artifact provenance belong to this batch's PR/CI. Rendering and real multiplayer need in-game tests.
+- CI 34774979949 on 6a2c0b489dd406fa1f0aa97b6179be4e50eefe7b passed 2956 core and 398 native checks with zero compile warnings/errors. PR #9 records final validation including an additional buoyancy regression. Rendering and real multiplayer need in-game tests.
 - Save v3 imports v1/v2 and retains paid-cost refunds/retired AutoJump migration. Protocol 9 requires all peers on 0.7.0.
 - Real multiplayer, segmented/multi-stage bosses, potion duration/fishing yield and tiered crit remain previously deferred. No acceptance is implied for them.
 - Next after this batch: remaining P2 catalog candidates and scanner; P3 world operations remain future work. Independent jump height and dodge semantics still need a decision; cancelled AutoJump/world chest enhancement stay cancelled.

@@ -30,7 +30,7 @@ public sealed class SwimmingSystem : ModSystem
         if (factor<=1) { orig(p,fallThrough,ignorePlats); return; }
         // Native WaterCollision lacks DryCollision's high-speed stepping.
         // At most 32 calls (8px steps), independent of the talent's stored level.
-        int steps=Math.Max(1,(int)Math.Ceiling(Math.Max(Math.Abs(p.velocity.X),Math.Abs(p.velocity.Y))*factor/8));
+        int steps=Math.Clamp((int)Math.Ceiling(Math.Max(Math.Abs(p.velocity.X),Math.Abs(p.velocity.Y))*factor/8),1,32);
         float scale=factor/steps;
         var previous=scope; var current=new SwimScope(p); scope=current;
         p.velocity*=scale;
