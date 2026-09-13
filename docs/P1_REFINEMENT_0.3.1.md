@@ -30,6 +30,8 @@ Actual pixel/Rectangle/map numeric limits remain. Infinite talent levels do not 
 
 ## Validation
 
-Production and isolated harness compile against official tModLoader v2026.07.3.0 / Terraria 1.4.4.9 with .NET 8. Core checks include old saves/costs and exact additional-roll boundaries. Native harness checks actual resolver pools/conditions/chains, category exclusion, unknown rules, budgets, real crate/Boss bag contents, MP outgoing item copies, thrust collision/restoration, and CombinedHooks use intervals for gun/bow/magic. CI results are recorded on this PR after the final code commit. GUI and two physical multiplayer clients still need user verification.
+Production and isolated harness compile against official tModLoader v2026.07.3.0 / Terraria 1.4.4.9 with .NET 8. Core checks include old saves/costs and exact additional-roll boundaries. Native harness checks actual resolver pools/conditions/chains, category exclusion, unknown rules, budgets, real crate/Boss bag contents, MP outgoing item copies, thrust collision/restoration, and CombinedHooks use intervals for gun/bow/magic. Code fcd77c0c09d06e7636e3c3b5ee9fa33a51535140 passed [CI run 34761264199](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34761264199): 2826 core checks and 198 native runtime checks.
+
+The user subsequently confirmed all four delivered feature groups passed in-game testing: extra loot rolls, bag quantity and stacking, vanilla thrusting shortsword/spear reach, and ordinary gun/bow/magic firing speed. This is acceptance of those features, not new evidence for every GUI scaling setting or two physical multiplayer clients. PR #5 remains unmerged pending explicit authorization; it depends on unmerged PR #4.
 
 P0 XP/segmented settlement remains unchanged. Exact +4% physical jump height, other special attack families, arbitrary mod rule compatibility and multiplayer private rewards are not completed by this batch.

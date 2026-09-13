@@ -1,7 +1,7 @@
 # PROJECT_STATUS.md
 
 ## Current phase
-P1 refinement 0.3.1 on `feat/p1-loot-and-reach`, based on PR #4 head b2eb14f1671eacb30ad08934d3618428aa1e54af. PR #4 / 0.3.0 is user-accepted as a stage; not merged. New scope: extra loot rolls replacing DropChance semantics, BagQuantity, vanilla thrust/spear reach and firing-speed verification. 46 numeric entries. See `docs/P1_REFINEMENT_0.3.1.md` for validation and limits. No P2/P3.
+P1 refinement 0.3.1 on `feat/p1-loot-and-reach`, based on PR #4 head b2eb14f1671eacb30ad08934d3618428aa1e54af. PR #4 / 0.3.0 is user-accepted as a stage; not merged. New scope: extra loot rolls replacing DropChance semantics, BagQuantity, vanilla thrust/spear reach and firing-speed verification. 46 numeric entries. User confirmed all four 0.3.1 feature groups passed in-game testing; PR #5 awaits explicit merge authorization. See `docs/P1_REFINEMENT_0.3.1.md` for validation and limits. No P2/P3.
 
 ## Repository state
 - Default branch: `main`; PR #1, #2 and #3 merged with explicit user approval.
@@ -86,11 +86,17 @@ The core progression rules, P1 default balance direction, utility unlock pricing
 ## User acceptance update (2026-09-13)
 - Confirmed in 0.3.0: critical chance, ordinary wooden-sword swing size, tool reach, mining/wood yield, purchase and selling prices. Potion sickness and fishing lack user test conditions. The user subsequently accepted 0.3.0 as a stage. The latest message corrects the earlier report of copper yield failure.
 - Tiered critical damage did not work in the user test; the user explicitly deferred fixing it because the separate critical-damage talent provides adjustment. Do not report tiered crit as accepted.
-- Thrusting shortswords do not expand: outside the current ordinary-swing adapter; not evidence that their reach is supported.
+- In 0.3.0, thrusting shortswords were outside the ordinary-swing adapter. The 0.3.1 adapter now passes user testing for vanilla thrusting shortswords and spears.
 - No new merge authorization for PR #4. Unpublished mining diagnostics were discarded after the correction.
 
+## 0.3.1 user acceptance
+- User confirmed successful tests for extra loot rolls (10/20 levels and original reward pools), bag quantity and stacking, vanilla thrusting shortsword/spear reach, and ordinary gun/bow/magic firing speed.
+- Tested code: fcd77c0c09d06e7636e3c3b5ee9fa33a51535140. CI run 34761264199 passed 2826 core checks and 198 native runtime checks.
+- This confirmation covers the four listed feature groups; it does not claim completion of deferred multiplayer, potion sickness, fishing capture yield, tiered critical damage or arbitrary mod compatibility tests.
+- PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
+
 ## Next implementation task
-Compile and validate 0.3.1, deliver a separate dependent PR and test package. Await real-game acceptance and explicit merge authorization. Exact jump height, other special projectile reach and multiplayer private drops remain scoped follow-ups; tiered crit remains deferred.
+0.3.1 test and source packages delivered; the four feature groups passed real-game testing. Await explicit merge authorization for PR #4 and PR #5. Exact jump height, other special projectile reach and multiplayer private drops remain scoped follow-ups; tiered crit remains deferred.
 
 ## Later implementation task
 Build the P2 `FunctionalTalentRegistry` before implementing the first permanent utility effects. Add `AccessoryTalentScanner` after the registry and core P2 effects are stable; the scanner must not block initial P2 delivery.
