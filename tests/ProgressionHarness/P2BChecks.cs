@@ -100,12 +100,16 @@ public sealed partial class RuntimeChecks
         }
         p.inventory[0]=new Item(ItemID.WoodFishingPole); p.inventory[1]=new Item(ItemID.MasterBait){stack=10}; p.selectedItem=0; p.wet=false;
         var lavaBobber=new Projectile { owner=0, type=ProjectileID.BobberWooden, width=14, height=14, position=new Vector2(pondX*16,pondY*16) };
+        // Use the real dedicated-server identity during pond evaluation: no local
+        // achievement manager exists on a dedicated server. The attempt is unchanged.
+        Main.netMode=NetmodeID.Server; Main.myPlayer=255;
         Toggle("LavaFishing",false); p.ResetEffects(); PlayerLoader.UpdateEquips(p); FishingProbe.Last=null; lavaBobber.FishingCheck();
         Check(FishingProbe.Last is { inLava: true, CanFishInLava: false },"native lava attempt rejects ordinary rod and bait without ability");
         Toggle("LavaFishing",true); p.ResetEffects(); PlayerLoader.UpdateEquips(p); FishingProbe.Last=null; lavaBobber.FishingCheck();
         Check(FishingProbe.Last is { inLava: true, CanFishInLava: true },"native lava attempt accepts ordinary rod and bait with ability");
         p.inventory[1]=new Item(); FishingProbe.Last=null; lavaBobber.FishingCheck();
         Check(FishingProbe.Last==null,"lava ability does not bypass missing bait");
+        Main.netMode=NetmodeID.SinglePlayer; Main.myPlayer=0;
 
         // Native wall placement must spend paint only when its builder toggle is on.
         p.inventory[0]=new Item(ItemID.WoodWall){stack=1}; p.selectedItem=0;

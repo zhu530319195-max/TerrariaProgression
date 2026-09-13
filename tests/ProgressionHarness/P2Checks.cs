@@ -74,7 +74,7 @@ public sealed partial class RuntimeChecks
         var retained=A.State; Main.netMode=NetmodeID.MultiplayerClient;
         Check(A.ApplyTalent(TalentOperation.ToggleChild,"AllInformation",TalentCategory.Utility,3)==TalentResult.NotReady && ReferenceEquals(retained,A.State),"client cannot mutate child state locally");
         Main.netMode=NetmodeID.Server; A.SessionReady=false; Receive(1,retained);
-        Check(A.SessionReady && A.State.Talents.ContainsKey("AllInformation"),"protocol six imports functional talents");
+        Check(A.SessionReady && A.State.Talents.ContainsKey("AllInformation"),"current protocol imports functional talents");
         p.autoJump=true; PlayerLoader.UpdateEquips(p);
         Check(p.autoJump,"retirement preserves auto jump supplied by real equipment");
         Reset(); A.Award(10000*Experience.Scale); A.State.Invest("AutoJump",2); A.State.Invest("MaxLife",1);

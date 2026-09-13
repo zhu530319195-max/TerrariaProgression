@@ -6,7 +6,7 @@ P2-A 0.4.1 was accepted by the user and PR #6 merged into main at `bb36b53721db5
 P2-B 0.5.0 is implemented on `feat/p2b-utility`, based on that merged main. The user approved this batch: dash, separate wall cling/slide, unlimited existing wing flight, ice traction, grid/ruler, auto paint, line protection and lava fishing. All nine new unlocks cost 2 points each. There are 47 numeric registry entries and 18 functional entries (including numeric MultiJump), 65 total.
 
 ## Repository state
-- PR #1–#6 are merged. P2-B awaits its own CI and in-game acceptance; do not merge its PR without explicit authorization.
+- PR #1–#6 are merged. PR #7 is open for P2-B; it awaits its own CI and in-game acceptance; do not merge its PR without explicit authorization.
 - Target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
 - Local P2-B core verification: 2884 checks pass. Native compilation and runtime results are tracked in the P2-B PR and its CI logs; compile success is not game acceptance.
 - P0/P1 deferred real multiplayer, special bosses, potion sickness/fishing yield and tiered crit remain unaccepted/deferred.
