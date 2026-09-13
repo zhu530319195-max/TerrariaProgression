@@ -92,7 +92,7 @@ Check(state.Invest("MaxLife", 1, BigInteger.Pow(10, 30)), "unlimited compressed 
 Check(state.Talents["MaxLife"].CostRuns.Count == 1 && StateCodec.Encode(state).Length < 512, "huge same-price levels fit a compact snapshot");
 copy = StateCodec.Decode(StateCodec.Encode(state));
 Check(copy.RefundOne("MaxLife") == 1 && copy.RefundAll("MaxLife") == BigInteger.Pow(10, 30) - 1, "constant-time huge refunds preserve exact costs");
-Check(NumericTalents.All.Count == 45 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "45 implemented unlimited numeric talents registered");
+Check(NumericTalents.All.Count == 46 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "46 implemented unlimited numeric talents registered");
 state = new(); state.Award(1000 * scale, 50000);
 var result = NumericTalents.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 1, out copy);
 Check(result == TalentResult.Success && copy.AvailableTalentPoints == 2 && state.AvailableTalentPoints == 3, "transaction copy commits without mutating original");
@@ -158,3 +158,9 @@ copy.Talents["MeleeRange"].CurrentIntensity=.5m;
 Check(!NumericTalents.ValidateImported(copy),"fractional active level rejected");
 Check(NumericTalents.Apply(state,TalentOperation.DecreaseIntensity,"Damage",TalentCategory.Combat,1,out _)==TalentResult.InvalidRequest,"unsupported intensity change rejected");
 Console.WriteLine($"PASS: {checks} core checks (formulas, capped/uncapped multi-level, precision, save validation, refunds, multiplayer allocation).");
+
+Check(TalentMath.ExtraRolls(0, 0) == 0, "zero extra rolls");
+Check(TalentMath.ExtraRolls(5, .49) == 1 && TalentMath.ExtraRolls(5, .5) == 0, "fractional extra roll threshold");
+Check(TalentMath.ExtraRolls(10, .9) == 1 && TalentMath.ExtraRolls(20, .9) == 2, "whole additional loot rolls");
+Check(TalentMath.ExtraRolls(BigInteger.Pow(10, 80), .5) == BigInteger.Pow(10, 79), "unbounded level roll arithmetic");
+Console.WriteLine($"Final core checks passed: {checks}");

@@ -63,3 +63,6 @@ Terraria/tModLoader 独立角色成长系统。
 - [安装与分组测试](docs/P1_COMPLETION_TEST_GUIDE_zh-CN.md)
 - [实现与明确未覆盖的项目](docs/P1_COMPLETION_IMPLEMENTATION.md)
 - [验证记录](docs/P1_COMPLETION_VALIDATION.md)
+
+### 0.3.1 P1 refinement
+Extra loot rolls, container quantities and vanilla thrust reach: [implementation and limits](docs/P1_REFINEMENT_0.3.1.md), [中文安装测试](docs/P1_REFINEMENT_TEST_GUIDE_zh-CN.md). Depends on PR #4; no automatic merge.

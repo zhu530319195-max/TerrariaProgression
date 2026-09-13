@@ -84,7 +84,8 @@ Mods: {
   "Invulnerability": "Invulnerability",
   "Coins": "Coins",
   "LootQuantity": "Loot Quantity",
-  "DropChance": "Drop Chance",
+  "BagQuantity": "Bag and crate quantity",
+  "DropChance": "Extra loot rolls",
   "MiningYield": "Mining Yield",
   "WoodYield": "Wood Yield",
   "HerbYield": "Herb Yield",
@@ -119,8 +120,9 @@ Mods: {
   "Sentries": "+1 sentry capacity per level, additive with equipment.",
   "PickupRange": "+10% pickup range per level, multiplied with the original item range.",
   "CritChance": "Adds 10 percentage points per level. Above 100%: tier 1 x2, tier 2 x3, tier 3 x4. Respects DisableCrit and standard crit classes.",
-  "DropChance": "p = 1-(1-base chance)^(1+0.1*level). Supports exact native CommonDrop rules; complex/unknown rules are unchanged.",
-  "MeleeRange": "Adds 10% native swing size and hitbox per level. Separate projectile weapons are not enlarged. Active level is adjustable.",
+  "BagQuantity": "+10% contents per level when opening vanilla Boss bags or fishing crates. Equipment duplicates are separate items. Uses the opener, with probabilistic fractional quantities. Does not affect world chests.",
+  "DropChance": "+10% extra rolls per level: level 10 adds one roll, level 20 adds two. Fractional rolls are probabilistic. Independent rolls can repeat rewards and stack with quantity. Native supported rules; per-event budget applies.",
+  "MeleeRange": "Adds 10% native swing, vanilla shortsword thrust and spear size/reach per level. Sword beams, whips, yoyos and unknown modded projectiles are not enlarged. Active level is adjustable.",
   "ToolReach": "Adds 1 tile of pick/axe/hammer reach per level. Does not change power, speed or tile count. Adjustable.",
   "BuildReach": "Adds 1 tile of tile/wall placement reach per level, separately from tool reach. Adjustable.",
   "PotionDuration": "New Potion Sickness duration x0.93 per level; stacks with Debuff Duration. Existing timers are not rescaled.",
@@ -144,6 +146,7 @@ Mods: {
   "Invulnerability": "Adds 1 frame to the applicable native hurt immunity timer per level."
 }
     Messages: {
+      LootLimit: "Extra loot reached the roll budget or item capacity; some extra rewards were not generated. Adjust the roll budget in Mod Config. Levels and points are unchanged."
       Status: "Level {0} | XP {1} / {2} | Total XP {3} | Available talent points {4} | Spent {5}"
       Waiting: "Waiting for the server to confirm character progression."
       DebugDisabled: "Enable developer commands in the mod configuration first."
@@ -153,6 +156,7 @@ Mods: {
     Configs: {
       ProgressionConfig: {
         DisplayName: Progression rules (server)
+        MaxExtraLootRollsPerEvent: { Label: "Extra rolls per event budget", Tooltip: "Default 1000; range 1-100000. Stops excess rolls with a notice, without changing levels or points. Larger budgets may cause stalls." }
         BoostMaterials: { Label: "Boost Materials", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
         BoostConsumables: { Label: "Boost Consumables", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
         BoostPotions: { Label: "Boost Potions", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }

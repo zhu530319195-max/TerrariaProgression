@@ -26,7 +26,7 @@ public sealed class CiCommand : ModCommand
     public override void Action(CommandCaller caller, string input, string[] args) => ModContent.GetInstance<RuntimeChecks>().RunFromConsole();
 }
 
-public sealed class RuntimeChecks : ModSystem
+public sealed partial class RuntimeChecks : ModSystem
 {
     private bool ran;
     private int count;
@@ -309,6 +309,7 @@ public sealed class RuntimeChecks : ModSystem
         Check(overflow.stack==1 && !Main.item.Take(Main.maxItems).Any(i=>i.active) && Main.timeItemSlotCannotBeReusedFor.Take(Main.maxItems).All(t=>t==90),"bonus overflow preserves inactive but reserved private item slots");
         for(int i=0;i<Main.maxItems;i++) Main.timeItemSlotCannotBeReusedFor[i]=0;
         RunCopperMining();
+        RunP1Refinement();
     }
     private void RunCopperMining()
     {
