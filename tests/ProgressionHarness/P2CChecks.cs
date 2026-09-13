@@ -23,6 +23,11 @@ public sealed partial class RuntimeChecks
 {
     private void RunP2C()
     {
+        // Headless tML has no fonts. Fill cosmetic text slots so native damage
+        // still executes in owner mode without attempting to render a number.
+        var oldCombatText=Main.combatText;
+        Main.combatText=Enumerable.Range(0,100).Select(_=>new CombatText { active=true }).ToArray();
+        try {
         Reset(); A.Award(1000000*Experience.Scale);
         var p=A.Player;
         var combat=p.GetModPlayer<CombatUtilityPlayer>();
@@ -140,5 +145,6 @@ public sealed partial class RuntimeChecks
         var imported=StateCodec.Decode(StateCodec.Encode(A.State)); A.SessionReady=false; Receive(1,imported);
         Check(A.SessionReady && A.State.Talents.ContainsKey("StarRetaliation"),"protocol eight imports P2C catalog");
         Reset();
+        } finally { Main.combatText=oldCombatText; HurtImmunityProbe.Enabled=false; }
     }
 }
