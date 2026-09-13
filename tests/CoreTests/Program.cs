@@ -226,3 +226,29 @@ foreach (string id in new[]{"Dash","WallClimb","WallSlide","UnlimitedFlight","Ic
     Check(copy.TotalSpentTalentPoints==0 && copy.AvailableTalentPoints==state.AvailableTalentPoints+2,"P2B refunds paid two points: "+id);
 }
 Console.WriteLine($"Final P2-B core checks passed: {checks}");
+
+// P2-C binary composite, independent children and growing combat effects.
+state=new(); state.Award(1000000*scale,50000);
+Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,"StatusImmunity",TalentCategory.Utility,1,out state)==TalentResult.Success && state.TotalSpentTalentPoints==2,"immunity composite costs two points");
+Check(FunctionalTalentRegistry.ImmunityChildren.Count==13,"explicit common immunity scope");
+for(int i=1;i<=13;i++) {
+    TalentCatalog.Apply(state,TalentOperation.ToggleChild,"StatusImmunity",TalentCategory.Utility,i,out state);
+    copy=StateCodec.Decode(StateCodec.Encode(state));
+    Check(!FunctionalTalentRegistry.ChildEnabled(copy,"StatusImmunity",FunctionalTalentRegistry.ImmunityChildren[i-1]) && copy.TotalSpentTalentPoints==2 && TalentCatalog.ValidateImported(copy),"immunity child persists at no extra cost: "+i);
+}
+Check(TalentCatalog.Apply(state,TalentOperation.ToggleChild,"StatusImmunity",TalentCategory.Utility,14,out _)==TalentResult.InvalidRequest,"immunity child index bounded");
+Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,"PanicSpeed",TalentCategory.Combat,1,out state)==TalentResult.Success && state.TotalSpentTalentPoints==4,"panic is a two-point binary combat unlock");
+foreach(string id in new[]{"StarRetaliation","BeeRetaliation","AttackBurn","AttackPoison"}) {
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,id,TalentCategory.Combat,10,out state)==TalentResult.Success,"growing effect purchases ten levels: "+id);
+    Check(TalentCatalog.TryGet(id,out var def) && def.Category==TalentCategory.Combat && def.MaxLevel==0 && def.DefaultCost==1 && def.Adjustable,"growing effect contract: "+id);
+    TalentCatalog.Apply(state,TalentOperation.DecreaseIntensity,id,TalentCategory.Combat,7,out state);
+    copy=StateCodec.Decode(StateCodec.Encode(state));
+    Check(NumericTalents.ActiveLevel(copy,id)==3 && copy.Talents[id].InvestedPoints==10,"growing effect adjustable save: "+id);
+    var prior=copy.AvailableTalentPoints;
+    TalentCatalog.Apply(copy,TalentOperation.RefundTalent,id,TalentCategory.Combat,1,out copy);
+    Check(copy.AvailableTalentPoints==prior+10,"growing effect actual refund: "+id);
+}
+TalentCatalog.Apply(state,TalentOperation.RefundCategory,"",TalentCategory.Combat,1,out copy);
+Check(copy.TotalSpentTalentPoints==2 && copy.Talents.ContainsKey("StatusImmunity"),"combat page refund preserves utility immunity composite");
+Check(TalentMath.AddInt(0,BigInteger.Pow(10,80)*120)==int.MaxValue && TalentMath.ScaleInt(75,TalentMath.Level(BigInteger.Pow(10,80)))==int.MaxValue,"huge effect values saturate engine fields without level loops");
+Console.WriteLine($"Final P2-C core checks passed: {checks}");

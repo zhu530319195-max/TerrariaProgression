@@ -70,7 +70,22 @@ Mods: {
   "ChildOre": "Ore",
   "ChildTreasure": "Treasure",
   "ChildKillCount": "KillCount",
-  "GroupFishing": "Fishing / Gathering"
+  "GroupFishing": "Fishing / Gathering",
+  "NativeDamageMultiplier": "Native retaliation damage x{0}",
+  "EffectSeconds": "Duration: {0} seconds",
+  "ChildPoisoned": "Poisoned",
+  "ChildBleeding": "Bleeding",
+  "ChildSlow": "Slow",
+  "ChildWeak": "Weak",
+  "ChildBrokenArmor": "BrokenArmor",
+  "ChildSilenced": "Silenced",
+  "ChildCursed": "Cursed",
+  "ChildConfused": "Confused",
+  "ChildDarkness": "Darkness",
+  "ChildChilled": "Chilled",
+  "ChildFrozen": "Frozen",
+  "ChildStoned": "Stoned",
+  "ChildOnFire": "OnFire"
 }
     TalentNames: {
   "MaxLife": "Maximum life",
@@ -137,7 +152,13 @@ Mods: {
   "BuildingRuler": "Building Ruler",
   "AutoPaint": "Auto Paint",
   "FishingLine": "Fishing Line",
-  "LavaFishing": "Lava Fishing"
+  "LavaFishing": "Lava Fishing",
+  "StatusImmunity": "Status Immunity",
+  "StarRetaliation": "Star Retaliation",
+  "BeeRetaliation": "Bee Retaliation",
+  "PanicSpeed": "Panic Speed",
+  "AttackBurn": "Attack Burn",
+  "AttackPoison": "Attack Poison"
 }
     TalentHints: {
   "MaxLife": "+25 HP per level. Raising the maximum never heals; lowering it only clips current life.",
@@ -204,7 +225,13 @@ Mods: {
   "BuildingRuler": "Enables native grid/ruler display controls. Select displays using the vanilla builder buttons beside inventory. Preserves the built-in ruler and your button preferences.",
   "AutoPaint": "Uses inventory paint while placing tiles, furniture and walls, with native consumption. Enable the vanilla paint builder button. Building still works without paint; existing buildings are not repainted automatically.",
   "FishingLine": "Prevents native line-break loss on retrieval. Bait consumption and normal fishing requirements remain. Does not guarantee a catch on every cast.",
-  "LavaFishing": "Allows ordinary rods and bait to fish in a sufficiently large lava pool. Normal fishing power, waiting and consumption apply. Does not grant lava immunity."
+  "LavaFishing": "Allows ordinary rods and bait to fish in a sufficiently large lava pool. Normal fishing power, waiting and consumption apply. Does not grant lava immunity.",
+  "StatusImmunity": "Two points unlock 13 native status immunities, each freely toggleable. Equipment immunity remains. Excludes potion sickness, chaos state, moon leech, lava damage and unknown mod debuffs. Native immunity cleanup removes covered active statuses.",
+  "StarRetaliation": "Native retaliation damage x active level (level 1 normal, level 10 x10). A survived eligible hit spawns three native stars; count never grows. Existing cloak retaliation is strengthened instead of duplicated. Adjustable strength and native damage-channel rules.",
+  "BeeRetaliation": "Native retaliation bee damage x active level (level 1 normal, level 10 x10). A survived hit spawns the native 1-3 bees; real strong-bee effects can add one. Existing honey-comb retaliation is strengthened instead of duplicated. Talent does not grant Honey healing.",
+  "PanicSpeed": "A real hit grants native Panic for 8 seconds (+100% movement-speed bonus). Does not stack twice with a Panic Necklace. Enabling does not trigger it. An already triggered buff expires naturally after disabling.",
+  "AttackBurn": "Applies native On Fire for 2 seconds per active level (20 seconds at level 10). Melee, projectiles and minions use current active strength. Refreshes to the longer duration; never adds durations. Respects enemy immunity, retains native DPS, excludes PvP/friendly NPCs.",
+  "AttackPoison": "Applies native Poisoned for 2 seconds per active level (20 seconds at level 10). Melee, projectiles and minions use current active strength. Refreshes to the longer duration; never adds durations. Respects enemy immunity, retains native DPS, excludes PvP/friendly NPCs."
 }
     Messages: {
       LootLimit: "Extra loot reached the roll budget or item capacity; some extra rewards were not generated. Adjust the roll budget in Mod Config. Levels and points are unchanged."

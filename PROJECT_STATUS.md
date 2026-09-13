@@ -3,16 +3,18 @@
 ## Current phase
 P2-A 0.4.1 was accepted by the user and PR #6 merged into main at `bb36b53721db5f4a1758591b2406d6b0c88595d5` on 2026-09-13. Final CI run 34765157029 passed 2848 core checks and 252 native checks. The latest acceptance and merge authorization supersede all earlier pending P2-A notes.
 
-P2-B 0.5.0 is implemented on `feat/p2b-utility`, based on that merged main. The user approved this batch: dash, separate wall cling/slide, unlimited existing wing flight, ice traction, grid/ruler, auto paint, line protection and lava fishing. All nine new unlocks cost 2 points each. There are 47 numeric registry entries and 18 functional entries (including numeric MultiJump), 65 total.
+P2-B 0.5.0 was accepted by the user and PR #7 merged at `a3ac45aeccb739b42bbcf3d317a7ced45075b539`. Final CI run 34766385691 passed 2884 core checks and 304 native checks. This acceptance supersedes earlier pending P2-B notes.
+
+P2-C 0.6.0 is implemented on `feat/p2c-combat-effects`, based on merged P2-B. The user requested this stage. It adds StatusImmunity (13 free child switches), StarRetaliation, BeeRetaliation, PanicSpeed, AttackBurn and AttackPoison. There are 47 numeric registry entries and 24 functional registry entries (five numeric), 71 total.
 
 ## Repository state
-- PR #1–#6 are merged. PR #7 is open for P2-B; it awaits its own CI and in-game acceptance; do not merge its PR without explicit authorization.
+- PR #1–#7 are merged. P2-C requires its own CI and in-game acceptance; do not merge without explicit authorization.
 - Target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
-- Local P2-B core verification: 2884 checks pass. Native compilation and runtime results are tracked in the P2-B PR and its CI logs; compile success is not game acceptance.
+- Local P2-C verification: 2919 core checks pass; MOD and runtime harness compile. Native runtime validation is tracked in the P2-C PR and CI logs. Compile success is not game acceptance.
 - P0/P1 deferred real multiplayer, special bosses, potion sickness/fishing yield and tiered crit remain unaccepted/deferred.
-- Save v3 still imports v1/v2; paid-cost ledger and the idempotent retired AutoJump refund are preserved. Use a character backup to return to an older MOD.
-- Protocol 7; all clients and server must update to 0.5.0 together. Native movement, fishing inventory and painting use the engine's owner-client flow; purchases and toggles remain server-confirmed.
-- Implementation: `docs/P2B_IMPLEMENTATION.md`; Chinese tests: `docs/P2B_TEST_GUIDE_zh-CN.md`.
+- Save v3 imports v1/v2; paid-cost ledger and idempotent retired AutoJump refund preserved. Back up characters before updating.
+- Protocol 8; all clients and server must update to 0.6.0. Purchases/toggles remain server-confirmed; hit/hurt effects use native owner-client flow and engine networking.
+- Implementation: `docs/P2C_IMPLEMENTATION.md`; Chinese tests: `docs/P2C_TEST_GUIDE_zh-CN.md`.
 
 ## Confirmed core rules
 - Initial level: 1.
@@ -97,7 +99,7 @@ The core progression rules, P1 default balance direction, utility unlock pricing
 - PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
 
 ## Next implementation task
-Finish P2-B automated validation, deliver player/source packages and request the nine-feature in-game acceptance. Preserve already accepted P2-A results. P2-C and P3 remain future tasks.
+Finish P2-C automated validation and deliver player/source packages for six-feature in-game acceptance. Preserve P2-A/P2-B acceptance. P2-D scanner and P3 remain future tasks.
 
 ## P1 merge authorization supersedes earlier notes
 The earlier acceptance sections above record history at the time of feedback. PR #4 and #5 were subsequently explicitly authorized and merged. Their tested code is the P2-A base.

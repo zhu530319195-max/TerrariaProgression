@@ -70,7 +70,22 @@ Mods: {
   "ChildOre": "矿物探测",
   "ChildTreasure": "宝藏探测",
   "ChildKillCount": "击杀计数",
-  "GroupFishing": "钓鱼／采集"
+  "GroupFishing": "钓鱼／采集",
+  "NativeDamageMultiplier": "原生反击伤害 ×{0}",
+  "EffectSeconds": "持续 {0} 秒",
+  "ChildPoisoned": "中毒",
+  "ChildBleeding": "流血",
+  "ChildSlow": "缓慢",
+  "ChildWeak": "虚弱",
+  "ChildBrokenArmor": "破甲",
+  "ChildSilenced": "沉默",
+  "ChildCursed": "诅咒",
+  "ChildConfused": "混乱",
+  "ChildDarkness": "黑暗",
+  "ChildChilled": "寒冷",
+  "ChildFrozen": "冰冻",
+  "ChildStoned": "石化",
+  "ChildOnFire": "燃烧"
 }
     TalentNames: {
   "MaxLife": "最大生命",
@@ -137,7 +152,13 @@ Mods: {
   "BuildingRuler": "建筑标尺／格线",
   "AutoPaint": "自动喷漆",
   "FishingLine": "钓线不断",
-  "LavaFishing": "熔岩钓鱼"
+  "LavaFishing": "熔岩钓鱼",
+  "StatusImmunity": "异常状态免疫",
+  "StarRetaliation": "星落反击",
+  "BeeRetaliation": "蜂群反击",
+  "PanicSpeed": "受击加速",
+  "AttackBurn": "攻击附加燃烧",
+  "AttackPoison": "攻击附加中毒"
 }
     TalentHints: {
   "MaxLife": "每级 +25 HP。提高上限不会补血；降低上限仅截断当前生命。",
@@ -204,7 +225,13 @@ Mods: {
   "BuildingRuler": "获得原生建筑格线与标尺显示入口；请在背包旁原版建筑辅助按钮中开启所需显示。保留原版自带的标尺和你的按钮设置。",
   "AutoPaint": "放置方块、家具、背景墙时使用背包中的涂料自动上色，按原版规则消耗。需开启背包旁的喷漆辅助按钮；没有涂料仍可正常建造，不自动涂改已有建筑。",
   "FishingLine": "取消原生收竿断线概率，保留鱼饵消耗和正常钓鱼流程；不保证每次抛竿都能钓到鱼。",
-  "LavaFishing": "允许使用普通鱼竿和鱼饵在足够大的岩浆池钓鱼；仍遵守鱼池、渔力、等待时间和消耗规则，不附带岩浆免疫。"
+  "LavaFishing": "允许使用普通鱼竿和鱼饵在足够大的岩浆池钓鱼；仍遵守鱼池、渔力、等待时间和消耗规则，不附带岩浆免疫。",
+  "StatusImmunity": "2点解锁13项常规原版异常免疫，子项免费开关。关闭仅停止天赋来源，真实装备免疫保留。不含药水病、混沌状态、月噬、岩浆伤害或未知MOD异常。已中的对应异常由原生免疫清理。",
+  "StarRetaliation": "每级提供1倍原生星落反击伤害：1级正常、10级10倍。受到有效伤害并存活时降下3颗原生星星，不增加数量。真实星星斗篷类饰品已有反击时强化同一批星星，不再多触发一批。当前强度可调；保留原生触发伤害类型。",
+  "BeeRetaliation": "每级提供1倍原生受击蜂群伤害：1级正常、10级10倍。受到有效伤害并存活时释放原生1至3只蜜蜂；真实强蜂效果可能额外增加1只。已有蜂巢类饰品时强化同一批，不重复触发。天赋本身不附送蜂蜜回血。",
+  "PanicSpeed": "受到有效伤害后获得原生恐慌加速8秒（移动速度加成+100%），与恐慌项链不重复叠加。购买、启用不会立即触发。关闭后已触发的短时增益自然结束，后续不再触发。",
+  "AttackBurn": "每级使有效攻击附加2秒原版燃烧，10级20秒，当前强度可调。近战、弹体和召唤物命中均适用；按当前启用等级计算，重复命中刷新至较长时间而非累加。尊重敌人免疫，不改变原版燃烧每秒伤害，不作用于玩家PVP或友方NPC。",
+  "AttackPoison": "每级使有效攻击附加2秒原版中毒，10级20秒，当前强度可调。近战、弹体和召唤物命中均适用；按当前启用等级计算，重复命中刷新至较长时间而非累加。尊重敌人免疫，不改变原版中毒每秒伤害，不作用于玩家PVP或友方NPC。"
 }
     Messages: {
       LootLimit: "额外战利品达到单次抽取保护或物品容量，部分额外奖励未生成；可在 MOD 配置调整抽取保护。天赋等级与点数不变。"
