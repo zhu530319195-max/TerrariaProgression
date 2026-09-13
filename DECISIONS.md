@@ -68,3 +68,6 @@ For abilities that can become inconvenient or dangerous at high levels (multi-ju
 
 ## D021 — World-editing growth remains unlimited but performance may be capped per action
 Character talent levels are not capped for world-interaction abilities. Servers may independently enforce a per-action world-edit limit such as `MaxBlocksPerAction` for performance and safety. This is a runtime protection limit, not a progression cap.
+
+## D022 — Binary utility unlocks cost 2 talent points by default
+One-time functional unlock talents (`U` type), such as no fall damage, unlimited underwater breathing, water walking, lava immunity, accessory-like information functions, and status immunities, use a unified default unlock price of 2 talent points. This keeps utility abilities accessible and avoids unnecessary price tiers. Individual exceptions may only be introduced deliberately if a future ability is materially more powerful than the normal utility set.
