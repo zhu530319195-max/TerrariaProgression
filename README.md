@@ -1,12 +1,12 @@
 # TerrariaProgression
 
-A standalone Terraria/tModLoader infinite progression framework.
+A standalone Terraria/tModLoader progression module focused on infinite character growth, configurable XP, reversible talents, and optional high-power utility/world interaction abilities.
 
-## Current status
+## Project status
 
-Design/bootstrap phase. No gameplay code is implemented yet.
+Design/bootstrap phase. Gameplay code has not been implemented yet.
 
-The authoritative design baseline is:
+The authoritative design baseline is maintained in:
 
 - `docs/PROGRESSION_DESIGN_v0.1.md`
 - `DECISIONS.md`
@@ -15,21 +15,21 @@ The authoritative design baseline is:
 
 ## Core direction
 
-- Infinite character level.
-- Character-bound progression persists across worlds and multiplayer sessions.
-- Kill XP is derived from NPC maximum life with configurable scaling.
-- Per-level XP requirement has a configurable default cap of 50,000.
-- Level-ups grant talent points.
-- Numeric talents are infinitely repeatable by default.
-- Default balance target: Lv.1–3 is noticeable, Lv.5 is clearly strong, Lv.10 is very strong; levels above 10 continue scaling without a conventional balance guarantee.
-- Talents can be disabled without refunding, or rolled back to refund the points actually paid.
-- Six talent families: Base Stats, Recovery, Combat, Economy/Resources, Utility, and Transcendent/World Interaction.
-- Dangerous world-changing effects are server-authoritative and independently toggleable.
+- Infinite character level
+- Character-bound progression across worlds
+- No XP or level loss on death
+- XP derived from NPC maximum life
+- Configurable XP-per-HP multiplier
+- Configurable per-level XP requirement cap (default 50,000)
+- Talent points gained on level-up
+- Numeric talents are repeatable without a level cap by default
+- Lv.10 is the default strong-state balance target; higher levels may become intentionally extreme
+- Normal numeric talents usually cost 1 point per level
+- One-time utility/function unlocks cost 2 talent points by default
+- Talent effects can be disabled without refunding them
+- Refund/respec is free and reversible
+- Multiplayer XP and world edits use server authority
 
-## Development workflow
+## Workflow
 
-`main` is treated as the stable branch. Features are developed on dedicated branches and proposed through pull requests. Gameplay changes should not be merged until implementation/build checks and the requested in-game acceptance testing are complete.
-
-## Scope separation
-
-This repository does not contain Xiaoyu visual replacement, hair, sprite, or PlayerDrawLayer work. Progression is intentionally developed as an independent module so it can run on its own or be integrated with a visual mod later.
+Development should use feature branches and pull requests. Do not develop directly on `main`. User-facing gameplay changes should be tested in tModLoader before merge whenever practical.
