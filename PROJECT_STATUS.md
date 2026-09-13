@@ -29,6 +29,7 @@ Project bootstrap / design freeze before implementation.
 - Six categories: Base Stats; Recovery & Sustain; Combat; Economy & Resources; Utility/Accessory-like Abilities; Transcendent/World Interaction.
 - Numeric talents default to unlimited levels (`MaxLevel = 0`).
 - Pure binary functionality uses one-time unlocks.
+- One-time utility/function unlocks use a unified default price of 2 talent points.
 - Toggle/mode talents may combine unlimited progression with a separately adjustable current strength.
 - Numeric talent cost is normally fixed rather than increasing with level.
 - Default balance target: Lv.1–3 immediately noticeable, Lv.5 clearly strong, Lv.10 very strong; beyond Lv.10 balance is intentionally not guaranteed.
@@ -50,14 +51,14 @@ Project bootstrap / design freeze before implementation.
 - Full formulas and the rest of the current defaults are authoritative in `docs/PROGRESSION_DESIGN_v0.1.md`.
 
 ## Still not finalized
-- Default costs for one-time utility unlocks (fall immunity, water breathing, lava immunity, etc.).
 - Final UI layout and hotkeys.
 - Detailed segmented/multi-entity boss settlement handling.
 - Exact runtime implementation for dynamic loot probability/quantity modification across vanilla and third-party drop rules.
 - Exact compatibility behavior for over-100% critical chance with third-party crit systems.
+- Any deliberate exceptions to the default 2-point price for future unusually powerful one-time unlocks.
 
 ## Next design task
-Finalize one-time functional unlock prices and any remaining utility/transcendent defaults that need explicit costs.
+Review the remaining utility/transcendent catalog for missing abilities or intentional exceptions before implementation begins.
 
 ## Next implementation task after design approval
 Create the tModLoader project skeleton and P0 progression core: player save data, XP calculation, level-up loop, configurable XP cap, talent point storage, save/load, refund bookkeeping, toggle state, configuration scaffolding, and multiplayer synchronization foundations.
