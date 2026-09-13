@@ -1,7 +1,7 @@
 # PROJECT_STATUS.md
 
 ## Current phase
-P1-A 0.2.0: first 21 numeric talents and a categorized talent panel implemented on `feat/numeric-talents-ui`; compilation/core checks passed, runtime CI and user acceptance in progress. P1 is not complete. P2/P3 remain unimplemented.
+P1-A 0.2.0: first 21 numeric talents and a categorized talent panel implemented on `feat/numeric-talents-ui`; official compilation, 2,058 core checks and 73 native runtime checks passed; PR #3 awaits user in-game acceptance. P1 is not complete. P2/P3 remain unimplemented.
 
 ## Repository state
 - Default branch: `main`; P0 PR #1 and #2 merged with explicit user approval.
