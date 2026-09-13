@@ -81,7 +81,7 @@ public sealed partial class RuntimeChecks
         Check(p.position==start+Vector2.One,"swimming excludes grapple movement"); p.grapCount=0;
         for(int dy=-2;dy<6;dy++) Main.tile[x+2,y+dy].ResetToType(TileID.Stone);
         p.position=start; p.velocity=new Vector2(30,0); p.WaterCollision(false,false);
-        Check(p.position.X+p.width<=(x+2)*16 && p.velocity.X<30,"boosted water movement still stops at solid wall");
+        Check(p.position.X+p.width<=(x+2)*16 && p.velocity.X<30,$"boosted water movement still stops at solid wall: right={p.position.X+p.width}, wall={(x+2)*16}, vx={p.velocity.X}");
         p.wet=false;
 
         // Engine action and animation timers use the same multiplier.
