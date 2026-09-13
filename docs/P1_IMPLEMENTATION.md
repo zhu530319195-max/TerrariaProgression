@@ -54,3 +54,7 @@ Crit chance includes half-percentage levels and >100% tiered behavior. Native cr
 ## Evidence
 
 Official pinned target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8. API references: [ModPlayer](https://docs.tmodloader.net/docs/stable/class_mod_player.html), [Player](https://docs.tmodloader.net/docs/stable/class_player.html), [ModSystem](https://docs.tmodloader.net/docs/stable/class_mod_system.html). Build against the actual official release assemblies; unit tests and native harness cover mutations and effects. See `P1_VALIDATION.md` and the Chinese test guide for the exact evidence and outstanding in-game checks.
+
+## 0.2.1 UI refinement
+
+No talent math, save format, gameplay hooks, configuration, or network protocol changes. UI keeps the game's scale / input coordinate system. Category columns respond to viewport width; per-talent actions are outside the scroll container; dynamic text height replaces 400px fixed detail cards. Selection is highlighted and scrollbars draw only for overflowing content. Resync appears only when a multiplayer operation has timed out.

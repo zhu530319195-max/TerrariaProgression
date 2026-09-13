@@ -1,5 +1,5 @@
 displayName = Terraria Progression
 author = 四季华
-version = 0.2.0
+version = 0.2.1
 side = Both
 buildIgnore = bin/*, obj/*, *.csproj
