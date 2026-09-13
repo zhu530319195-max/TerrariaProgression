@@ -3,6 +3,8 @@
 ## P0 — Progression Core
 Goal: stable character-bound infinite leveling foundation.
 
+Implementation status: P0 0.1.0 is delivered through PR #2 (bootstrap dependency #1); official compilation, 1,537 core assertions and 28 tModLoader runtime assertions passed. On 2026-09-13 the user confirmed singleplayer XP and persistence across death, restart and world changes, and authorized merging. Real multiplayer contribution and segmented/multi-stage Boss tests are explicitly deferred, not passed. See `docs/P0_VALIDATION.md`. P1–P3 remain unimplemented.
+
 - tModLoader project skeleton
 - `ModPlayer` progression data
 - Level starts at 1; no level cap

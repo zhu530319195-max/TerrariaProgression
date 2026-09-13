@@ -1,0 +1,6 @@
+displayName = Progression CI Harness - DO NOT INSTALL IN REAL WORLDS
+author = TerrariaProgression tests
+version = 0.1.0
+side = Server
+modReferences = TerrariaProgression
+buildIgnore = bin/*, obj/*, *.csproj
