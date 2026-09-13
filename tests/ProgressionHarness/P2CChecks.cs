@@ -27,7 +27,8 @@ public sealed partial class RuntimeChecks
         var p=A.Player;
         var combat=p.GetModPlayer<CombatUtilityPlayer>();
         void Toggle(string id,bool enabled) => A.ApplyTalent(enabled ? TalentOperation.Enable : TalentOperation.Disable,id,TalentCategory.Combat,1);
-        void Equip() { p.ResetEffects(); PlayerLoader.UpdateEquips(p); }
+        // Player.Update clears buffImmune separately before UpdateBuffs/UpdateEquips.
+        void Equip() { p.ResetEffects(); Array.Clear(p.buffImmune); PlayerLoader.UpdateEquips(p); }
         A.ApplyTalent(TalentOperation.Upgrade,"StatusImmunity",TalentCategory.Utility,1);
         Equip();
         Check(CombatUtilityPlayer.Immunities.Select(i=>i.Child).SequenceEqual(FunctionalTalentRegistry.ImmunityChildren),"immunity runtime mapping matches child UI order");
