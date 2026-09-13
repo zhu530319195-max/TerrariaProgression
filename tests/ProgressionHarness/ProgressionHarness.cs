@@ -289,11 +289,13 @@ public sealed partial class RuntimeChecks : ModSystem
         Check(dropResult.State==ItemDropAttemptResultState.Success && after-before==6,"actual CommonDrop path preserves successful quantity boost");
         // Real mining call proves scope attribution and restoration, not just classification.
         int x=Main.spawnTileX+12, y=Main.spawnTileY-5;
+        // Isolate the fixture from randomly generated trees/chests supported above it.
+        for(int dx=-2;dx<=2;dx++) for(int dy=-3;dy<=2;dy++) Main.tile[x+dx,y+dy].ClearEverything();
         Main.tile[x,y].ResetToType(TileID.Iron);
         int priorOre=Main.item.Where(i=>i.active&&i.type==ItemID.IronOre).Sum(i=>i.stack);
         p.PickTile(x,y,10000);
         int finalOre=Main.item.Where(i=>i.active&&i.type==ItemID.IronOre).Sum(i=>i.stack);
-        Check(!Main.tile[x,y].HasTile && finalOre-priorOre==2 && EconomySystem.Actor==null && EconomySystem.BreakingTile==-1,"real mining doubles ore and restores scopes");
+        Check(!Main.tile[x,y].HasTile && finalOre-priorOre==2 && EconomySystem.Actor==null && EconomySystem.BreakingTile==-1,$"real mining doubles ore and restores scopes: tile={Main.tile[x,y].HasTile}, ore={finalOre-priorOre}");
         Main.netMode=NetmodeID.Server;
         int privateItem=Item.NewItem(npc.GetSource_Loot(),p.Hitbox,ItemID.IronOre,3,noBroadcast:true);
         Check(Main.item[privateItem].stack==3,"private server spawns are not expanded into public bonuses");
@@ -323,6 +325,7 @@ public sealed partial class RuntimeChecks : ModSystem
         Check(A.ApplyTalent(TalentOperation.Upgrade, "MiningYield", TalentCategory.Economy, 10) == TalentResult.Success,
             "purchase only mining yield, without other quantity talents");
         int x = Main.spawnTileX + 16, y = Main.spawnTileY - 5;
+        for(int dx=-2;dx<=2;dx++) for(int dy=-3;dy<=2;dy++) Main.tile[x+dx,y+dy].ClearEverything();
         foreach (var sample in new[] { (TileID.Copper, ItemID.CopperOre), (TileID.Tin, ItemID.TinOre),
             (TileID.Iron, ItemID.IronOre), (TileID.Lead, ItemID.LeadOre) }) {
             foreach (bool enabled in new[] { true, false, true }) {
