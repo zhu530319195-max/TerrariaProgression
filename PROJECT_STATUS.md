@@ -1,7 +1,7 @@
 # PROJECT_STATUS.md
 
 ## Current phase
-P2-A 0.4.1 on `feat/p2a-functional-talents`, based on main `30e4da33647afc3b4d25e9b7990bbacf8150b377`. User explicitly authorized P2-A after PR #4/#5 acceptance and merge. Implements the nine remaining functional entries, tool efficiency and configurable points per level. 0.4.1 retirement implemented; local official MOD/harness builds pass with 0 warnings/errors, 2848 core checks pass; native CI pending. User explicitly authorized pushing P2-A, creating its PR and continuing automatic tests on 2026-09-13. PR #6 is open. Code 55569cf25cc237aeb5576357fd761e502c4ffaef passed CI run 34764075680: 2840 core checks, 249 native runtime checks, official MOD/harness builds with 0 warnings/errors. User confirmed all other P2-A functions pass; AutoJump cancelled in 0.4.1 with automatic actual-cost refund. Await retirement CI and refund regression; do not merge.
+P2-A 0.4.1 on `feat/p2a-functional-talents`, based on main `30e4da33647afc3b4d25e9b7990bbacf8150b377`. User explicitly authorized P2-A after PR #4/#5 acceptance and merge. Implements the nine remaining functional entries, tool efficiency and configurable points per level. 0.4.1 retirement implemented; local official MOD/harness builds pass with 0 warnings/errors, 2848 core checks and 252 native runtime checks pass in CI run 34765054630 (code 14cd3658a1459c10b49c3f47a29efbd3f17dfeb7). User explicitly authorized pushing P2-A, creating its PR and continuing automatic tests on 2026-09-13. PR #6 is open. Code 55569cf25cc237aeb5576357fd761e502c4ffaef passed CI run 34764075680: 2840 core checks, 249 native runtime checks, official MOD/harness builds with 0 warnings/errors. User confirmed all other P2-A functions pass; AutoJump cancelled in 0.4.1 with automatic actual-cost refund. Automatic retirement/refund checks passed; user only needs the short in-game retirement/refund check. Do not merge.
 
 ## Repository state
 - PR #1–#5 are merged. PR #4/#5 merged 2026-09-13 after explicit user instruction “验收通过，可以合并 PR #4、#5”. Earlier historical statements that they await merge are superseded.
@@ -94,7 +94,7 @@ The core progression rules, P1 default balance direction, utility unlock pricing
 - PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
 
 ## Next implementation task
-0.4.1 test/source packages will be produced by the updated CI. Next: run retirement CI, deliver 0.4.1, then confirm retirement/refund regression via PR #6. Do not begin P2-B/C or P3 until the current batch is reviewed. P2-A contains 47 numeric registry entries and 9 functional registry entries (eight binary unlocks and numeric MultiJump), 56 total.
+0.4.1 CI passed and test/source packages are ready. Next: confirm in-game retirement/refund via PR #6; do not re-run already accepted P2-A feature acceptance. Do not begin P2-B/C or P3 until the current batch is reviewed. P2-A contains 47 numeric registry entries and 9 functional registry entries (eight binary unlocks and numeric MultiJump), 56 total.
 
 ## P1 merge authorization supersedes earlier notes
 The earlier acceptance sections above record history at the time of feedback. PR #4 and #5 were subsequently explicitly authorized and merged. Their tested code is the P2-A base.
