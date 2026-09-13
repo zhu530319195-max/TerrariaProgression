@@ -308,6 +308,31 @@ public sealed class RuntimeChecks : ModSystem
         EconomySystem.BoostWorld(overflow,new EntitySource_Misc("CI capacity"),10);
         Check(overflow.stack==1 && !Main.item.Take(Main.maxItems).Any(i=>i.active) && Main.timeItemSlotCannotBeReusedFor.Take(Main.maxItems).All(t=>t==90),"bonus overflow preserves inactive but reserved private item slots");
         for(int i=0;i<Main.maxItems;i++) Main.timeItemSlotCannotBeReusedFor[i]=0;
+        RunCopperMining();
+    }
+    private void RunCopperMining()
+    {
+        Reset(); A.Award(1000000 * Experience.Scale);
+        var p = A.Player;
+        p.inventory[0] = new Item(ItemID.CopperPickaxe); p.selectedItem = 0;
+        Check(A.ApplyTalent(TalentOperation.Upgrade, "MiningYield", TalentCategory.Economy, 10) == TalentResult.Success,
+            "purchase only mining yield, without other quantity talents");
+        int x = Main.spawnTileX + 16, y = Main.spawnTileY - 5;
+        foreach (var sample in new[] { (TileID.Copper, ItemID.CopperOre), (TileID.Tin, ItemID.TinOre),
+            (TileID.Iron, ItemID.IronOre), (TileID.Lead, ItemID.LeadOre) }) {
+            foreach (bool enabled in new[] { true, false, true }) {
+                A.ApplyTalent(enabled ? TalentOperation.Enable : TalentOperation.Disable, "MiningYield", TalentCategory.Economy, 1);
+                foreach (var item in Main.item) item.active = false;
+                Main.tile[x,y].ResetToType(sample.Item1);
+                int hits = 0;
+                while (Main.tile[x,y].HasTile && hits++ < 20) p.PickTile(x,y,p.HeldItem.pick);
+                int amount = Main.item.Where(i => i.active && i.type == sample.Item2).Sum(i => i.stack);
+                Check(!Main.tile[x,y].HasTile && hits > 1 && amount == (enabled ? 2 : 1),
+                    $"ordinary copper pick repeated hits: tile={sample.Item1}, enabled={enabled}, amount={amount}, hits={hits}");
+                Check(EconomySystem.Actor == null && EconomySystem.BreakingTile == -1,
+                    "resource scopes restored after partial and final mining hits");
+            }
+        }
     }
     private void RunTalents()
     {
