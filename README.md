@@ -44,10 +44,14 @@ Terraria/tModLoader 独立角色成长系统。
 - `docs/PROGRESSION_DESIGN_v0.1.md` — 等级、经验、数值天赋与世界能力总设计
 - `docs/FUNCTIONAL_TALENTS_v0.1.md` — 功能天赋正式目录、Registry、Scanner 与兼容策略
 
-当前阶段：P0 0.1.0 已通过编译、1,537 项核心检查和 28 项 tModLoader 运行时检查。用户已确认单人经验正确、死亡／重进游戏／更换世界保留经验，并于 2026-09-13 授权合并。多人贡献及多节／多阶段 Boss 实机测试由用户决定暂缓，仍属于待验证项；尚未实现正式天赋效果。P0 见 [PR #2](https://github.com/zhu530319195-max/TerrariaProgression/pull/2)，文档基线见 [PR #1](https://github.com/zhu530319195-max/TerrariaProgression/pull/1)。
+当前阶段：**P1-A 0.2.1 数值天赋与高缩放页面优化**，0.2.0 的升级、启停、回退、换世界／重启保存已通过用户实机测试；本次优化 200% UI 缩放下的页面布局。包含 21 项数值天赋；P1 剩余目录、P2/P3 尚未完成。已合并的 P0 保留原有经验规则与角色成长。
 
-- [中文安装与测试步骤](docs/P0_TEST_GUIDE_zh-CN.md)
-- [P0 工程、联网与兼容说明](docs/P0_IMPLEMENTATION.md)
-- [验证结果与人工验收边界](docs/P0_VALIDATION.md)
+- **按 P 打开天赋页**（可在控制设置中改键），也可输入 `/tptalents`。
+- 支持升级、回退一级、整项／分类／全部退款、启停。关闭不退款。
+- 旧 P0 角色自动读取，保存为新版 v2；升级前备份角色，新存档不可交给旧 P0 读取。
+- [P1 中文安装与测试步骤](docs/P1_TEST_GUIDE_zh-CN.md)
+- [P1 工程、网络、已实现项目与后续范围](docs/P1_IMPLEMENTATION.md)
+- [P1 验证记录](docs/P1_VALIDATION.md)
+- [P0 验证记录及用户暂缓项目](docs/P0_VALIDATION.md)
 - 工程位于 `TerrariaProgression/`。目标：tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8。
 - `/tpstatus` 查看成长。新角色开启开发命令后 `/tpgivexp 1000`，应为 Lv.4、50/490 XP、3 个天赋点。

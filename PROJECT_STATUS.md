@@ -1,19 +1,17 @@
 # PROJECT_STATUS.md
 
 ## Current phase
-P0 Progression Core 0.1.0 implemented and automatically verified. On 2026-09-13 the user confirmed singleplayer XP, death persistence, restart persistence and world-change persistence, and explicitly authorized merging. Real multiplayer contribution and segmented/multi-stage Boss tests are deferred by the user, not passed.
+P1-A 0.2.1 UI refinement: first 21 numeric talents and a categorized talent panel implemented on `feat/numeric-talents-ui`; official compilation, 2,058 core checks and 73 native runtime checks passed; user has confirmed upgrades, P/command entry, enable/disable without refunds or instant resource refill, refunds, and world/restart persistence in 0.2.0. PR #3 now includes a 200% UI layout refinement awaiting focused visual acceptance. P1 is not complete. P2/P3 remain unimplemented.
 
 ## Repository state
-- Default branch: `main`
-- Bootstrap branch: `chore/project-bootstrap`
-- Bootstrap documentation: PR #1 (dependency of P0 PR #2).
-- Integration order authorized by the user: bootstrap PR #1 into `main`, then P0 PR #2 retargeted from `chore/project-bootstrap` to `main`.
-- Official target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
-- Local official compilation and `.tmod` packaging: 0 errors, 0 warnings.
-- 1,537 core automated assertions and 28 native tModLoader runtime assertions passed in GitHub Actions run 34751256027. Actual two-client play and segmented/multi-stage Boss encounters remain deferred validation items. See `docs/P0_VALIDATION.md`.
-- P0 PR: #2; user merge authorization recorded on 2026-09-13. See `docs/P0_VALIDATION.md` for the accepted scope and deferred checks.
-- Progression design baseline exists in `docs/PROGRESSION_DESIGN_v0.1.md`.
-- Functional/utility talent baseline exists in `docs/FUNCTIONAL_TALENTS_v0.1.md`.
+- Default branch: `main`; P0 PR #1 and #2 merged with explicit user approval.
+- P1 branch: `feat/numeric-talents-ui`, based on main `3799d3ef07bb89bf1ee46529f0cf25c9584ee24d`.
+- Official target unchanged: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
+- P0 user-confirmed: correct XP; death/restart/world-change persistence. Real multiplayer contribution and segmented/multi-stage Boss tests deferred by user.
+- P1 save format v2 imports v1 and compresses historical costs; old P0 cannot load a newly saved v2 character.
+- P1 numeric operations are server-confirmed. GUI: P (rebindable) or `/tptalents`.
+- See `docs/P1_IMPLEMENTATION.md`, `docs/P1_VALIDATION.md` and `docs/P1_TEST_GUIDE_zh-CN.md`.
+- Do not merge P1 until separately authorized after in-game acceptance.
 
 ## Confirmed core rules
 - Initial level: 1.
@@ -86,7 +84,7 @@ P0 Progression Core 0.1.0 implemented and automatically verified. On 2026-09-13 
 The core progression rules, P1 default balance direction, utility unlock pricing, and functional talent architecture are sufficiently defined to begin implementation. Remaining design questions can be handled as targeted follow-ups without blocking P0.
 
 ## Next implementation task
-Address any reported P0 issues. P1 is the next planned phase, but requires a separate implementation instruction; P0 merge authorization does not start P1. P0 contains the project skeleton, character save, XP/level/points, generic paid-cost/toggle model, config, owner snapshots and server contribution settlement. No formal talents or effects are registered.
+Validate P1-A and fix reported issues. Continue the remaining P1 catalog in focused batches: crit chance / tiered crit, economy and resource attribution, and remaining base/recovery/combat entries. Confirm API incompatibilities instead of changing approved rules. No P2/P3 expansion in P1.
 
 ## Later implementation task
 Build the P2 `FunctionalTalentRegistry` before implementing the first permanent utility effects. Add `AccessoryTalentScanner` after the registry and core P2 effects are stable; the scanner must not block initial P2 delivery.

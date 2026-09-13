@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Numerics;
 using Terraria;
@@ -15,10 +16,22 @@ public sealed class ProgressionPlayer : ModPlayer
     public ProgressionState State { get; internal set; } = new();
     internal bool SessionReady;
     internal System.Guid SessionId;
+    internal ulong TalentRevision, LastActionTick, LastSnapshotTick;
+    internal bool HasActionTick, HasSnapshotTick;
+    internal uint PendingRequest, NextRequest;
+    internal TalentResult LastResult = TalentResult.Success;
+    internal bool HasResult;
+    private DateTime requestStarted;
+    internal bool RequestPending => PendingRequest != 0;
+    internal bool RequestCoolingDown => Main.netMode == NetmodeID.MultiplayerClient && (DateTime.UtcNow - requestStarted).TotalSeconds < .15;
+    internal bool RequestTimedOut => RequestPending && (DateTime.UtcNow - requestStarted).TotalSeconds > 5;
     public override void Initialize()
     {
         State = new();
         SessionReady = false;
+        TalentRevision = 0;
+        PendingRequest = NextRequest = 0;
+        HasActionTick = HasSnapshotTick = HasResult = false;
         SessionId = System.Guid.NewGuid();
     }
     public override void SaveData(TagCompound tag)
@@ -29,7 +42,7 @@ public sealed class ProgressionPlayer : ModPlayer
     public override void LoadData(TagCompound tag)
     {
         if (!tag.ContainsKey("DataVersion")) { State = new(); return; }
-        if (tag.GetInt("DataVersion") != ProgressionState.DataVersion)
+        if (tag.GetInt("DataVersion") is not (1 or ProgressionState.DataVersion))
             throw new InvalidDataException("Unsupported TerrariaProgression save version; save was not reset.");
         State = StateCodec.Decode(tag.GetByteArray("Progression"));
     }
@@ -45,8 +58,8 @@ public sealed class ProgressionPlayer : ModPlayer
     {
         // Import happens once via OnEnterWorld; never send an uninitialised server state
         // over the player's saved character during the vanilla connection handshake.
-        if (Main.netMode == NetmodeID.Server && SessionReady && toWho == Player.whoAmI)
-            ProgressionNetwork.SendSnapshot(this);
+        if (Main.netMode == NetmodeID.Server && SessionReady)
+            ProgressionNetwork.SendSnapshot(this, toWho);
     }
     public override void PlayerDisconnect()
     {
@@ -60,5 +73,39 @@ public sealed class ProgressionPlayer : ModPlayer
         if (Main.netMode == NetmodeID.Server) ProgressionNetwork.SendSnapshot(this);
         return levels;
     }
-    // No Kill, UpdateDead, ResetEffects or world save hook modifies progression.
+    internal TalentResult ApplyTalent(TalentOperation operation, string id, TalentCategory category, int count)
+    {
+        if (Main.netMode == NetmodeID.MultiplayerClient || !SessionReady || Player.dead) return TalentResult.NotReady;
+        var result = NumericTalents.Apply(State, operation, id, category, count, out var updated);
+        if (result == TalentResult.Success) { State = updated; TalentRevision++; }
+        return result;
+    }
+    internal void RequestTalent(TalentOperation operation, string id = "", TalentCategory category = TalentCategory.BaseStats, int count = 1)
+    {
+        if (RequestPending || RequestCoolingDown) return;
+        if (Main.netMode == NetmodeID.SinglePlayer) {
+            LastResult = ApplyTalent(operation, id, category, count);
+            HasResult = true;
+        }
+        else if (SessionReady) {
+            PendingRequest = ++NextRequest;
+            if (PendingRequest == 0) PendingRequest = ++NextRequest;
+            requestStarted = DateTime.UtcNow;
+            HasResult = false;
+            ProgressionNetwork.SendAction(this, operation, id, category, count, PendingRequest);
+        }
+    }
+    internal void Acknowledge(uint request, TalentResult result)
+    {
+        if ((request != 0 && request == PendingRequest) || (request == 0 && RequestTimedOut)) {
+            PendingRequest = 0;
+            LastResult = result;
+            HasResult = true;
+        }
+    }
+    public override void ProcessTriggers(Terraria.GameInput.TriggersSet triggersSet)
+    {
+        if (UI.TalentUISystem.ToggleKey?.JustPressed == true) UI.TalentUISystem.Toggle();
+    }
+    // No death or world save hook modifies progression.
 }

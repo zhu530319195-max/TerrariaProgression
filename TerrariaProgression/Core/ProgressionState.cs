@@ -6,7 +6,7 @@ namespace TerrariaProgression.Core;
 
 public sealed class ProgressionState
 {
-    public const int DataVersion = 1;
+    public const int DataVersion = 2;
     public BigInteger Level { get; internal set; } = 1;
     public BigInteger CurrentExperience { get; internal set; }
     public BigInteger TotalExperienceEarned { get; internal set; }
@@ -26,35 +26,63 @@ public sealed class ProgressionState
         return levels;
     }
 
-    // P1/P2 callers must supply a registered talent and a server-approved price.
-    // P0 exposes no purchase packet and registers no dummy talents.
-    public bool Invest(string id, BigInteger actualCost)
+    // The server-facing TalentService supplies the registered ID and price.
+    public bool Invest(string id, BigInteger actualCost, BigInteger? levels = null)
     {
-        if (string.IsNullOrWhiteSpace(id) || actualCost <= 0 || actualCost > AvailableTalentPoints) return false;
+        var count = levels ?? BigInteger.One;
+        if (string.IsNullOrWhiteSpace(id) || actualCost <= 0 || count <= 0 || actualCost * count > AvailableTalentPoints) return false;
         if (!Talents.TryGetValue(id, out var talent)) Talents[id] = talent = new();
-        talent.PaidCosts.Add(actualCost);
-        AvailableTalentPoints -= actualCost;
-        TotalSpentTalentPoints += actualCost;
+        talent.AddCost(actualCost, count);
+        AvailableTalentPoints -= actualCost * count;
+        TotalSpentTalentPoints += actualCost * count;
         return true;
     }
     public BigInteger RefundOne(string id)
     {
-        if (!Talents.TryGetValue(id, out var talent) || talent.PaidCosts.Count == 0) return 0;
-        int index = talent.PaidCosts.Count - 1;
-        var paid = talent.PaidCosts[index];
-        talent.PaidCosts.RemoveAt(index);
+        if (!Talents.TryGetValue(id, out var talent)) return 0;
+        var paid = talent.RemoveLast();
         AvailableTalentPoints += paid;
         TotalSpentTalentPoints -= paid;
-        if (talent.PaidCosts.Count == 0) Talents.Remove(id);
+        if (talent.TalentLevel == 0) Talents.Remove(id);
+        return paid;
+    }
+    public BigInteger RefundAll(string id)
+    {
+        if (!Talents.Remove(id, out var talent)) return 0;
+        var paid = talent.InvestedPoints;
+        AvailableTalentPoints += paid;
+        TotalSpentTalentPoints -= paid;
         return paid;
     }
 }
 
+public readonly record struct PaidCostRun(BigInteger Cost, BigInteger Count);
+
 public sealed class TalentState
 {
-    public BigInteger TalentLevel => PaidCosts.Count;
+    // Adjacent equal prices are compressed. A million levels at the default price
+    // occupy one run, while refunds still preserve the exact historical cost.
+    public BigInteger TalentLevel { get; private set; }
     public bool Enabled { get; set; } = true;
-    public List<BigInteger> PaidCosts { get; } = new();
-    public BigInteger InvestedPoints { get { BigInteger n = 0; foreach (var c in PaidCosts) n += c; return n; } }
+    private readonly List<PaidCostRun> costs = new();
+    public IReadOnlyList<PaidCostRun> CostRuns => costs;
+    public BigInteger InvestedPoints { get; private set; }
     public decimal? CurrentIntensity { get; set; }
+    internal void AddCost(BigInteger cost, BigInteger count)
+    {
+        if (cost <= 0 || count <= 0) throw new ArgumentOutOfRangeException();
+        if (costs.Count > 0 && costs[^1].Cost == cost) costs[^1] = new(cost, costs[^1].Count + count);
+        else costs.Add(new(cost, count));
+        TalentLevel += count;
+        InvestedPoints += cost * count;
+    }
+    internal BigInteger RemoveLast()
+    {
+        var run = costs[^1];
+        if (run.Count == 1) costs.RemoveAt(costs.Count - 1);
+        else costs[^1] = new(run.Cost, run.Count - 1);
+        TalentLevel--;
+        InvestedPoints -= run.Cost;
+        return run.Cost;
+    }
 }

@@ -1,5 +1,96 @@
 Mods: {
   TerrariaProgression: {
+    Keybinds: {
+  "ToggleTalents": {
+    "DisplayName": "打开／关闭天赋页面"
+  }
+}
+    TalentsUI: {
+  "Close": "关闭",
+  "Category0": "基础属性",
+  "Category1": "恢复续航",
+  "Category2": "战斗",
+  "Category3": "经济资源",
+  "Category4": "功能能力",
+  "Category5": "超凡能力",
+  "Upgrade": "升级 +1（1 点）",
+  "RefundOne": "回退一级",
+  "Enable": "启用",
+  "Disable": "关闭（不退款）",
+  "RefundTalent": "此项全部回退",
+  "RefundCategory": "本分类全部回退",
+  "EnableEverything": "全部启用",
+  "DisableEverything": "全部关闭（不退款）",
+  "RefundEverything": "全部回退并退款",
+  "Resync": "重新同步",
+  "Digits": "位",
+  "Remaining": "消耗概率／比例 ×{0}%",
+  "PerSecond": " / 秒",
+  "Header": "天赋  ·  Lv.{0}   |   经验 {1} / {2}",
+  "Totals": "可用点数 {0}   ·   已投入 {1}   ·   累计经验 {2}",
+  "Detail": "天赋等级：{0}（无限） · {1}\n当前效果：{2}\n下一级解锁效果：{3}\n升级花费：{4} 点\n累计投入：{5} 点",
+  "Off": "已关闭",
+  "On": "生效中",
+  "Unlearned": "未学习",
+  "ComingLater": "此分类的天赋将在后续阶段开放。",
+  "Waiting": "正在等待服务器确认……",
+  "Timeout": "请求暂未确认，请点击重新同步后再操作。",
+  "Help": "P 键开关页面；可在控制设置中改键。关闭天赋不退款。",
+  "ResultSuccess": "操作成功。",
+  "ResultNotReady": "角色尚未就绪或正在死亡状态。",
+  "ResultUnknownTalent": "此天赋尚未开放。",
+  "ResultInvalidRequest": "操作参数无效。",
+  "ResultNotEnoughPoints": "天赋点不足。",
+  "ResultNoChange": "没有需要修改的内容。",
+  "ResultStaleRequest": "状态已更新，本次操作未执行，请重试。",
+  "ResultCapacity": "存档容量不足，操作未执行。"
+}
+    TalentNames: {
+  "MaxLife": "最大生命",
+  "MaxMana": "最大魔力",
+  "Defense": "防御力",
+  "MoveSpeed": "移动速度",
+  "Acceleration": "移动加速度",
+  "LifeRegen": "固定生命恢复",
+  "NaturalLifeRegen": "自然生命恢复",
+  "ManaRegen": "固定魔力恢复",
+  "NaturalManaRegen": "自然魔力恢复",
+  "Healing": "治疗效果",
+  "ManaRestoration": "魔力恢复效果",
+  "Damage": "全局伤害",
+  "AttackSpeed": "全局攻击速度",
+  "CritDamage": "暴击伤害",
+  "ArmorPenetration": "护甲穿透",
+  "Knockback": "击退强度",
+  "AmmoSaving": "弹药节约",
+  "ManaSaving": "魔力消耗降低",
+  "Minions": "召唤物上限",
+  "Sentries": "哨兵上限",
+  "PickupRange": "物品拾取范围"
+}
+    TalentHints: {
+  "MaxLife": "每级 +25 HP。提高上限不会补血；降低上限仅截断当前生命。",
+  "MaxMana": "每级 +20 MP。提高上限不会补魔；降低上限仅截断当前魔力。",
+  "Defense": "每级 +4 防御，与装备加算。",
+  "MoveSpeed": "每级 +5% 跑步速度，乘算于装备后的速度；坐骑仍受原版运动规则影响。",
+  "Acceleration": "每级 +5% 跑步加速度，乘算于装备后的加速度。",
+  "LifeRegen": "每级 +1 HP/秒，加入原版生命恢复；受原版恢复状态影响。",
+  "NaturalLifeRegen": "每级 +10% 自然回血，乘算原版自然恢复部分。",
+  "ManaRegen": "每级 +2 MP/秒，独立于自然回魔延迟。",
+  "NaturalManaRegen": "每级 +10% 自然回魔，按原版实际回魔速度补充；保留回魔延迟。",
+  "Healing": "每级 +5% 物品治疗量；红心拾取属于后续独立天赋。",
+  "ManaRestoration": "每级 +5% 物品回魔量；魔力星属于后续独立天赋。",
+  "Damage": "每级 +5% 全局伤害，与装备伤害加成加算。",
+  "AttackSpeed": "每级 +3% 攻速；遵循武器的攻速继承和帧数限制。",
+  "CritDamage": "每级增加 0.05 暴击倍率。10 级令原版 ×2 暴击变为 ×2.5。",
+  "ArmorPenetration": "每级 +3 护甲穿透，使用通用伤害类型继承。",
+  "Knockback": "每级 +10% 击退强度，与装备加算；不改变敌人的击退免疫。",
+  "AmmoSaving": "每级令弹药消耗概率 ×0.93，与原版节约效果相乘。",
+  "ManaSaving": "每级令魔力消耗 ×0.95，与原版耗魔修正相乘。",
+  "Minions": "每级 +1 召唤物容量，与装备加算。",
+  "Sentries": "每级 +1 哨兵容量，与装备加算。",
+  "PickupRange": "每级 +10% 拾取范围，乘算物品原有范围。"
+}
     Messages: {
       Status: "等级 {0}｜当前经验 {1} / {2}｜累计经验 {3}｜可用天赋点 {4}｜已投入 {5}"
       Waiting: "正在等待服务器确认角色成长数据。"

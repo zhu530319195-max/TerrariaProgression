@@ -40,8 +40,11 @@ public static class StateCodec
             writer.Write(talent.Enabled);
             writer.Write(talent.CurrentIntensity.HasValue);
             if (talent.CurrentIntensity.HasValue) writer.Write(talent.CurrentIntensity.Value);
-            writer.Write(talent.PaidCosts.Count);
-            foreach (var cost in talent.PaidCosts) WriteInteger(writer, cost);
+            writer.Write(talent.CostRuns.Count);
+            foreach (var run in talent.CostRuns) {
+                WriteInteger(writer, run.Cost);
+                WriteInteger(writer, run.Count);
+            }
         }
         if (stream.Length > MaxPacketBytes) throw new InvalidDataException("Progression snapshot exceeds transport capacity.");
         return stream.ToArray();
@@ -52,7 +55,7 @@ public static class StateCodec
         using var stream = new MemoryStream(bytes, writable: false);
         using var reader = new BinaryReader(stream);
         int version = reader.ReadInt32();
-        if (version != ProgressionState.DataVersion) throw new InvalidDataException($"Unsupported progression DataVersion {version}; use a compatible mod version. Data was not reset.");
+        if (version is not (1 or ProgressionState.DataVersion)) throw new InvalidDataException($"Unsupported progression DataVersion {version}; use a compatible mod version. Data was not reset.");
         var result = new ProgressionState {
             Level = ReadInteger(reader), CurrentExperience = ReadInteger(reader),
             TotalExperienceEarned = ReadInteger(reader), AvailableTalentPoints = ReadInteger(reader),
@@ -73,9 +76,10 @@ public static class StateCodec
             if (costs is < 1 or > 10000) throw new InvalidDataException("Invalid paid-cost history.");
             for (int j = 0; j < costs; j++) {
                 var cost = ReadInteger(reader);
-                if (cost <= 0) throw new InvalidDataException("Invalid talent cost.");
-                talent.PaidCosts.Add(cost);
-                spent += cost;
+                var levels = version == 1 ? BigInteger.One : ReadInteger(reader);
+                if (cost <= 0 || levels <= 0) throw new InvalidDataException("Invalid talent cost.");
+                talent.AddCost(cost, levels);
+                spent += cost * levels;
             }
             result.Talents.Add(id, talent);
         }

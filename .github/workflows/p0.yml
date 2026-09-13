@@ -1,7 +1,7 @@
-name: P0 build and verification
+name: Progression build and verification
 on:
   push:
-    branches: [feat/progression-core, main]
+    branches: ['feat/**', main]
   pull_request:
     branches: [main, chore/project-bootstrap]
 permissions:
@@ -41,6 +41,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TerrariaProgression-P0
+          name: TerrariaProgression-P1
           if-no-files-found: warn
           path: artifacts/
