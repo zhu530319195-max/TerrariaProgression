@@ -6,6 +6,7 @@ Project bootstrap / design freeze before implementation.
 ## Repository state
 - Default branch: `main`
 - Bootstrap branch: `chore/project-bootstrap`
+- Open bootstrap PR: #1
 - No gameplay code implemented yet.
 - Progression design baseline exists in `docs/PROGRESSION_DESIGN_v0.1.md`.
 
@@ -24,24 +25,39 @@ Project bootstrap / design freeze before implementation.
 - Talents can be upgraded, disabled/enabled, and refunded. Disable does not refund points.
 - Refunds return the points actually paid.
 
-## Talent categories approved
-1. Base Stats
-2. Recovery & Sustain
-3. Combat
-4. Economy & Resources
-5. Utility / Accessory-like Abilities
-6. Transcendent / World Interaction Abilities
+## Talent model approved
+- Six categories: Base Stats; Recovery & Sustain; Combat; Economy & Resources; Utility/Accessory-like Abilities; Transcendent/World Interaction.
+- Numeric talents default to unlimited levels (`MaxLevel = 0`).
+- Pure binary functionality uses one-time unlocks.
+- Toggle/mode talents may combine unlimited progression with a separately adjustable current strength.
+- Numeric talent cost is normally fixed rather than increasing with level.
+- Default balance target: Lv.1–3 immediately noticeable, Lv.5 clearly strong, Lv.10 very strong; beyond Lv.10 balance is intentionally not guaranteed.
 
-## Not finalized yet
-- Exact default P1 talent values.
-- Exact talent point costs and cost curves.
-- Exact max levels for most finite talents.
+## Approved P1 default examples
+- Max HP: +25 / level.
+- Max MP: +20 / level.
+- Defense: +4 / level.
+- Movement speed: +5% / level.
+- Fixed life regeneration: +1 HP/s / level.
+- Fixed mana regeneration: +2 MP/s / level.
+- Global damage: +5% / level.
+- Global attack speed: +3% / level.
+- Critical chance: +2.5 percentage points / level.
+- Critical damage multiplier: +5% / level.
+- Armor penetration: +3 / level.
+- Monster coin gain: +10% / level.
+- Loot/resource quantity talents: generally +10% / level.
+- Full formulas and the rest of the current defaults are authoritative in `docs/PROGRESSION_DESIGN_v0.1.md`.
+
+## Still not finalized
+- Default costs for one-time utility unlocks (fall immunity, water breathing, lava immunity, etc.).
 - Final UI layout and hotkeys.
-- Detailed handling of segmented bosses and unusual multi-entity encounters.
-- Exact loot multiplication implementation strategy.
+- Detailed segmented/multi-entity boss settlement handling.
+- Exact runtime implementation for dynamic loot probability/quantity modification across vanilla and third-party drop rules.
+- Exact compatibility behavior for over-100% critical chance with third-party crit systems.
 
 ## Next design task
-Finalize P1 talent defaults: effect per level, default cost, max level, and any soft/hard caps for Base Stats, Recovery, Combat, and Economy talents.
+Finalize one-time functional unlock prices and any remaining utility/transcendent defaults that need explicit costs.
 
 ## Next implementation task after design approval
-Create the tModLoader project skeleton and P0 progression core: player save data, XP calculation, level-up loop, configurable XP cap, talent point storage, save/load, and multiplayer synchronization foundations.
+Create the tModLoader project skeleton and P0 progression core: player save data, XP calculation, level-up loop, configurable XP cap, talent point storage, save/load, refund bookkeeping, toggle state, configuration scaffolding, and multiplayer synchronization foundations.
