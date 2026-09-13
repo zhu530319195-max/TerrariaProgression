@@ -46,10 +46,12 @@ public sealed partial class RuntimeChecks
         fail.OnFailedRoll(ItemDropRule.Common(ItemID.StoneBlock));
         condition.OnSuccess(fail); db.RegisterToNPC(npc.netID, condition);
         solver = new ItemDropResolver(db);
-        ClearItems(); info.IsExpertMode = true; solver.TryDropping(info);
+        int originalMode = Main.GameMode;
+        ClearItems(); Main.GameMode = GameModeID.Expert; info.IsExpertMode = true; solver.TryDropping(info);
         Check(Count(ItemID.Wood) + Count(ItemID.StoneBlock) == 0, "extra draws preserve failed difficulty conditions");
-        ClearItems(); info.IsExpertMode = false; solver.TryDropping(info);
+        ClearItems(); Main.GameMode = GameModeID.Normal; info.IsExpertMode = false; solver.TryDropping(info);
         Check(Count(ItemID.StoneBlock) == 3 && Count(ItemID.Wood) == 0, "failure chain resolves independently each draw");
+        Main.GameMode = originalMode;
         db = new ItemDropDatabase(); db.RegisterToNPC(npc.netID, new UnknownDrop()); solver = new ItemDropResolver(db);
         ClearItems(); solver.TryDropping(info);
         Check(Count(ItemID.DirtBlock) == 1, "unknown rule executes original only without guessed replay");
