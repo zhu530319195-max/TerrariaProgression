@@ -110,11 +110,16 @@ Architecture first:
 - Fishing-line protection / lava-fishing eligibility where reliable
 
 ### P2-C — Composite and combat-trigger effects
-0.6.0 implements the common 13-status immunity composite, stars, bees, panic speed and attack burn/poison. Two binary unlocks cost 2 points; four adjustable numeric effects cost 1 point per level. Retaliation grows damage at bounded native counts; attack debuffs last 2 seconds per level. See `docs/P2C_IMPLEMENTATION.md`; in-game acceptance pending.
+0.6.0 implements the common 13-status immunity composite, stars, bees, panic speed and attack burn/poison. Two binary unlocks cost 2 points; four adjustable numeric effects cost 1 point per level. Retaliation grows damage at bounded native counts; attack debuffs last 2 seconds per level. See `docs/P2C_IMPLEMENTATION.md`; accepted and merged in PR #8.
 - Common status-immunity composite
 - Selected on-hit/on-hurt accessory effects
 - Selected attack-inflicted vanilla Debuffs
 - Additional vanilla functions explicitly approved after testing
+
+### P2 completion batch 1 — 0.7.0
+Implemented for acceptance: wing duration (+1s/level), wing speed (+5%/level), swimming speed (+10%/level), tile/wall placement speed (+20%/level each), night vision, personal light and dangersense. Adjustable numeric entries cost 1/level; binary entries cost 2 once. Native dangersense covers recognized traps without a second paid trap toggle. See `docs/P2Completion_IMPLEMENTATION.md`.
+
+Remaining catalog candidates include independent jump height, bait saving/crate chance, liquid utility/hover/actuator/wire helpers and dodge. This batch does not claim the entire P2 catalog is done. Tool destruction efficiency already shipped in P2-A and is not duplicate P3 work.
 
 ### P2-D — Developer discovery tooling
 - `AccessoryTalentScanner`

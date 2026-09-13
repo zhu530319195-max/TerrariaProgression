@@ -252,3 +252,28 @@ TalentCatalog.Apply(state,TalentOperation.RefundCategory,"",TalentCategory.Comba
 Check(copy.TotalSpentTalentPoints==2 && copy.Talents.ContainsKey("StatusImmunity"),"combat page refund preserves utility immunity composite");
 Check(TalentMath.AddInt(0,BigInteger.Pow(10,80)*120)==int.MaxValue && TalentMath.ScaleInt(75,TalentMath.Level(BigInteger.Pow(10,80)))==int.MaxValue,"huge effect values saturate engine fields without level loops");
 Console.WriteLine($"Final P2-C core checks passed: {checks}");
+
+// P2 completion: every new entry shares the same validated paid-cost ledger.
+foreach(string id in new[]{"FlightTime","FlightSpeed","SwimSpeed","PlacementSpeed","WallPlacementSpeed"}) {
+    state=new(); state.Award(1000000*scale,50000);
+    Check(TalentCatalog.TryGet(id,out var d) && d.Category==TalentCategory.Utility && d.DefaultCost==1 && d.MaxLevel==0 && d.Adjustable,"completion numeric contract: "+id);
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,id,TalentCategory.Utility,10,out state)==TalentResult.Success && state.TotalSpentTalentPoints==10,"completion numeric cost: "+id);
+    TalentCatalog.Apply(state,TalentOperation.DecreaseIntensity,id,TalentCategory.Utility,7,out state);
+    copy=StateCodec.Decode(StateCodec.Encode(state));
+    Check(TalentCatalog.ValidateImported(copy) && NumericTalents.ActiveLevel(copy,id)==3,"completion adjustable save: "+id);
+    TalentCatalog.Apply(copy,TalentOperation.Disable,id,TalentCategory.Utility,1,out copy);
+    Check(NumericTalents.ActiveLevel(copy,id)==0 && copy.TotalSpentTalentPoints==10,"completion disable keeps payment: "+id);
+    TalentCatalog.Apply(copy,TalentOperation.RefundTalent,id,TalentCategory.Utility,1,out copy);
+    Check(copy.TotalSpentTalentPoints==0 && copy.AvailableTalentPoints==state.AvailableTalentPoints+10,"completion refund: "+id);
+}
+foreach(string id in new[]{"NightVision","SelfLight","DangerSense"}) {
+    state=new(); state.Award(1000000*scale,50000);
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,id,TalentCategory.Utility,1,out state)==TalentResult.Success && state.TotalSpentTalentPoints==2,"completion binary price: "+id);
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,id,TalentCategory.Utility,1,out _)==TalentResult.NoChange,"completion binary no duplicate: "+id);
+    TalentCatalog.Apply(state,TalentOperation.Disable,id,TalentCategory.Utility,1,out state);
+    copy=StateCodec.Decode(StateCodec.Encode(state));
+    Check(TalentCatalog.ValidateImported(copy) && !copy.Talents[id].Enabled,"completion binary save: "+id);
+    TalentCatalog.Apply(copy,TalentOperation.RefundTalent,id,TalentCategory.Utility,1,out copy);
+    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+2,"completion binary refund: "+id);
+}
+Console.WriteLine($"Final P2-Completion core checks passed: {checks}");
