@@ -312,6 +312,7 @@ public sealed partial class RuntimeChecks : ModSystem
         RunCopperMining();
         RunP1Refinement();
         RunP2();
+        RunP2B();
     }
     private void RunCopperMining()
     {

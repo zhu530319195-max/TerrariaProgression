@@ -24,6 +24,11 @@ public sealed class FunctionalTalentPlayer : ModPlayer
         if (Has("LavaImmunity")) Player.lavaImmune = true;
         if (Has("HotTileImmunity")) Player.fireWalk = true;
         if (MaximumJumps > 0) Player.GetJumpState<ProgressionExtraJump>().Enable();
+        if (Has("IceTraction")) Player.iceSkate = true;
+        if (Has("BuildingRuler")) { Player.rulerGrid = true; Player.rulerLine = true; }
+        if (Has("AutoPaint")) Player.autoPaint = true;
+        if (Has("FishingLine")) Player.accFishingLine = true;
+        if (Has("LavaFishing")) Player.accLavaFishing = true;
         ApplyInformation();
     }
     public override void PreUpdateMovement()

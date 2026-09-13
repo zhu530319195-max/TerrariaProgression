@@ -69,7 +69,8 @@ Mods: {
   "ChildRareCreatures": "RareCreatures",
   "ChildOre": "Ore",
   "ChildTreasure": "Treasure",
-  "ChildKillCount": "KillCount"
+  "ChildKillCount": "KillCount",
+  "GroupFishing": "Fishing / Gathering"
 }
     TalentNames: {
   "MaxLife": "Maximum life",
@@ -127,7 +128,16 @@ Mods: {
   "HotTileImmunity": "Hot Tile Immunity",
   "KnockbackImmunity": "Knockback Immunity",
   "AllInformation": "All Information",
-  "ToolSpeed": "Tool Speed"
+  "ToolSpeed": "Tool Speed",
+  "Dash": "Dash",
+  "WallClimb": "Wall Climb",
+  "WallSlide": "Wall Slide",
+  "UnlimitedFlight": "Unlimited Flight",
+  "IceTraction": "Ice Traction",
+  "BuildingRuler": "Building Ruler",
+  "AutoPaint": "Auto Paint",
+  "FishingLine": "Fishing Line",
+  "LavaFishing": "Lava Fishing"
 }
     TalentHints: {
   "MaxLife": "+25 HP per level. Raising the maximum never heals; lowering it only clips current life.",
@@ -185,7 +195,16 @@ Mods: {
   "HotTileImmunity": "Protects against native hot-tile contact, not every fire attack.",
   "KnockbackImmunity": "Prevents native hit knockback. Disabling retains real equipment immunity.",
   "AllInformation": "Unlocks 12 native information/treasure effects. Toggle each below at no cost. Disabling removes only talent contributions, not equipment or team information.",
-  "ToolSpeed": "Tool intervals divided by (1 + 0.2 x active level); level 10 is about 3x efficiency. Native picks, axes and hammers; preserves tool power, protection and placement speed. Minimum one frame."
+  "ToolSpeed": "Tool intervals divided by (1 + 0.2 x active level); level 10 is about 3x efficiency. Native picks, axes and hammers; preserves tool power, protection and placement speed. Minimum one frame.",
+  "Dash": "Double-tap left/right for a native standard dash, with native cooldown/collision and no damage or dodge. Existing equipment dash takes priority. Disabling does not reset an active dash or cooldown.",
+  "WallClimb": "Hold toward a wall to cling; press jump repeatedly to climb by wall-jumping. Down slides. Cling takes priority over the slide talent. Native rules, no phasing or rope-style climbing.",
+  "WallSlide": "Hold toward a wall to descend slowly; down descends faster. Wall-jumping is supported. Existing cling equipment or Wall Climb takes priority.",
+  "UnlimitedFlight": "Conserves remaining flight time of existing wings without granting wings or speed. No mounts or standalone rocket boots. If already exhausted, land once first. Disabling does not refill time.",
+  "IceTraction": "Native ice traction improves starting, braking and turning. Does not stack twice with ice skates.",
+  "BuildingRuler": "Enables native grid/ruler display controls. Select displays using the vanilla builder buttons beside inventory. Preserves the built-in ruler and your button preferences.",
+  "AutoPaint": "Uses inventory paint while placing tiles, furniture and walls, with native consumption. Enable the vanilla paint builder button. Building still works without paint; existing buildings are not repainted automatically.",
+  "FishingLine": "Prevents native line-break loss on retrieval. Bait consumption and normal fishing requirements remain. Does not guarantee a catch on every cast.",
+  "LavaFishing": "Allows ordinary rods and bait to fish in a sufficiently large lava pool. Normal fishing power, waiting and consumption apply. Does not grant lava immunity."
 }
     Messages: {
       LootLimit: "Extra loot reached the roll budget or item capacity; some extra rewards were not generated. Adjust the roll budget in Mod Config. Levels and points are unchanged."

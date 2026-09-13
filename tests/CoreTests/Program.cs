@@ -213,3 +213,16 @@ Check(TalentCatalog.Apply(copy,TalentOperation.Upgrade,"AutoJump",TalentCategory
 state=new(); state.Award(10000*scale,50000); state.Invest("AutoJump",2); state.TotalSpentTalentPoints++;
 Bad(()=>StateCodec.Decode(StateCodec.Encode(state)),"retirement cannot repair or accept a corrupt original ledger");
 Console.WriteLine($"Final P2 core checks passed: {checks}");
+
+// P2-B: each new unlock crosses save/import boundaries without changing paid costs.
+foreach (string id in new[]{"Dash","WallClimb","WallSlide","UnlimitedFlight","IceTraction","BuildingRuler","AutoPaint","FishingLine","LavaFishing"}) {
+    state=new(); state.Award(10000*scale,50000);
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,id,TalentCategory.Utility,1,out state)==TalentResult.Success && state.TotalSpentTalentPoints==2,"P2B unlock price: "+id);
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,id,TalentCategory.Utility,1,out _)==TalentResult.NoChange,"P2B cannot repurchase: "+id);
+    TalentCatalog.Apply(state,TalentOperation.Disable,id,TalentCategory.Utility,1,out state);
+    copy=StateCodec.Decode(StateCodec.Encode(state));
+    Check(TalentCatalog.ValidateImported(copy) && !copy.Talents[id].Enabled && copy.TotalSpentTalentPoints==2,"P2B disabled save imports: "+id);
+    TalentCatalog.Apply(copy,TalentOperation.RefundTalent,id,TalentCategory.Utility,1,out copy);
+    Check(copy.TotalSpentTalentPoints==0 && copy.AvailableTalentPoints==state.AvailableTalentPoints+2,"P2B refunds paid two points: "+id);
+}
+Console.WriteLine($"Final P2-B core checks passed: {checks}");
