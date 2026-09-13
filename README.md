@@ -1,36 +1,35 @@
 # TerrariaProgression
 
-Terraria/tModLoader 的独立无限成长系统项目。
+A standalone Terraria/tModLoader infinite progression framework.
 
-当前目标是建立一套与角色外观完全解耦的成长框架：玩家通过击杀获得经验、无限升级并获得天赋点，再将天赋点投入基础属性、恢复、战斗、经济、功能能力与超凡世界能力。
+## Current status
 
-## 当前状态
+Design/bootstrap phase. No gameplay code is implemented yet.
 
-项目处于设计基线与工程初始化阶段，尚未进入正式功能实现。
+The authoritative design baseline is:
 
-已确认的核心规则包括：
+- `docs/PROGRESSION_DESIGN_v0.1.md`
+- `DECISIONS.md`
+- `PROJECT_STATUS.md`
+- `ROADMAP.md`
 
-- 等级无上限
-- 经验与成长绑定角色，而不是世界
-- 死亡、切换世界、单人/联机切换不损失经验或等级
-- 击杀经验默认按 `NPC.lifeMax` 计算
-- 每 1 最大生命对应经验可配置为 0.01～10.00，默认 1.00
-- 单级经验需求默认最高 50,000，支持关闭封顶
-- 雕像生成单位经验倍率可配置
-- 多人经验按有效贡献分配，不采用最后一击独占
-- 升级获得天赋点
-- 天赋支持升级、启停与自由回退
+## Core direction
 
-完整设计见 [`docs/PROGRESSION_DESIGN_v0.1.md`](docs/PROGRESSION_DESIGN_v0.1.md)。
+- Infinite character level.
+- Character-bound progression persists across worlds and multiplayer sessions.
+- Kill XP is derived from NPC maximum life with configurable scaling.
+- Per-level XP requirement has a configurable default cap of 50,000.
+- Level-ups grant talent points.
+- Numeric talents are infinitely repeatable by default.
+- Default balance target: Lv.1–3 is noticeable, Lv.5 is clearly strong, Lv.10 is very strong; levels above 10 continue scaling without a conventional balance guarantee.
+- Talents can be disabled without refunding, or rolled back to refund the points actually paid.
+- Six talent families: Base Stats, Recovery, Combat, Economy/Resources, Utility, and Transcendent/World Interaction.
+- Dangerous world-changing effects are server-authoritative and independently toggleable.
 
-## 项目文档
+## Development workflow
 
-- `AGENTS.md`：工程与协作规则
-- `PROJECT_STATUS.md`：当前进度与未决事项
-- `ROADMAP.md`：P0～P3 开发路线
-- `DECISIONS.md`：已确认的重要设计决策
-- `docs/PROGRESSION_DESIGN_v0.1.md`：成长系统完整设计基线
+`main` is treated as the stable branch. Features are developed on dedicated branches and proposed through pull requests. Gameplay changes should not be merged until implementation/build checks and the requested in-game acceptance testing are complete.
 
-## 开发流程
+## Scope separation
 
-`main` 保持稳定。实际功能通过独立分支与 Pull Request 开发，并在实机验收通过后再合并。
+This repository does not contain Xiaoyu visual replacement, hair, sprite, or PlayerDrawLayer work. Progression is intentionally developed as an independent module so it can run on its own or be integrated with a visual mod later.
