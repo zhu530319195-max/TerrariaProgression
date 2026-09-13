@@ -9,6 +9,7 @@ Project bootstrap / design freeze before implementation.
 - Open bootstrap PR: #1
 - No gameplay code implemented yet.
 - Progression design baseline exists in `docs/PROGRESSION_DESIGN_v0.1.md`.
+- Functional/utility talent baseline exists in `docs/FUNCTIONAL_TALENTS_v0.1.md`.
 
 ## Confirmed core rules
 - Initial level: 1.
@@ -50,15 +51,38 @@ Project bootstrap / design freeze before implementation.
 - Loot/resource quantity talents: generally +10% / level.
 - Full formulas and the rest of the current defaults are authoritative in `docs/PROGRESSION_DESIGN_v0.1.md`.
 
+## Functional talent architecture approved
+- Use `FunctionalTalentRegistry` as the single explicit registration source for utility/accessory-like powers.
+- Prefer `NativeFlag` and `NativeSystem` implementations.
+- Use `AccessoryBridge` only for explicit, tested vanilla whitelist entries.
+- Use `Custom` for mechanics that cannot be safely represented by stable native hooks.
+- Use `Composite` for grouped abilities such as All Information and common status immunity.
+- Unknown accessories are never automatically turned into purchasable talents.
+- `AccessoryTalentScanner` is a development-time candidate finder only; it does not infer or execute unknown effects.
+- Third-party accessory auto-import is experimental and disabled by default.
+- Boolean/special effects default to non-duplicating behavior when a real equipped item already provides the same effect.
+
+## Approved first functional groups
+- Movement: no fall damage, auto jump, dash, wall climb/slide, ice traction, water/lava surface movement, optional unlimited flight.
+- Environment: underwater breathing, lava immunity, hot-tile immunity, danger/trap sensing, optional night vision/light functions.
+- Information: one 2-point All Information composite unlock with individually toggleable readouts.
+- Immunity: one 2-point common status-immunity composite; knockback immunity remains a separate 2-point toggle.
+- Building/tool assistance: numeric reach/speed talents plus selected binary helpers after compatibility testing.
+- Fishing/collection convenience: line protection, lava fishing eligibility and other approved utility effects.
+- Combat-trigger accessory effects remain in the Combat page rather than bloating the Utility page.
+
 ## Still not finalized
 - Final UI layout and hotkeys.
 - Detailed segmented/multi-entity boss settlement handling.
 - Exact runtime implementation for dynamic loot probability/quantity modification across vanilla and third-party drop rules.
 - Exact compatibility behavior for over-100% critical chance with third-party crit systems.
-- Any deliberate exceptions to the default 2-point price for future unusually powerful one-time unlocks.
+- Exact implementation mappings (`NativeFlag` vs `NativeSystem` vs `AccessoryBridge` vs `Custom`) for every P2 functional entry; these are technical tasks, not unresolved product rules.
 
-## Next design task
-Review the remaining utility/transcendent catalog for missing abilities or intentional exceptions before implementation begins.
+## Design status
+The core progression rules, P1 default balance direction, utility unlock pricing, and functional talent architecture are sufficiently defined to begin implementation. Remaining design questions can be handled as targeted follow-ups without blocking P0.
 
-## Next implementation task after design approval
+## Next implementation task
 Create the tModLoader project skeleton and P0 progression core: player save data, XP calculation, level-up loop, configurable XP cap, talent point storage, save/load, refund bookkeeping, toggle state, configuration scaffolding, and multiplayer synchronization foundations.
+
+## Later implementation task
+Build the P2 `FunctionalTalentRegistry` before implementing the first permanent utility effects. Add `AccessoryTalentScanner` after the registry and core P2 effects are stable; the scanner must not block initial P2 delivery.
