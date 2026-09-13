@@ -43,7 +43,11 @@ Mods: {
   "ResultNotEnoughPoints": "Not enough talent points.",
   "ResultNoChange": "Nothing to change.",
   "ResultStaleRequest": "State changed; this request was not applied. Try again.",
-  "ResultCapacity": "Save capacity exceeded. No changes applied."
+  "ResultCapacity": "Save capacity exceeded. No changes applied.",
+  "DecreaseIntensity": "Power -1",
+  "IncreaseIntensity": "Power +1",
+  "MaximumIntensity": "Maximum power",
+  "Intensity": "Active level: {0} (no refund)"
 }
     TalentNames: {
   "MaxLife": "Maximum life",
@@ -66,7 +70,31 @@ Mods: {
   "ManaSaving": "Mana cost reduction",
   "Minions": "Minion capacity",
   "Sentries": "Sentry capacity",
-  "PickupRange": "Pickup range"
+  "PickupRange": "Pickup range",
+  "JumpSpeed": "Jump Speed",
+  "Breath": "Breath",
+  "KnockbackResistance": "Knockback Resistance",
+  "HeartRecovery": "Heart Recovery",
+  "StarRecovery": "Star Recovery",
+  "PotionDuration": "Potion Duration",
+  "DebuffDuration": "Debuff Duration",
+  "CritChance": "Crit Chance",
+  "MeleeRange": "Melee Range",
+  "ProjectileSpeed": "Projectile Speed",
+  "Invulnerability": "Invulnerability",
+  "Coins": "Coins",
+  "LootQuantity": "Loot Quantity",
+  "DropChance": "Drop Chance",
+  "MiningYield": "Mining Yield",
+  "WoodYield": "Wood Yield",
+  "HerbYield": "Herb Yield",
+  "GemYield": "Gem Yield",
+  "FishingYield": "Fishing Yield",
+  "SellPrice": "Sell Price",
+  "BuyDiscount": "Buy Discount",
+  "ReforgeDiscount": "Reforge Discount",
+  "ToolReach": "Tool Reach",
+  "BuildReach": "Build Reach"
 }
     TalentHints: {
   "MaxLife": "+25 HP per level. Raising the maximum never heals; lowering it only clips current life.",
@@ -89,7 +117,31 @@ Mods: {
   "ManaSaving": "Mana cost ×0.95 per level, multiplicative with native modifiers.",
   "Minions": "+1 minion capacity per level, additive with equipment.",
   "Sentries": "+1 sentry capacity per level, additive with equipment.",
-  "PickupRange": "+10% pickup range per level, multiplied with the original item range."
+  "PickupRange": "+10% pickup range per level, multiplied with the original item range.",
+  "CritChance": "Adds 10 percentage points per level. Above 100%: tier 1 x2, tier 2 x3, tier 3 x4. Respects DisableCrit and standard crit classes.",
+  "DropChance": "p = 1-(1-base chance)^(1+0.1*level). Supports exact native CommonDrop rules; complex/unknown rules are unchanged.",
+  "MeleeRange": "Adds 10% native swing size and hitbox per level. Separate projectile weapons are not enlarged. Active level is adjustable.",
+  "ToolReach": "Adds 1 tile of pick/axe/hammer reach per level. Does not change power, speed or tile count. Adjustable.",
+  "BuildReach": "Adds 1 tile of tile/wall placement reach per level, separately from tool reach. Adjustable.",
+  "PotionDuration": "New Potion Sickness duration x0.93 per level; stacks with Debuff Duration. Existing timers are not rescaled.",
+  "DebuffDuration": "New debuff duration x0.95 per level, at least 1 tick. Continuous sources can refresh debuffs.",
+  "LootQuantity": "Adds 10% quantity per level to successful NPC loot; fractional tail is probabilistic. Native loot recipient, server category controls.",
+  "Coins": "Adds 10% NPC coin output per level using native loot attribution; no bonus on ordinary pickups or discarded coins.",
+  "MiningYield": "Adds 10% attributed Ore-tagged tile yield per level. Unowned environmental breaks are excluded.",
+  "WoodYield": "Adds 10% attributed tree wood output per level. Does not fell additional blocks.",
+  "HerbYield": "Adds 10% attributed vanilla herb plant output including seeds per level. Unknown plants need an adapter.",
+  "GemYield": "Adds 10% attributed output of the seven vanilla gems, including gem trees.",
+  "FishingYield": "Adds 10% caught item quantity per level. Uses native owner-client fishing; no quest or container bonus.",
+  "SellPrice": "Adds 5% coin selling price per level after happiness. Special currencies unchanged.",
+  "BuyDiscount": "Coin buying price x0.95 per level after native modifiers. Nonfree goods cost at least 1 copper.",
+  "ReforgeDiscount": "Reforge price basis x0.95 per level; native final discounts and rounding remain.",
+  "JumpSpeed": "Adds 3% native jump speed per level after equipment. Custom movement may override it.",
+  "Breath": "Adds 10% breath capacity per level. Raising the maximum does not refill breath.",
+  "KnockbackResistance": "Incoming knockback x0.95 per level. Preserves immunity.",
+  "HeartRecovery": "Adds 10% healing from vanilla hearts and seasonal equivalents per level.",
+  "StarRecovery": "Adds 10% restoration from vanilla mana stars and equivalents per level.",
+  "ProjectileSpeed": "Adds 5% launch velocity per level. Projectile AI can override velocity.",
+  "Invulnerability": "Adds 1 frame to the applicable native hurt immunity timer per level."
 }
     Messages: {
       Status: "Level {0} | XP {1} / {2} | Total XP {3} | Available talent points {4} | Spent {5}"
@@ -101,6 +153,18 @@ Mods: {
     Configs: {
       ProgressionConfig: {
         DisplayName: Progression rules (server)
+        BoostMaterials: { Label: "Boost Materials", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        BoostConsumables: { Label: "Boost Consumables", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        BoostPotions: { Label: "Boost Potions", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        BoostAmmo: { Label: "Boost Ammo", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        BoostWeapons: { Label: "Boost Weapons", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        BoostArmor: { Label: "Boost Armor", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        BoostAccessories: { Label: "Boost Accessories", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        BoostBossLoot: { Label: "Boost BossLoot", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        BoostTreasureBags: { Label: "Boost TreasureBags", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        BoostMounts: { Label: "Boost Mounts", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        BoostPets: { Label: "Boost Pets", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
+        BoostModItems: { Label: "Boost ModItems", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
         HpToXpMultiplier: {
           Label: XP per maximum HP
           Tooltip: "NPC.lifeMax × this multiplier. Range 0.01–10.00."

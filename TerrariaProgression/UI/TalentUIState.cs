@@ -70,21 +70,23 @@ internal sealed class TalentUIState : UIState
         scroll.Left.Set(-18, 1); scroll.Height.Set(0, 1); left.Append(scroll);
         list.SetScrollbar(scroll);
         panel.Append(rightArea);
-        detailsList.Width.Set(-20, 1); detailsList.Height.Set(-78, 1); rightArea.Append(detailsList);
+        detailsList.Width.Set(-20, 1); detailsList.Height.Set(-114, 1); rightArea.Append(detailsList);
         var detailScroll = new TalentScrollbar(detailsList);
-        detailScroll.Left.Set(-18, 1); detailScroll.Height.Set(-78, 1); rightArea.Append(detailScroll);
+        detailScroll.Left.Set(-18, 1); detailScroll.Height.Set(-114, 1); rightArea.Append(detailScroll);
         detailsList.SetScrollbar(detailScroll);
         detailCard.Width.Set(0, 1); detailsList.Add(detailCard);
         Place(title, detailCard, 0, 0, 1, 0, 26);
         Place(detail, detailCard, 0, 32, 1, 0, 0); detail.IsWrapped = true;
         Place(hint, detailCard, 0, 140, 1, 0, 0); hint.IsWrapped = true;
-        actions.Width.Set(0, 1); actions.Height.Set(70, 0); actions.Top.Set(-70, 1); rightArea.Append(actions);
+        actions.Width.Set(0, 1); actions.Height.Set(106, 0); actions.Top.Set(-106, 1); rightArea.Append(actions);
         ActionButton(actions, "Upgrade", () => Request(TalentOperation.Upgrade), () => CanAct && Player.State.AvailableTalentPoints > 0 && NumericTalents.TryGet(selected, out _));
         ActionButton(actions, "RefundOne", () => Request(TalentOperation.RefundOne), () => CanAct && HasSelected);
         ActionButton(actions, "RefundTalent", () => Request(TalentOperation.RefundTalent), () => CanAct && HasSelected);
         ActionButton(actions, "Enable", () => Request(TalentOperation.Enable), () => CanAct && HasSelected && !Player.State.Talents[selected].Enabled);
         ActionButton(actions, "Disable", () => Request(TalentOperation.Disable), () => CanAct && HasSelected && Player.State.Talents[selected].Enabled);
         ActionButton(actions, "RefundCategory", () => Player.RequestTalent(TalentOperation.RefundCategory, category: category), () => CanAct && Player.State.Talents.Keys.Any(id => NumericTalents.TryGet(id, out var d) && d.Category == category));
+        foreach (var op in new[] { TalentOperation.DecreaseIntensity, TalentOperation.IncreaseIntensity, TalentOperation.MaximumIntensity })
+            ActionButton(actions, op.ToString(), () => Request(op), () => CanAct && HasSelected && NumericTalents.TryGet(selected, out var d) && d.Adjustable);
         var footerOps = new[] { TalentOperation.EnableEverything, TalentOperation.DisableEverything, TalentOperation.RefundEverything };
         for (int i = 0; i < footerOps.Length; i++) {
             var op = footerOps[i];
@@ -208,8 +210,9 @@ internal sealed class TalentUIState : UIState
             var level = owned?.TalentLevel ?? 0;
             title.SetText(Name(selected));
             detail.SetText(Text("Detail", Compact(level), owned?.Enabled == false ? Text("Off") : level > 0 ? Text("On") : Text("Unlearned"),
-                Effect(definition, owned?.Enabled == false ? 0 : level), Effect(definition, level + 1), definition.DefaultCost, Compact(owned?.InvestedPoints ?? 0)));
-            hint.SetText(Language.GetTextValue("Mods.TerrariaProgression.TalentHints." + selected));
+                Effect(definition, NumericTalents.ActiveLevel(s, selected)), Effect(definition, level + 1), definition.DefaultCost, Compact(owned?.InvestedPoints ?? 0)));
+            hint.SetText(Language.GetTextValue("Mods.TerrariaProgression.TalentHints." + selected) +
+                (definition.Adjustable ? "\n" + Text("Intensity", Compact(owned == null ? 0 : NumericTalents.EffectiveLevel(owned))) : ""));
         }
         else { title.SetText(Text("Category" + (int)category)); detail.SetText(Text("ComingLater")); hint.SetText(""); }
         feedback.SetText(!Player.SessionReady ? Text("Waiting") : Player.RequestTimedOut ? Text("Timeout") : Player.RequestPending ? Text("Waiting") : Player.HasResult ? Text("Result" + Player.LastResult) : Text("Help"));

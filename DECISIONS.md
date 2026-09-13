@@ -86,3 +86,9 @@ Any future third-party accessory bridge is opt-in/experimental (`ExperimentalImp
 
 ## D027 — Information and common status immunity are bundled utility unlocks
 To avoid menu bloat, vanilla-style information readouts are grouped under one 2-point `All Information` composite unlock with individually toggleable sub-effects. Common vanilla accessory-style debuff immunities are grouped under one 2-point status-immunity composite unlock, while knockback immunity remains a separate 2-point toggle because it materially changes combat feel.
+
+## D028 — P1 completion scope and revised crit chance (2026-09-13)
+User approved combining remaining P1 batches, adding melee swing size/reach (+10% per level, cost 1, unlimited, adjustable active strength), and advancing tool/build reach (+1 tile per level each) into P1. Crit chance is now +10 percentage points per level, superseding D019's +2.5. Lv.10 is a strength target, not a cap. P2 binary powers and P3 world destruction remain excluded. API limitations must be reported rather than changing the approved mechanics. PR #3 was explicitly authorized and merged.
+
+## D029 — Tiered crit fix deferred after in-game feedback (2026-09-13)
+The user confirmed critical chance, wooden-sword swing size, tool reach and mining yield. Their latest message supersedes the earlier copper-yield failure report. Tiered crit did not work in their game; they explicitly requested no fix for now because the separate critical-damage talent is available. Preserve the existing crit rules/code for now and mark tiered crit as unaccepted/deferred, not passed. Thrusting shortswords remain outside the implemented ordinary-swing reach adapter. This feedback does not authorize merging PR #4.

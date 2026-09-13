@@ -1,11 +1,11 @@
 # PROJECT_STATUS.md
 
 ## Current phase
-P1-A 0.2.1 UI refinement: first 21 numeric talents and a categorized talent panel implemented on `feat/numeric-talents-ui`; official compilation, 2,058 core checks and 73 native runtime checks passed; user has confirmed upgrades, P/command entry, enable/disable without refunds or instant resource refill, refunds, and world/restart persistence in 0.2.0. PR #3 now includes a 200% UI layout refinement awaiting focused visual acceptance. P1 is not complete. P2/P3 remain unimplemented.
+P1 completion 0.3.0 on `feat/p1-numeric-completion`, based on merged PR #3. 45 numeric entries are registered; local compilation and 2,822 core checks pass. Latest native runtime CI passed 161 checks, including copper/tin/iron/lead mining with an ordinary copper pick and enable/disable cycles. See `docs/P1_COMPLETION_IMPLEMENTATION.md` for jump-height, complex drop-rule and multiplayer private-loot limits. No P2/P3 expansion.
 
 ## Repository state
-- Default branch: `main`; P0 PR #1 and #2 merged with explicit user approval.
-- P1 branch: `feat/numeric-talents-ui`, based on main `3799d3ef07bb89bf1ee46529f0cf25c9584ee24d`.
+- Default branch: `main`; PR #1, #2 and #3 merged with explicit user approval.
+- P1 completion branch: `feat/p1-numeric-completion`, based on main `5f23b0fa544726106e88cb2b9d5db999c7a8b797`.
 - Official target unchanged: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
 - P0 user-confirmed: correct XP; death/restart/world-change persistence. Real multiplayer contribution and segmented/multi-stage Boss tests deferred by user.
 - P1 save format v2 imports v1 and compresses historical costs; old P0 cannot load a newly saved v2 character.
@@ -46,7 +46,7 @@ P1-A 0.2.1 UI refinement: first 21 numeric talents and a categorized talent pane
 - Fixed mana regeneration: +2 MP/s / level.
 - Global damage: +5% / level.
 - Global attack speed: +3% / level.
-- Critical chance: +2.5 percentage points / level.
+- Critical chance: +10 percentage points / level (user revision 2026-09-13).
 - Critical damage multiplier: +5% / level.
 - Armor penetration: +3 / level.
 - Monster coin gain: +10% / level.
@@ -83,8 +83,14 @@ P1-A 0.2.1 UI refinement: first 21 numeric talents and a categorized talent pane
 ## Design status
 The core progression rules, P1 default balance direction, utility unlock pricing, and functional talent architecture are sufficiently defined to begin implementation. Remaining design questions can be handled as targeted follow-ups without blocking P0.
 
+## User acceptance update (2026-09-13)
+- Confirmed in 0.3.0: critical chance, ordinary wooden-sword swing size, tool reach, and mining yield. The latest message corrects the earlier report of copper yield failure.
+- Tiered critical damage did not work in the user test; the user explicitly deferred fixing it because the separate critical-damage talent provides adjustment. Do not report tiered crit as accepted.
+- Thrusting shortswords do not expand: outside the current ordinary-swing adapter; not evidence that their reach is supported.
+- No new merge authorization for PR #4. Unpublished mining diagnostics were discarded after the correction.
+
 ## Next implementation task
-Validate P1-A and fix reported issues. Continue the remaining P1 catalog in focused batches: crit chance / tiered crit, economy and resource attribution, and remaining base/recovery/combat entries. Confirm API incompatibilities instead of changing approved rules. No P2/P3 expansion in P1.
+Continue remaining grouped 0.3.0 acceptance tests, then await explicit merge authorization. Remaining targeted work: confirm jump-height semantics, extend non-CommonDrop rule adapters and multiplayer private loot attribution. No P2/P3 expansion in this PR.
 
 ## Later implementation task
 Build the P2 `FunctionalTalentRegistry` before implementing the first permanent utility effects. Add `AccessoryTalentScanner` after the registry and core P2 effects are stable; the scanner must not block initial P2 delivery.

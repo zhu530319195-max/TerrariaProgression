@@ -7,6 +7,11 @@ namespace TerrariaProgression.Talents;
 
 public sealed class NumericTalentItem : GlobalItem
 {
+    public override bool ReforgePrice(Item item, ref int reforgePrice, ref bool canApplyDiscount)
+    {
+        reforgePrice = TalentMath.ScaleInt(reforgePrice, TalentMath.Remaining(.95, ExtendedTalentPlayer.Level(Main.LocalPlayer, "ReforgeDiscount")));
+        return true;
+    }
     public override void GrabRange(Item item, Player player, ref int grabRange)
     {
         var progression = player.GetModPlayer<ProgressionPlayer>();

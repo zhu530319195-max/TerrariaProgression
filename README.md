@@ -55,3 +55,11 @@ Terraria/tModLoader 独立角色成长系统。
 - [P0 验证记录及用户暂缓项目](docs/P0_VALIDATION.md)
 - 工程位于 `TerrariaProgression/`。目标：tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8。
 - `/tpstatus` 查看成长。新角色开启开发命令后 `/tpgivexp 1000`，应为 Lv.4、50/490 XP、3 个天赋点。
+
+## P1 补全测试版 0.3.0
+
+新增 24 项，共 45 项数值天赋；暴击率每级 +10 个百分点，新增多重暴击与可调攻击／工具／建造范围。
+
+- [安装与分组测试](docs/P1_COMPLETION_TEST_GUIDE_zh-CN.md)
+- [实现与明确未覆盖的项目](docs/P1_COMPLETION_IMPLEMENTATION.md)
+- [验证记录](docs/P1_COMPLETION_VALIDATION.md)
