@@ -8,3 +8,9 @@
 - Local GUI rendering and two physical multiplayer clients are unavailable here. Prior 0.2.0 player acceptance is preserved; it does not automatically accept 0.3.0 effects or UI changes.
 - P0 multiplayer contribution / segmented Boss real-game acceptance remains explicitly deferred by the user.
 - Limitations and incomplete catalog mappings: `P1_COMPLETION_IMPLEMENTATION.md`.
+
+## Follow-up evidence and user feedback (2026-09-13)
+
+[Actions 34758260039](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34758260039) at a4cac0fa24b35186a3393580f51338223953f60b passed compilation, 2,822 core checks and **161 native runtime checks**. The added fixture purchases only MiningYield Lv.10, uses normal copper-pick power (three hits per tile), and verifies copper/tin/iron/lead output through enable → disable → enable: 2 → 1 → 2 items per tile. All partial/final mining scopes restore. This is headless native testing, not GUI acceptance.
+
+The user subsequently corrected their report: mining yield **does work**. Also confirmed: critical chance, wooden-sword swing size, tool reach. Thrusting shortswords remain unsupported by the swing adapter. Tiered crit failed in-game and its fix is explicitly deferred by the user; the synthetic HitModifiers tests do not supersede that real-game result. No tiered-crit acceptance or PR #4 merge authorization is inferred. Unpublished diagnostic code was discarded; production remains 0.3.0.
