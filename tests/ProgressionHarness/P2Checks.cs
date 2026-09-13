@@ -35,7 +35,7 @@ public sealed partial class RuntimeChecks
         foreach (var t in FunctionalTalentRegistry.All)
             Check(A.ApplyTalent(TalentOperation.Upgrade,t.Definition.Id,TalentCategory.Utility,t.Definition.MaxLevel == 1 ? 1 : 3)==TalentResult.Success,"runtime functional purchase: "+t.Definition.Id);
         p.ResetEffects(); PlayerLoader.UpdateEquips(p);
-        Check(p.noFallDmg && p.autoJump && p.noKnockback && p.waterWalk2 && p.lavaImmune && p.fireWalk,"native equip lifecycle applies purchased utility flags");
+        Check(p.noFallDmg && !p.autoJump && p.noKnockback && p.waterWalk2 && p.lavaImmune && p.fireWalk,"native equip lifecycle applies purchased utility flags");
         Check(p.accWatch==3 && p.accCompass==1 && p.accWeatherRadio && p.accCalendar && p.accFishFinder && p.accThirdEye && p.accDreamCatcher && p.accCritterGuide && p.accOreFinder && p.findTreasure && p.accJarOfSouls,"information composite applies native readouts");
         A.ApplyTalent(TalentOperation.ToggleChild,"AllInformation",TalentCategory.Utility,3);
         p.ResetEffects(); PlayerLoader.UpdateEquips(p);
@@ -74,7 +74,17 @@ public sealed partial class RuntimeChecks
         var retained=A.State; Main.netMode=NetmodeID.MultiplayerClient;
         Check(A.ApplyTalent(TalentOperation.ToggleChild,"AllInformation",TalentCategory.Utility,3)==TalentResult.NotReady && ReferenceEquals(retained,A.State),"client cannot mutate child state locally");
         Main.netMode=NetmodeID.Server; A.SessionReady=false; Receive(1,retained);
-        Check(A.SessionReady && A.State.Talents.ContainsKey("AllInformation"),"protocol five imports functional talents");
+        Check(A.SessionReady && A.State.Talents.ContainsKey("AllInformation"),"protocol six imports functional talents");
+        p.autoJump=true; PlayerLoader.UpdateEquips(p);
+        Check(p.autoJump,"retirement preserves auto jump supplied by real equipment");
+        Reset(); A.Award(10000*Experience.Scale); A.State.Invest("AutoJump",2); A.State.Invest("MaxLife",1);
+        var oldAvailable=A.State.AvailableTalentPoints; var legacy=new TagCompound(); A.SaveData(legacy); B.LoadData(legacy);
+        Check(!B.State.Talents.ContainsKey("AutoJump") && B.State.AvailableTalentPoints==oldAvailable+2 && B.State.Talents.ContainsKey("MaxLife"),"native save migration refunds retired auto jump only");
+        var upgraded=new TagCompound(); B.SaveData(upgraded); A.LoadData(upgraded);
+        Check(A.State.AvailableTalentPoints==B.State.AvailableTalentPoints,"native repeat load cannot duplicate retirement refund");
+        Main.netMode=NetmodeID.Server; A.SessionReady=false;
+        var oldState=StateCodec.Decode(StateCodec.Encode(A.State)); oldState.Invest("AutoJump",2); Receive(1,oldState);
+        Check(A.SessionReady && !A.State.Talents.ContainsKey("AutoJump") && A.State.AvailableTalentPoints==B.State.AvailableTalentPoints,"server import migrates retired talent before catalog validation");
         RunToolEfficiency();
     }
     private void RunToolEfficiency()

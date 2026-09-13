@@ -19,7 +19,6 @@ public sealed class FunctionalTalentPlayer : ModPlayer
     {
         // Only provide purchased effects; never clear real equipment/potion flags.
         if (Has("NoFallDamage")) Player.noFallDmg = true;
-        if (Has("AutoJump")) Player.autoJump = true;
         if (Has("KnockbackImmunity")) Player.noKnockback = true;
         if (Has("WaterWalking")) Player.waterWalk2 = true;
         if (Has("LavaImmunity")) Player.lavaImmune = true;

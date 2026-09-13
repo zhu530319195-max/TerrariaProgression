@@ -22,7 +22,7 @@ public static class FunctionalTalentRegistry
         new(new TalentDefinition(id, TalentCategory.Utility, 0, EffectUnit.Flag, DefaultCost: 2, MaxLevel: 1),
             kind, group, FunctionalStackPolicy.SatisfyOnce, FunctionalAuthority.ConfirmedPlayerState, Array.Empty<string>());
     public static readonly IReadOnlyList<FunctionalTalent> All = Array.AsReadOnly(new[] {
-        Unlock("NoFallDamage", "Movement"), Unlock("AutoJump", "Movement"),
+        Unlock("NoFallDamage", "Movement"),
         new FunctionalTalent(new TalentDefinition("MultiJump", TalentCategory.Utility, 1, EffectUnit.Flat, true),
             FunctionalImplementation.NativeSystem, "Movement", FunctionalStackPolicy.Add, FunctionalAuthority.ConfirmedPlayerState, Array.Empty<string>()),
         Unlock("WaterWalking", "Environment"), Unlock("LavaWalking", "Environment", FunctionalImplementation.NativeSystem),

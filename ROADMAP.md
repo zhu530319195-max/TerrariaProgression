@@ -94,7 +94,7 @@ Architecture first:
 - Lava-surface walking
 - Lava immunity
 - Hot-tile/fire-block immunity
-- Auto jump
+- Auto jump — cancelled by user after P2-A testing; refund existing purchases
 - Multi-jump integration
 - Knockback immunity
 - All Information composite

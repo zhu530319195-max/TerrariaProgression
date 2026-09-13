@@ -102,6 +102,9 @@ public static class StateCodec
             || result.TotalExperienceEarned < result.CurrentExperience
             || result.TotalExperienceEarned - result.CurrentExperience < (result.Level - 1) * Experience.Scale)
             throw new InvalidDataException("Inconsistent progression snapshot.");
+        // Retired by user request in 0.4.1. Validate the original ledger first,
+        // then return its actual paid cost once; all save/network loads share this path.
+        result.RefundAll("AutoJump");
         return result;
     }
 }

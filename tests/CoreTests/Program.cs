@@ -198,4 +198,18 @@ TalentCatalog.Apply(state,TalentOperation.DecreaseIntensity,"MultiJump",TalentCa
 Check(NumericTalents.ActiveLevel(copy,"MultiJump")==3 && copy.TotalSpentTalentPoints==10,"jump active intensity independent of purchased count");
 state.Talents["NoFallDamage"]=new TalentState(); state.Talents["NoFallDamage"].AddCost(2,2);
 Check(!TalentCatalog.ValidateImported(state),"import cannot exceed binary level cap");
+// Retired AutoJump is refunded once, enabled or disabled, using historical cost.
+foreach (int paid in new[]{2,7}) {
+    state=new(); state.Award(10000*scale,50000); state.Invest("AutoJump",paid); state.Invest("MaxLife",1);
+    state.Talents["AutoJump"].Enabled=paid==2;
+    var available=state.AvailableTalentPoints;
+    copy=StateCodec.Decode(StateCodec.Encode(state));
+    Check(!copy.Talents.ContainsKey("AutoJump") && copy.AvailableTalentPoints==available+paid,"retired talent refunds actual paid cost after validated decode");
+    Check(copy.Talents.ContainsKey("MaxLife") && copy.TotalSpentTalentPoints==1 && copy.TotalTalentPointsEarned==state.TotalTalentPointsEarned,"retirement preserves other talents and lifetime point ledger");
+    var twice=StateCodec.Decode(StateCodec.Encode(copy));
+    Check(twice.AvailableTalentPoints==copy.AvailableTalentPoints && TalentCatalog.ValidateImported(twice),"retired migration is idempotent and importable");
+}
+Check(TalentCatalog.Apply(copy,TalentOperation.Upgrade,"AutoJump",TalentCategory.Utility,1,out _)==TalentResult.UnknownTalent,"retired talent cannot be repurchased");
+state=new(); state.Award(10000*scale,50000); state.Invest("AutoJump",2); state.TotalSpentTalentPoints++;
+Bad(()=>StateCodec.Decode(StateCodec.Encode(state)),"retirement cannot repair or accept a corrupt original ledger");
 Console.WriteLine($"Final P2 core checks passed: {checks}");

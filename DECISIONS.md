@@ -104,3 +104,6 @@ User explicitly accepted and authorized merging PR #4 and #5, now merged. User t
 
 ## D033 — Lifetime point ledger and functional state
 Server reward settings affect future level gains only. Save v3 records lifetime points actually earned, imports v1/v2 as Level−1, and keeps actual paid-cost refunds. Text input uses BigInteger (0 allowed; invalid input becomes 1), retaining existing bounded transport safety; no silent reward clamping. Binary unlocks cost 2 once, numeric MultiJump costs 1 per extra jump. Information sub-toggles are free and persist in the parent talent. Protocol 5 requires same-version peers.
+
+## D034 — Retire AutoJump after acceptance feedback
+User confirmed all other P2-A functions tested successfully and requested cancellation of AutoJump. Remove the talent entirely and automatically refund actual paid points from existing validated saves, without changing real equipment behavior or other talents. Repeated loads must not duplicate refunds. This supersedes all earlier AutoJump catalog entries. No merge authorization in this feedback.
