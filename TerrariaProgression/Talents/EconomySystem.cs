@@ -29,7 +29,6 @@ public sealed class EconomySystem : ModSystem
         On_MessageBuffer.GetData += Message;
         On_WorldGen.KillTile += KillTile;
         On_ItemDropResolver.TryDropping += Drop;
-        On_CommonDrop.TryDroppingItem += Common;
         On_CommonCode.DropItemLocalPerClientAndSetNPCMoneyTo0 += Instanced;
         On_CommonCode.DropItemForEachInteractingPlayerOnThePlayer += PerPlayer;
     }
@@ -41,7 +40,6 @@ public sealed class EconomySystem : ModSystem
         On_MessageBuffer.GetData -= Message;
         On_WorldGen.KillTile -= KillTile;
         On_ItemDropResolver.TryDropping -= Drop;
-        On_CommonDrop.TryDroppingItem -= Common;
         On_CommonCode.DropItemLocalPerClientAndSetNPCMoneyTo0 -= Instanced;
         On_CommonCode.DropItemForEachInteractingPlayerOnThePlayer -= PerPlayer;
         Clear();
@@ -51,6 +49,12 @@ public sealed class EconomySystem : ModSystem
     private static void Clear() { Actor = null; DropContext = null; BreakingTile = -1; SpawningBonus = warnedCapacity = false; }
     private static int SpawnItem(On_Item.orig_NewItem_Inner orig, IEntitySource source, int x, int y, int width, int height, Item clone, int type, int stack, bool noBroadcast, int prefix, bool noDelay, bool reverse)
     {
+        if (ExtraLootSystem.ExtraPass && !ExtraLootSystem.AllowExtraSpawn(source, clone?.type ?? type, noBroadcast)) {
+            Main.item[Main.maxItems] = new Item();
+            return Main.maxItems;
+        }
+        if (!SpawningBonus && BagLootSystem.CanBoost(source) && clone == null)
+            return BagLootSystem.Spawn(orig, source, x, y, width, height, type, stack, noBroadcast, prefix, noDelay, reverse);
         bool old = SpawningBonus;
         // Private/instanced item recipients are assigned AFTER OnSpawn. Until an
         // explicit per-recipient adapter is present, do not turn them into public
@@ -89,30 +93,18 @@ public sealed class EconomySystem : ModSystem
     private static void Drop(On_ItemDropResolver.orig_TryDropping orig, ItemDropResolver resolver, DropAttemptInfo info)
     {
         var old = DropContext; DropContext = info;
-        try { orig(resolver, info); } finally { DropContext = old; }
-    }
-    private static ItemDropAttemptResult Common(On_CommonDrop.orig_TryDroppingItem orig, CommonDrop rule, DropAttemptInfo info)
-    {
-        // Do not guess the semantics of subclass overrides, pity systems, options
-        // pools or third-party rules. Their original code remains in control.
-        if (Main.netMode == NetmodeID.MultiplayerClient || info.npc == null || rule.GetType() != typeof(CommonDrop) ||
-            info.player == null || !Allowed(ContentSamples.ItemsByType[rule.itemId], info.npc)) return orig(rule, info);
-        var level = ExtendedTalentPlayer.Level(info.player, "DropChance");
-        if (level <= 0 || rule.chanceDenominator <= 0) return orig(rule, info);
-        double baseline = TalentMath.LuckProbability(rule.chanceNumerator, rule.chanceDenominator, info.player.luck);
-        if (info.rng.NextDouble() >= TalentMath.DropProbability(baseline, level))
-            return new ItemDropAttemptResult { State = ItemDropAttemptResultState.FailedRandomRoll };
-        CommonCode.DropItem(info, rule.itemId, info.rng.Next(rule.amountDroppedMinimum, rule.amountDroppedMaximum + 1));
-        return new ItemDropAttemptResult { State = ItemDropAttemptResultState.Success };
+        try { ExtraLootSystem.Run(orig, resolver, info); } finally { DropContext = old; }
     }
     private static void Instanced(On_CommonCode.orig_DropItemLocalPerClientAndSetNPCMoneyTo0 orig, NPC npc, int id, int stack, bool required)
     {
+        if (ExtraLootSystem.ExtraPass && Main.netMode == NetmodeID.Server) return;
         bool old = SpawningBonus;
         if (Main.netMode == NetmodeID.Server) SpawningBonus = true;
         try { orig(npc, id, stack, required); } finally { SpawningBonus = old; }
     }
     private static void PerPlayer(On_CommonCode.orig_DropItemForEachInteractingPlayerOnThePlayer orig, NPC npc, int id, Terraria.Utilities.UnifiedRandom rng, int numerator, int denominator, int stack, bool required)
     {
+        if (ExtraLootSystem.ExtraPass && Main.netMode == NetmodeID.Server) return;
         bool old = SpawningBonus;
         if (Main.netMode == NetmodeID.Server) SpawningBonus = true;
         try { orig(npc, id, rng, numerator, denominator, stack, required); } finally { SpawningBonus = old; }

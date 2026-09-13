@@ -22,6 +22,9 @@ public sealed class ProgressionConfig : ModConfig
     [DefaultValue(false)]
     public bool LogExperienceSettlements;
 
+    [DefaultValue(1000), Range(1, 100000)]
+    public int MaxExtraLootRollsPerEvent = 1000;
+
     [DefaultValue(true)] public bool BoostMaterials = true;
     [DefaultValue(true)] public bool BoostConsumables = true;
     [DefaultValue(true)] public bool BoostPotions = true;
@@ -40,6 +43,7 @@ public sealed class ProgressionConfig : ModConfig
         HpToXpMultiplier = float.IsFinite(HpToXpMultiplier) ? Math.Clamp(HpToXpMultiplier, 0.01f, 10f) : 1f;
         StatueExperienceMultiplier = float.IsFinite(StatueExperienceMultiplier) ? Math.Clamp(StatueExperienceMultiplier, 0f, 10f) : 0f;
         ExperienceRequirementCap = Math.Max(0, ExperienceRequirementCap);
+        MaxExtraLootRollsPerEvent = Math.Clamp(MaxExtraLootRollsPerEvent, 1, 100000);
     }
     public override bool AcceptClientChanges(ModConfig pendingConfig, int whoAmI, ref NetworkText message)
     {

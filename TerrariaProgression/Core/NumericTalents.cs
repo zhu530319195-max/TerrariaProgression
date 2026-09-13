@@ -54,6 +54,7 @@ public static class NumericTalents
         new NumericTalent("Invulnerability", TalentCategory.Combat, 1, EffectUnit.Flat),
         new NumericTalent("Coins", TalentCategory.Economy, 10, EffectUnit.Percent),
         new NumericTalent("LootQuantity", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new NumericTalent("BagQuantity", TalentCategory.Economy, 10, EffectUnit.Percent),
         new NumericTalent("DropChance", TalentCategory.Economy, 10, EffectUnit.Percent),
         new NumericTalent("MiningYield", TalentCategory.Economy, 10, EffectUnit.Percent),
         new NumericTalent("WoodYield", TalentCategory.Economy, 10, EffectUnit.Percent),
@@ -144,6 +145,12 @@ public static class NumericTalents
 
 public static class TalentMath
 {
+    // Additional independent rolls; existing DropChance save ID is retained.
+    public static BigInteger ExtraRolls(BigInteger level, double roll)
+    {
+        var whole = BigInteger.DivRem(BigInteger.Max(0, level), 10, out var remainder);
+        return whole + (roll < (double)remainder / 10 ? 1 : 0);
+    }
     // Whole tiers and a fractional remainder; no per-tier loops even at huge levels.
     public static BigInteger CritTier(BigInteger talentLevel, double nativeChance, double roll)
     {

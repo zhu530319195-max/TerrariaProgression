@@ -32,6 +32,8 @@ P1-A 0.2.0 implements 21 entries and the talent panel; official compilation, 2,0
 
 0.3.0 adds 24 entries (45 total) and adjustable melee/tool/build strength. Remaining exceptions: exact physical jump-height scaling, non-CommonDrop probability adapters and per-recipient multiplayer private loot. See `docs/P1_COMPLETION_IMPLEMENTATION.md`; this is not a claim of full third-party compatibility.
 
+0.3.1 P1 refinement: independent extra loot rolls replace DropChance, BagQuantity is added, vanilla shortsword/spear reach is adapted, and native firing intervals are checked. Depends on stage-accepted PR #4. No world-chest enhancement or P2/P3 expansion. See `docs/P1_REFINEMENT_0.3.1.md`.
+
 ### Base Stats
 - Max Life
 - Max Mana
