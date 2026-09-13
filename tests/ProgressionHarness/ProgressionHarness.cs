@@ -31,6 +31,9 @@ public sealed class RuntimeChecks : ModSystem
     private ProgressionConfig Config => ModContent.GetInstance<ProgressionConfig>();
     private ProgressionPlayer A => Main.player[0].GetModPlayer<ProgressionPlayer>();
     private ProgressionPlayer B => Main.player[1].GetModPlayer<ProgressionPlayer>();
+    // The world and mod registries are ready, but the networking thread has not yet
+    // started. Synthetic clients cannot race real connection/disconnection handling.
+    public override void PostWorldLoad() => RunFromConsole();
     private void Check(bool ok, string name)
     {
         if (!ok) throw new Exception(name);
@@ -44,6 +47,7 @@ public sealed class RuntimeChecks : ModSystem
         Main.netMode = NetmodeID.SinglePlayer;
         Main.myPlayer = 0;
         for (int i = 0; i < 2; i++) {
+            Main.player[i] = new Player { whoAmI = i };
             Main.player[i].active = true;
             Main.player[i].dead = false;
             Main.player[i].GetModPlayer<ProgressionPlayer>().Initialize();

@@ -35,12 +35,12 @@ jobs:
         run: dotnet build tests/ProgressionHarness/ProgressionHarness.csproj -c Release -p:TmlInstallPath="$TML_PATH"
       - name: Dedicated server runtime checks
         run: python3 scripts/runtime-smoke.py
+      - name: Package player and source downloads
+        run: python3 scripts/package.py --mod "$HOME/.local/share/Terraria/tModLoader/Mods/TerrariaProgression.tmod"
       - name: Upload player mod and verification logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: TerrariaProgression-P0
           if-no-files-found: warn
-          path: |
-            ~/.local/share/Terraria/tModLoader/Mods/TerrariaProgression.tmod
-            artifacts/*.log
+          path: artifacts/
