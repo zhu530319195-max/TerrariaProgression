@@ -6,10 +6,10 @@ using System.Numerics;
 namespace TerrariaProgression.Core;
 
 public enum TalentCategory : byte { BaseStats, Recovery, Combat, Economy, Utility, World }
-public enum TalentOperation : byte { Upgrade, RefundOne, RefundTalent, Enable, Disable, RefundCategory, RefundEverything, EnableEverything, DisableEverything }
+public enum TalentOperation : byte { Upgrade, RefundOne, RefundTalent, Enable, Disable, RefundCategory, RefundEverything, EnableEverything, DisableEverything, DecreaseIntensity, IncreaseIntensity, MaximumIntensity }
 public enum TalentResult : byte { Success, NotReady, UnknownTalent, InvalidRequest, NotEnoughPoints, NoChange, StaleRequest, Capacity }
 public enum EffectUnit { Flat, Percent, PerSecond, RemainingMultiplier }
-public sealed record NumericTalent(string Id, TalentCategory Category, decimal PerLevel, EffectUnit Unit)
+public sealed record NumericTalent(string Id, TalentCategory Category, decimal PerLevel, EffectUnit Unit, bool Adjustable = false)
 {
     public int DefaultCost => 1;
     public int MaxLevel => 0;
@@ -40,15 +40,41 @@ public static class NumericTalents
         new NumericTalent("ManaSaving", TalentCategory.Combat, .95m, EffectUnit.RemainingMultiplier),
         new NumericTalent("Minions", TalentCategory.Combat, 1, EffectUnit.Flat),
         new NumericTalent("Sentries", TalentCategory.Combat, 1, EffectUnit.Flat),
-        new NumericTalent("PickupRange", TalentCategory.Economy, 10, EffectUnit.Percent)
+        new NumericTalent("PickupRange", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new NumericTalent("JumpSpeed", TalentCategory.BaseStats, 3, EffectUnit.Percent),
+        new NumericTalent("Breath", TalentCategory.BaseStats, 10, EffectUnit.Percent),
+        new NumericTalent("KnockbackResistance", TalentCategory.BaseStats, .95m, EffectUnit.RemainingMultiplier),
+        new NumericTalent("HeartRecovery", TalentCategory.Recovery, 10, EffectUnit.Percent),
+        new NumericTalent("StarRecovery", TalentCategory.Recovery, 10, EffectUnit.Percent),
+        new NumericTalent("PotionDuration", TalentCategory.Recovery, .93m, EffectUnit.RemainingMultiplier),
+        new NumericTalent("DebuffDuration", TalentCategory.Recovery, .95m, EffectUnit.RemainingMultiplier),
+        new NumericTalent("CritChance", TalentCategory.Combat, 10, EffectUnit.Percent),
+        new NumericTalent("MeleeRange", TalentCategory.Combat, 10, EffectUnit.Percent, true),
+        new NumericTalent("ProjectileSpeed", TalentCategory.Combat, 5, EffectUnit.Percent),
+        new NumericTalent("Invulnerability", TalentCategory.Combat, 1, EffectUnit.Flat),
+        new NumericTalent("Coins", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new NumericTalent("LootQuantity", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new NumericTalent("DropChance", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new NumericTalent("MiningYield", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new NumericTalent("WoodYield", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new NumericTalent("HerbYield", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new NumericTalent("GemYield", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new NumericTalent("FishingYield", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new NumericTalent("SellPrice", TalentCategory.Economy, 5, EffectUnit.Percent),
+        new NumericTalent("BuyDiscount", TalentCategory.Economy, .95m, EffectUnit.RemainingMultiplier),
+        new NumericTalent("ReforgeDiscount", TalentCategory.Economy, .95m, EffectUnit.RemainingMultiplier),
+        new NumericTalent("ToolReach", TalentCategory.Utility, 1, EffectUnit.Flat, true),
+        new NumericTalent("BuildReach", TalentCategory.Utility, 1, EffectUnit.Flat, true)
     });
     private static readonly Dictionary<string, NumericTalent> byId = All.ToDictionary(t => t.Id, StringComparer.Ordinal);
     public static bool TryGet(string id, out NumericTalent talent) => byId.TryGetValue(id, out talent!);
     public static BigInteger ActiveLevel(ProgressionState state, string id) =>
-        state.Talents.TryGetValue(id, out var t) && t.Enabled ? t.TalentLevel : BigInteger.Zero;
+        state.Talents.TryGetValue(id, out var t) && t.Enabled ? EffectiveLevel(t) : BigInteger.Zero;
+    public static BigInteger EffectiveLevel(TalentState t) => t.CurrentIntensity is decimal n ? BigInteger.Min(t.TalentLevel, new BigInteger(n)) : t.TalentLevel;
 
     public static bool ValidateImported(ProgressionState state) => state.Talents.All(pair =>
-        byId.ContainsKey(pair.Key) && pair.Value.CurrentIntensity == null);
+        byId.TryGetValue(pair.Key, out var def) && (pair.Value.CurrentIntensity == null ||
+            (def.Adjustable && pair.Value.CurrentIntensity >= 0 && decimal.Truncate(pair.Value.CurrentIntensity.Value) == pair.Value.CurrentIntensity && new BigInteger(pair.Value.CurrentIntensity.Value) <= pair.Value.TalentLevel)));
 
     // A bounded request describes intent only. Neither price nor a resulting level
     // is accepted from a client. Clone/validate/commit makes mutations atomic.
@@ -63,6 +89,23 @@ public static class NumericTalents
             var next = StateCodec.Decode(StateCodec.Encode(original));
             bool changed = false;
             switch (operation) {
+                case TalentOperation.DecreaseIntensity:
+                case TalentOperation.IncreaseIntensity:
+                case TalentOperation.MaximumIntensity:
+                    if (!TryGet(id, out var adjustable) || !adjustable.Adjustable) return TalentResult.InvalidRequest;
+                    if (!next.Talents.TryGetValue(id, out var adjustableState)) return TalentResult.NoChange;
+                    decimal? intensity = null;
+                    if (operation != TalentOperation.MaximumIntensity) {
+                        var active = EffectiveLevel(adjustableState);
+                        var desired = BigInteger.Clamp(active + (operation == TalentOperation.DecreaseIntensity ? -count : count), 0, adjustableState.TalentLevel);
+                        if (desired < adjustableState.TalentLevel) {
+                            if (desired > new BigInteger(decimal.MaxValue)) return TalentResult.Capacity;
+                            intensity = (decimal)desired;
+                        }
+                    }
+                    changed = adjustableState.CurrentIntensity != intensity;
+                    adjustableState.CurrentIntensity = intensity;
+                    break;
                 case TalentOperation.Upgrade:
                     if (!next.Invest(id, byId[id].DefaultCost, count)) return TalentResult.NotEnoughPoints;
                     changed = true;
@@ -89,6 +132,8 @@ public static class NumericTalents
                     break;
             }
             if (!changed) return TalentResult.NoChange;
+            foreach (var t in next.Talents.Values)
+                if (t.CurrentIntensity is decimal n && new BigInteger(n) > t.TalentLevel) t.CurrentIntensity = null;
             StateCodec.Decode(StateCodec.Encode(next));
             result = next;
             return TalentResult.Success;
@@ -99,6 +144,45 @@ public static class NumericTalents
 
 public static class TalentMath
 {
+    // Whole tiers and a fractional remainder; no per-tier loops even at huge levels.
+    public static BigInteger CritTier(BigInteger talentLevel, double nativeChance, double roll)
+    {
+        var guaranteed = BigInteger.DivRem(talentLevel, 10, out var remainder);
+        double chance = Math.Max(0, double.IsFinite(nativeChance) ? nativeChance : 0) + (double)remainder * 10;
+        double tiers = Math.Floor(chance / 100);
+        return guaranteed + new BigInteger(tiers) + (roll < (chance % 100) / 100 ? 1 : 0);
+    }
+    public static int Quantity(int original, BigInteger level, double roll)
+    {
+        var numerator = (BigInteger)original * (10 + level);
+        var whole = BigInteger.DivRem(numerator, 10, out var fraction);
+        return (int)BigInteger.Min(int.MaxValue, whole + (roll < (double)fraction / 10 ? 1 : 0));
+    }
+    // Exact vanilla RollLuck distribution: choose a new denominator uniformly,
+    // then roll within it (not a minimum/maximum of two ordinary rolls).
+    public static double LuckProbability(int numerator, int denominator, double luck)
+    {
+        if (numerator <= 0 || denominator <= 0) return 0;
+        double normal = Math.Min(1, (double)numerator / denominator);
+        if (luck == 0 || !double.IsFinite(luck)) return normal;
+        long low = luck > 0 ? denominator / 2 : denominator;
+        long high = luck > 0 ? denominator - 1L : denominator * 2L - 1;
+        long certainEnd = Math.Min(high, numerator);
+        double sum = Math.Max(0, certainEnd - low + 1);
+        long from = Math.Max(low, numerator + 1L);
+        if (from <= high) sum += numerator * (Harmonic(high) - Harmonic(from - 1));
+        double altered = sum / (high - low + 1);
+        double weight = Math.Min(1, Math.Abs(luck));
+        return Math.Clamp(normal * (1 - weight) + altered * weight, 0, 1);
+    }
+    private static double Harmonic(long n)
+    {
+        if (n <= 0) return 0;
+        if (n < 64) { double sum = 0; for (int i = 1; i <= n; i++) sum += 1d / i; return sum; }
+        double x = n, inv2 = 1 / (x * x);
+        return Math.Log(x) + .5772156649015328606 + .5 / x - inv2 / 12 + inv2 * inv2 / 120 - inv2 * inv2 * inv2 / 252;
+    }
+    public static double DropProbability(double chance, BigInteger level) => 1 - Math.Pow(1 - Math.Clamp(chance, 0, 1), 1 + .1 * Level(level));
     public static double Level(BigInteger n) => (double)BigInteger.Min(n, new BigInteger(double.MaxValue / 1024));
     public static int AddInt(int value, BigInteger extra) => (int)BigInteger.Clamp(value + extra, 0, int.MaxValue);
     public static int ScaleInt(int value, double multiplier) => (int)Math.Clamp(value * multiplier, 0, int.MaxValue);

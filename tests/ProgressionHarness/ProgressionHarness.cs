@@ -12,6 +12,8 @@ using TerrariaProgression.Core;
 using TerrariaProgression.NPCs;
 using TerrariaProgression.Players;
 using TerrariaProgression.Networking;
+using TerrariaProgression.Talents;
+using Terraria.GameContent.ItemDropRules;
 
 namespace ProgressionHarness;
 
@@ -197,10 +199,114 @@ public sealed class RuntimeChecks : ModSystem
         ModContent.GetInstance<TerrariaProgression.TerrariaProgression>().HandlePacket(new BinaryReader(invalid), 0);
         Check(!A.SessionReady && A.State.TotalExperienceEarned == 10000 * Experience.Scale, "malformed import rejected without erasing existing state");
         RunTalents();
+        RunCompletion();
+    }
+    private void RunCompletion()
+    {
+        Reset(); A.Award(100000000 * Experience.Scale);
+        foreach (var def in NumericTalents.All) A.ApplyTalent(TalentOperation.Upgrade, def.Id, def.Category, 10);
+        var p = A.Player; var extended = p.GetModPlayer<ExtendedTalentPlayer>();
+        p.statLife = 50; p.statMana = 5; p.breath = 100;
+        p.ResetEffects(); PlayerLoader.PostUpdateEquips(p);
+        Check(p.breathMax==400 && p.breath==100,"breath capacity doubles without refill");
+        var sword = new Item(ItemID.CopperBroadsword);
+        Check(p.GetWeaponCrit(sword)==104,"native weapon crit includes +100 percentage points");
+        float itemScale = p.GetAdjustedItemScale(sword);
+        Check(Math.Abs(itemScale-2*sword.scale)<.001,"native swing item size doubles at level 10");
+        A.ApplyTalent(TalentOperation.DecreaseIntensity,"MeleeRange",TalentCategory.Combat,5);
+        Check(Math.Abs(p.GetAdjustedItemScale(sword)-1.5*sword.scale)<.001 && A.State.Talents["MeleeRange"].TalentLevel==10,"active melee level 5 without refund");
+        var tag = new TagCompound(); A.SaveData(tag); B.LoadData(tag);
+        Check(B.State.Talents["MeleeRange"].CurrentIntensity==5 && NumericTalents.ValidateImported(B.State),"active intensity survives real player save");
+        var npc=Spawn(10000); npc.defense=0;
+        foreach(var sample in new[]{ (100d,.9,200), (125d,.1,300), (125d,.5,200), (200d,.5,300), (300d,.5,400) }) {
+            var m=npc.GetIncomingStrikeModifiers(DamageClass.Melee,1);
+            ExtendedTalentPlayer.ApplyCritTiers(sample.Item1,sample.Item2,ref m);
+            Check(m.ToHitInfo(100,false,0,false).Damage==sample.Item3,"native tiered damage at chance "+sample.Item1+" roll "+sample.Item2);
+        }
+        var blocked=npc.GetIncomingStrikeModifiers(DamageClass.Melee,1);
+        ExtendedTalentPlayer.ApplyCritTiers(300,.5,ref blocked); blocked.DisableCrit();
+        Check(blocked.ToHitInfo(100,true,0,false).Damage==100,"later DisableCrit overrides guaranteed tiers");
+        var summon=npc.GetIncomingStrikeModifiers(DamageClass.Summon,1);
+        ExtendedTalentPlayer.ApplyCritTiers(300,.5,ref summon);
+        Check(!summon.ToHitInfo(100,false,0,false).Crit,"nonstandard summon classes not forced to crit");
+        var hurt=new Player.HurtModifiers(); extended.ModifyHurt(ref hurt);
+        Check(Math.Abs(hurt.GetKnockback(10,false)-10*Math.Pow(.95,10))<.001,"native incoming knockback reduction");
+        p.immuneTime=40; extended.PostHurt(new Player.HurtInfo{CooldownCounter=-1});
+        Check(p.immuneTime==50,"general immunity receives 10 frames");
+        p.hurtCooldowns[0]=20; extended.PostHurt(new Player.HurtInfo{CooldownCounter=0});
+        Check(p.hurtCooldowns[0]==30 && p.immuneTime==50,"slot immunity does not also extend general counter");
+        Player.jumpSpeed=5; Player.jumpHeight=15; p.UpdateJumpHeight();
+        Check(Math.Abs(Player.jumpSpeed-6.5)<.001,"jump speed hook multiplies final native speed");
+        var v=new Microsoft.Xna.Framework.Vector2(8,-6); var pos=p.Center; int type=ProjectileID.WoodenArrowFriendly, damage=10; float kb=1;
+        extended.ModifyShootStats(sword,ref pos,ref v,ref type,ref damage,ref kb);
+        Check(v.X==12 && v.Y==-9 && damage==10,"projectile launch speed preserves direction and damage");
+        p.inventory[0]=new Item(ItemID.CopperPickaxe); p.selectedItem=0;
+        Player.tileRangeX=5; Player.tileRangeY=4; p.blockRange=0; p.breathMax=200; extended.PostUpdateEquips();
+        Check(Player.tileRangeX==15 && Player.tileRangeY==14 && p.blockRange==0,"tool reach increases by 10 tiles");
+        p.inventory[0]=new Item(ItemID.DirtBlock); Player.tileRangeX=5; Player.tileRangeY=4; p.blockRange=0; p.breathMax=200; extended.PostUpdateEquips();
+        Check(Player.tileRangeX==5 && Player.tileRangeY==4 && p.blockRange==10,"placement reach separate from tool reach");
+        int mode=Main.GameMode; Main.GameMode=0;
+        p.AddBuff(BuffID.Poisoned,600); int buff=p.FindBuffIndex(BuffID.Poisoned);
+        Check(buff>=0 && p.buffTime[buff]==(int)(600*Math.Pow(.95,10)),"native AddBuff shortens new debuff once");
+        p.AddBuff(BuffID.PotionSickness,3600); buff=p.FindBuffIndex(BuffID.PotionSickness);
+        Check(buff>=0 && p.buffTime[buff]==(int)(3600*Math.Pow(.95,10)*Math.Pow(.93,10)),"potion and general duration reductions multiply once");
+        p.UpdateBuffs(0);
+        Check(p.potionDelay<=1044 && p.potionDelay>0,"actual potion lockout follows shortened buff timer");
+        Main.GameMode=mode;
+        var sale=new Item(ItemID.CopperBroadsword); sale.value=10000;
+        p.GetItemExpectedPrice(sale,out long sell,out long buy);
+        Check(sell==15000 && buy==5987,"native coin prices include sell and purchase talents");
+        sale.shopSpecialCurrency=1; long specialSell=100, specialBuy=200; NativeTalentHooks.AdjustPrice(p,sale,ref specialSell,ref specialBuy);
+        Check(specialSell==100 && specialBuy==200,"special currency untouched");
+        int reforge=10000; bool discount=true; new NumericTalentItem().ReforgePrice(sale,ref reforge,ref discount);
+        Check(reforge==5987 && discount,"reforge retains vanilla final calculation");
+        var fish=new Item(ItemID.Bass); extended.ModifyCaughtFish(fish);
+        Check(fish.stack==2,"native caught fish doubles quantity");
+        foreach(var it in Main.item) it.active=false;
+        npc.lastInteraction=0;
+        int normal=Item.NewItem(new EntitySource_Misc("CI discarded"),p.Hitbox,ItemID.IronOre,3);
+        Check(Main.item[normal].stack==3,"unattributed ordinary item spawn is not multiplied");
+        int loot=Item.NewItem(npc.GetSource_Loot(),p.Hitbox,ItemID.IronOre,3);
+        Check(Main.item[loot].stack==6,"NPC loot quantity doubles exactly once");
+        int coin=Item.NewItem(npc.GetSource_Loot(),p.Hitbox,ItemID.CopperCoin,10);
+        Check(Main.item[coin].stack==20,"NPC coin quantity uses its separate talent");
+        Config.BoostMaterials=false;
+        int excluded=Item.NewItem(npc.GetSource_Loot(),p.Hitbox,ItemID.IronOre,3);
+        Check(Main.item[excluded].stack==3,"server material category switch prevents multiplier");
+        Config.BoostMaterials=true;
+        EconomySystem.Actor=p; EconomySystem.BreakingTile=TileID.Iron;
+        int ore=Item.NewItem(new EntitySource_TileBreak(Main.spawnTileX,Main.spawnTileY),p.Hitbox,ItemID.IronOre,3);
+        EconomySystem.Actor=null; EconomySystem.BreakingTile=-1;
+        Check(Main.item[ore].stack==6,"attributed ore source doubles without NPC multiplier");
+        Check(EconomySystem.Resource(TileID.Trees,new Item(ItemID.Wood))=="WoodYield" && EconomySystem.Resource(TileID.Trees,new Item(ItemID.Acorn))==null,"tree wood classifier excludes acorns");
+        Check(EconomySystem.Resource(TileID.BloomingHerbs,new Item(ItemID.Daybloom))=="HerbYield" && EconomySystem.Resource(TileID.ExposedGems,new Item(ItemID.Ruby))=="GemYield","herb and gem families classified");
+        int before=Main.item.Where(i=>i.active&&i.type==ItemID.Wood).Sum(i=>i.stack);
+        var rule=new CommonDrop(ItemID.Wood,1,3,3);
+        var info=new DropAttemptInfo{npc=npc,player=p,rng=new Terraria.Utilities.UnifiedRandom(123)};
+        var dropResult=rule.TryDroppingItem(info);
+        int after=Main.item.Where(i=>i.active&&i.type==ItemID.Wood).Sum(i=>i.stack);
+        Check(dropResult.State==ItemDropAttemptResultState.Success && after-before==6,"actual CommonDrop path preserves successful quantity boost");
+        // Real mining call proves scope attribution and restoration, not just classification.
+        int x=Main.spawnTileX+12, y=Main.spawnTileY-5;
+        Main.tile[x,y].ResetToType(TileID.Iron);
+        int priorOre=Main.item.Where(i=>i.active&&i.type==ItemID.IronOre).Sum(i=>i.stack);
+        p.PickTile(x,y,10000);
+        int finalOre=Main.item.Where(i=>i.active&&i.type==ItemID.IronOre).Sum(i=>i.stack);
+        Check(!Main.tile[x,y].HasTile && finalOre-priorOre==2 && EconomySystem.Actor==null && EconomySystem.BreakingTile==-1,"real mining doubles ore and restores scopes");
+        Main.netMode=NetmodeID.Server;
+        int privateItem=Item.NewItem(npc.GetSource_Loot(),p.Hitbox,ItemID.IronOre,3,noBroadcast:true);
+        Check(Main.item[privateItem].stack==3,"private server spawns are not expanded into public bonuses");
+        npc.playerInteraction[0]=true;
+        CommonCode.DropItemLocalPerClientAndSetNPCMoneyTo0(npc,ItemID.KingSlimeBossBag,1);
+        Check(!EconomySystem.SpawningBonus,"instanced boss bag path restores suppression scope");
+        Main.netMode=NetmodeID.MultiplayerClient;
+        int clientItem=Item.NewItem(npc.GetSource_Loot(),p.Hitbox,ItemID.IronOre,3);
+        Check(Main.item[clientItem].stack==3,"client NPC spawn cannot apply server loot multiplier");
+        Main.netMode=NetmodeID.SinglePlayer;
     }
     private void RunTalents()
     {
-        Reset(); A.Award(10000000 * Experience.Scale);
+        Reset(); A.Award(100000000 * Experience.Scale);
         foreach (var def in NumericTalents.All) Check(A.ApplyTalent(TalentOperation.Upgrade, def.Id, def.Category, 10) == TalentResult.Success, "purchase 10 levels: " + def.Id);
         var p = A.Player;
         var effects = p.GetModPlayer<NumericTalentPlayer>();
@@ -233,9 +339,9 @@ public sealed class RuntimeChecks : ModSystem
         for(int i=0;i<60;i++) effects.PostUpdate();
         Check(p.statMana==12,"natural mana adds 100% of vanilla 12 MP/sec at level 10");
         var tag = new TagCompound(); A.SaveData(tag); B.LoadData(tag);
-        Check(B.State.Talents.Count==21 && !B.State.Talents["ManaRegen"].Enabled,"real SaveData / LoadData preserve all talents and toggle state");
+        Check(B.State.Talents.Count==NumericTalents.All.Count && !B.State.Talents["ManaRegen"].Enabled,"real SaveData / LoadData preserve all talents and toggle state");
         p.dead=true; PlayerLoader.UpdateDead(p); p.dead=false;
-        Check(A.State.Talents.Count==21 && A.State.TotalSpentTalentPoints==210,"death retains purchased talent levels and invested points");
+        Check(A.State.Talents.Count==NumericTalents.All.Count && A.State.TotalSpentTalentPoints==10*NumericTalents.All.Count,"death retains purchased talent levels and invested points");
         A.ApplyTalent(TalentOperation.DisableEverything,"",TalentCategory.BaseStats,1);
         p.statLife=300; p.statMana=200; p.ResetEffects(); effects.ClampResources();
         Check(p.statLife==100 && p.statMana==20,"disabling maximum stats clips resources without damage or healing");

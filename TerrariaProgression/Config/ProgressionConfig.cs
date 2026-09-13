@@ -22,6 +22,19 @@ public sealed class ProgressionConfig : ModConfig
     [DefaultValue(false)]
     public bool LogExperienceSettlements;
 
+    [DefaultValue(true)] public bool BoostMaterials = true;
+    [DefaultValue(true)] public bool BoostConsumables = true;
+    [DefaultValue(true)] public bool BoostPotions = true;
+    [DefaultValue(true)] public bool BoostAmmo = true;
+    [DefaultValue(true)] public bool BoostWeapons = true;
+    [DefaultValue(true)] public bool BoostArmor = true;
+    [DefaultValue(true)] public bool BoostAccessories = true;
+    [DefaultValue(true)] public bool BoostBossLoot = true;
+    [DefaultValue(true)] public bool BoostTreasureBags = true;
+    [DefaultValue(true)] public bool BoostMounts = true;
+    [DefaultValue(true)] public bool BoostPets = true;
+    [DefaultValue(true)] public bool BoostModItems = true;
+
     public override void OnChanged()
     {
         HpToXpMultiplier = float.IsFinite(HpToXpMultiplier) ? Math.Clamp(HpToXpMultiplier, 0.01f, 10f) : 1f;

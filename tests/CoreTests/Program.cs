@@ -92,7 +92,7 @@ Check(state.Invest("MaxLife", 1, BigInteger.Pow(10, 30)), "unlimited compressed 
 Check(state.Talents["MaxLife"].CostRuns.Count == 1 && StateCodec.Encode(state).Length < 512, "huge same-price levels fit a compact snapshot");
 copy = StateCodec.Decode(StateCodec.Encode(state));
 Check(copy.RefundOne("MaxLife") == 1 && copy.RefundAll("MaxLife") == BigInteger.Pow(10, 30) - 1, "constant-time huge refunds preserve exact costs");
-Check(NumericTalents.All.Count == 21 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "only 21 implemented unlimited numeric talents registered");
+Check(NumericTalents.All.Count == 45 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "45 implemented unlimited numeric talents registered");
 state = new(); state.Award(1000 * scale, 50000);
 var result = NumericTalents.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 1, out copy);
 Check(result == TalentResult.Success && copy.AvailableTalentPoints == 2 && state.AvailableTalentPoints == 3, "transaction copy commits without mutating original");
@@ -109,7 +109,7 @@ Check(!NumericTalents.ValidateImported(new ProgressionState { Talents = { ["Unkn
 state = new(); state.Award(1000000 * scale, 50000);
 for (int i = 0; i < 500; i++) {
     var def = NumericTalents.All[random.Next(NumericTalents.All.Count)];
-    var op = (TalentOperation)random.Next(9);
+    var op = (TalentOperation)random.Next(12);
     NumericTalents.Apply(state, op, def.Id, def.Category, 1, out state);
     copy = StateCodec.Decode(StateCodec.Encode(state));
     Check(copy.AvailableTalentPoints + copy.TotalSpentTalentPoints == copy.Level - 1 && copy.TotalSpentTalentPoints == copy.Talents.Values.Aggregate(BigInteger.Zero,(sum,t)=>sum+t.InvestedPoints), "random purchase/refund/toggle preserves point conservation");
@@ -127,4 +127,34 @@ Check(mana == 2 && carry < 1e-7,"fixed 2 MP/sec retains fractional ticks");
 Check(TalentMath.Recover(99,100,double.MaxValue/1024,ref carry)==100 && carry==0,"huge recovery clips in constant time without carry bank");
 Check(Math.Abs(TalentMath.Remaining(.95,10) - .5987369392383787)<1e-10,"mana reduction retains confirmed multiplicative curve");
 Check(Math.Abs(TalentMath.Remaining(.93,10) - .4839823071792932)<1e-10,"ammo reduction retains confirmed multiplicative curve");
+// P1 completion: tier boundaries, exact quantity tails, luck distribution and modes.
+Check(TalentMath.CritTier(0, 0, 0) == 0, "zero crit stays ordinary");
+Check(TalentMath.CritTier(10, 0, .999) == 1, "level 10 grants guaranteed first tier");
+Check(TalentMath.CritTier(20, 0, .999) == 2, "level 20 grants guaranteed second tier");
+Check(TalentMath.CritTier(10, 25, .249) == 2 && TalentMath.CritTier(10, 25, .25) == 1, "125 percent crit has exact tier boundary");
+Check(TalentMath.CritTier(BigInteger.Pow(10,100), 0, .5) == BigInteger.Pow(10,99), "huge tier math constant time");
+Check(TalentMath.Quantity(5, 1, .49) == 6 && TalentMath.Quantity(5,1,.5)==5, "quantity 5.5 has 50 percent tail");
+Check(TalentMath.Quantity(12, 10, .99)==24 && TalentMath.Quantity(12,0,0)==12, "quantity level 10 doubles and zero leaves original");
+Check(Math.Abs(TalentMath.DropProbability(.01,10)-.0199)<1e-12 && Math.Abs(TalentMath.DropProbability(.5,10)-.75)<1e-12, "approved drop chance formula");
+for (int denominator = 1; denominator <= 250; denominator++) {
+    foreach (double luck in new[] { -.7, 0d, .7 }) {
+        int numerator = Math.Max(1, denominator / 3);
+        int lo = luck > 0 ? denominator/2 : denominator, hi = luck > 0 ? denominator : 2*denominator;
+        double sum = 0;
+        for (int k=lo;k<hi;k++) sum += k==0 ? 1 : Math.Min(1,(double)numerator/k);
+        double brute = (double)numerator/denominator*(1-Math.Abs(luck)) + sum/(hi-lo)*Math.Abs(luck);
+        Check(Math.Abs(TalentMath.LuckProbability(numerator,denominator,luck)-brute)<1e-11, "vanilla luck matches exhaustive denominator distribution");
+    }
+}
+state = new(); state.Award(1000000 * scale, 50000); state.Invest("MeleeRange", 1, 10);
+NumericTalents.Apply(state,TalentOperation.DecreaseIntensity,"MeleeRange",TalentCategory.Combat,5,out copy);
+Check(NumericTalents.ActiveLevel(copy,"MeleeRange")==5 && copy.TotalSpentTalentPoints==10 && state.Talents["MeleeRange"].CurrentIntensity==null,"mode changes are atomic without refund");
+Check(NumericTalents.ValidateImported(StateCodec.Decode(StateCodec.Encode(copy))),"intensity survives save and validated import");
+NumericTalents.Apply(copy,TalentOperation.MaximumIntensity,"MeleeRange",TalentCategory.Combat,1,out state);
+Check(NumericTalents.ActiveLevel(state,"MeleeRange")==10,"maximum mode restores purchased strength");
+copy.Talents["MeleeRange"].CurrentIntensity=11;
+Check(!NumericTalents.ValidateImported(copy),"over-level imported intensity rejected");
+copy.Talents["MeleeRange"].CurrentIntensity=.5m;
+Check(!NumericTalents.ValidateImported(copy),"fractional active level rejected");
+Check(NumericTalents.Apply(state,TalentOperation.DecreaseIntensity,"Damage",TalentCategory.Combat,1,out _)==TalentResult.InvalidRequest,"unsupported intensity change rejected");
 Console.WriteLine($"PASS: {checks} core checks (formulas, capped/uncapped multi-level, precision, save validation, refunds, multiplayer allocation).");

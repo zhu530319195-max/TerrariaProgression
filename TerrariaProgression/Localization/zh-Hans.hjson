@@ -43,7 +43,11 @@ Mods: {
   "ResultNotEnoughPoints": "天赋点不足。",
   "ResultNoChange": "没有需要修改的内容。",
   "ResultStaleRequest": "状态已更新，本次操作未执行，请重试。",
-  "ResultCapacity": "存档容量不足，操作未执行。"
+  "ResultCapacity": "存档容量不足，操作未执行。",
+  "DecreaseIntensity": "强度 −1",
+  "IncreaseIntensity": "强度 +1",
+  "MaximumIntensity": "使用最大强度",
+  "Intensity": "当前使用等级：{0}（强度调整不退款）"
 }
     TalentNames: {
   "MaxLife": "最大生命",
@@ -66,7 +70,31 @@ Mods: {
   "ManaSaving": "魔力消耗降低",
   "Minions": "召唤物上限",
   "Sentries": "哨兵上限",
-  "PickupRange": "物品拾取范围"
+  "PickupRange": "物品拾取范围",
+  "JumpSpeed": "跳跃速度",
+  "Breath": "最大呼吸容量",
+  "KnockbackResistance": "击退抗性",
+  "HeartRecovery": "红心恢复量",
+  "StarRecovery": "魔力星恢复量",
+  "PotionDuration": "药水病缩短",
+  "DebuffDuration": "负面状态时间缩短",
+  "CritChance": "暴击率",
+  "MeleeRange": "近战攻击范围",
+  "ProjectileSpeed": "弹射物速度",
+  "Invulnerability": "无敌帧强化",
+  "Coins": "怪物金币掉落",
+  "LootQuantity": "战利品数量",
+  "DropChance": "战利品掉率",
+  "MiningYield": "矿物产量",
+  "WoodYield": "木材产量",
+  "HerbYield": "草药产量",
+  "GemYield": "宝石产量",
+  "FishingYield": "钓鱼产量",
+  "SellPrice": "出售价格",
+  "BuyDiscount": "商店购买折扣",
+  "ReforgeDiscount": "重铸折扣",
+  "ToolReach": "工具使用距离",
+  "BuildReach": "建造距离"
 }
     TalentHints: {
   "MaxLife": "每级 +25 HP。提高上限不会补血；降低上限仅截断当前生命。",
@@ -78,8 +106,8 @@ Mods: {
   "NaturalLifeRegen": "每级 +10% 自然回血，乘算原版自然恢复部分。",
   "ManaRegen": "每级 +2 MP/秒，独立于自然回魔延迟。",
   "NaturalManaRegen": "每级 +10% 自然回魔，按原版实际回魔速度补充；保留回魔延迟。",
-  "Healing": "每级 +5% 物品治疗量；红心拾取属于后续独立天赋。",
-  "ManaRestoration": "每级 +5% 物品回魔量；魔力星属于后续独立天赋。",
+  "Healing": "每级 +5% 物品治疗量；红心拾取使用独立天赋。",
+  "ManaRestoration": "每级 +5% 物品回魔量；魔力星使用独立天赋。",
   "Damage": "每级 +5% 全局伤害，与装备伤害加成加算。",
   "AttackSpeed": "每级 +3% 攻速；遵循武器的攻速继承和帧数限制。",
   "CritDamage": "每级增加 0.05 暴击倍率。10 级令原版 ×2 暴击变为 ×2.5。",
@@ -89,7 +117,31 @@ Mods: {
   "ManaSaving": "每级令魔力消耗 ×0.95，与原版耗魔修正相乘。",
   "Minions": "每级 +1 召唤物容量，与装备加算。",
   "Sentries": "每级 +1 哨兵容量，与装备加算。",
-  "PickupRange": "每级 +10% 拾取范围，乘算物品原有范围。"
+  "PickupRange": "每级 +10% 拾取范围，乘算物品原有范围。",
+  "JumpSpeed": "每级 +3% 原生跳跃速度，与装备后的速度相乘；特殊坐骑和第三方移动逻辑可能覆盖。",
+  "Breath": "每级 +10% 呼吸容量。提高上限不自动补充呼吸；关闭时仅截断到新上限。",
+  "KnockbackResistance": "每级令受到的击退 ×0.95，保留装备的击退免疫。",
+  "HeartRecovery": "每级 +10% 原版红心、糖苹果、糖棒恢复量；不增加生命上限。",
+  "StarRecovery": "每级 +10% 原版魔力星、灵魂蛋糕、糖梅及魔力斗篷星恢复量。",
+  "PotionDuration": "每级令新施加的药水病时间 ×0.93。与负面状态时间缩短相乘；不反复缩短已有计时。",
+  "DebuffDuration": "每级令新施加的负面状态时间 ×0.95，最短 1 帧；持续环境可重新施加。开关不重算已有计时。",
+  "CritChance": "每级 +10 个百分点，叠加武器暴击率。超过 100% 后：一重 ×2、二重 ×3、三重 ×4；暴击伤害天赋另加。遵循原生禁止暴击。",
+  "MeleeRange": "每级 +10% 普通挥砍武器／工具的可见尺寸与命中范围；不扩大剑气、鞭子、悠悠球等独立投射物。可调低当前强度。",
+  "ProjectileSpeed": "每级 +5% 武器发射瞬间的投射物速度；自定义 AI 可能重设速度，不强行干预。",
+  "Invulnerability": "每级 +1 帧受击后无敌时间，加入本次实际使用的无敌计时，不生成额外免伤。",
+  "Coins": "每级 +10% 怪物原生金币掉落。使用原生掉落归属角色的天赋；不放大普通拾取和玩家丢弃的金币。",
+  "LootQuantity": "每级 +10% 怪物已成功掉落物品的数量，小数概率补足；不提高掉率。使用原生掉落归属，受服务器分类开关控制。",
+  "DropChance": "额外判定强度每级 +10%；概率 = 1−(1−原概率)^(1+0.1×等级)。目前支持原生 CommonDrop，复杂选择池、保底和未知规则保持原样。",
+  "MiningYield": "每级 +10% 已明确归属的挖掘矿石产量，识别原版／MOD 的 Ore 标记。自动环境破坏不猜测玩家归属。",
+  "WoodYield": "每级 +10% 已明确归属的树干木材产量。保留原版伐木方式；未知树木可通过兼容接口登记。",
+  "HerbYield": "每级 +10% 已明确归属的原版草药植株掉落，包含其种子。未知 MOD 植物需要显式适配。",
+  "GemYield": "每级 +10% 已明确归属的原版七种宝石采集产量，包含宝石树产出的宝石。",
+  "FishingYield": "每级 +10% 实际钓获物品数量，小数概率补足。沿用原生钓鱼角色归属；不增加任务奖励或开箱产物。",
+  "SellPrice": "每级 +5% 出售价格，保留幸福度计算。仅普通金币交易，特殊货币不改变。",
+  "BuyDiscount": "每级令购买价格 ×0.95，保留装备／幸福度修正。普通非免费商品最低 1 铜币。",
+  "ReforgeDiscount": "每级令重铸计价基础 ×0.95，仍由原生重铸流程结算与取整。",
+  "ToolReach": "每级 +1 格镐／斧／锤使用距离。保留工具强度与挖掘速度，不增加一次挖掉的方块数量。可调低当前强度。",
+  "BuildReach": "每级 +1 格方块／墙壁放置距离，与工具距离分别生效。可调低当前强度。"
 }
     Messages: {
       Status: "等级 {0}｜当前经验 {1} / {2}｜累计经验 {3}｜可用天赋点 {4}｜已投入 {5}"
@@ -101,6 +153,18 @@ Mods: {
     Configs: {
       ProgressionConfig: {
         DisplayName: 成长规则（服务器）
+        BoostMaterials: { Label: "允许增益：普通材料", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        BoostConsumables: { Label: "允许增益：消耗品", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        BoostPotions: { Label: "允许增益：药水", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        BoostAmmo: { Label: "允许增益：弹药", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        BoostWeapons: { Label: "允许增益：武器", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        BoostArmor: { Label: "允许增益：护甲", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        BoostAccessories: { Label: "允许增益：饰品", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        BoostBossLoot: { Label: "允许增益：Boss 掉落", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        BoostTreasureBags: { Label: "允许增益：宝藏袋", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        BoostMounts: { Label: "允许增益：坐骑", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        BoostPets: { Label: "允许增益：宠物", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        BoostModItems: { Label: "允许增益：MOD 物品", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
         HpToXpMultiplier: {
           Label: 每点最大生命对应经验
           Tooltip: "使用 NPC.lifeMax 计算，范围 0.01～10.00。"

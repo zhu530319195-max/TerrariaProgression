@@ -28,7 +28,9 @@ Implementation status: P0 0.1.0 is delivered through PR #2 (bootstrap dependency
 ## P1 — Numeric Talents
 Goal: implement stable numeric talents using the approved Lv.10 strong-state baseline.
 
-P1-A 0.2.0 implements 21 entries and the talent panel; official compilation, 2,058 core checks and 73 runtime checks passed; the user has confirmed the core singleplayer talent interactions and persistence. PR #3 includes the 0.2.1 UI layout refinement for 200% scale, awaiting visual feedback and explicit merge authorization. Implemented: maximum HP/MP, defense, run speed/acceleration, fixed/natural HP/MP recovery, item HP/MP restoration, generic damage/attack speed/crit damage/armor penetration/knockback, ammo conservation, mana cost, minion/sentry capacity, pickup range. The remaining catalog below is still planned, particularly crit chance / tiers and economy / resource drops. See `docs/P1_IMPLEMENTATION.md`.
+P1-A 0.2.0 implements 21 entries and the talent panel; official compilation, 2,058 core checks and 73 runtime checks passed; the user has confirmed the core singleplayer talent interactions and persistence. PR #3 includes the 0.2.1 UI layout refinement for 200% scale, merged after explicit user authorization. Implemented: maximum HP/MP, defense, run speed/acceleration, fixed/natural HP/MP recovery, item HP/MP restoration, generic damage/attack speed/crit damage/armor penetration/knockback, ammo conservation, mana cost, minion/sentry capacity, pickup range. The remaining catalog below is still planned, particularly crit chance / tiers and economy / resource drops. See `docs/P1_IMPLEMENTATION.md`.
+
+0.3.0 adds 24 entries (45 total) and adjustable melee/tool/build strength. Remaining exceptions: exact physical jump-height scaling, non-CommonDrop probability adapters and per-recipient multiplayer private loot. See `docs/P1_COMPLETION_IMPLEMENTATION.md`; this is not a claim of full third-party compatibility.
 
 ### Base Stats
 - Max Life
