@@ -20,13 +20,13 @@ public sealed class ExtendedTalentPlayer : ModPlayer
     public override void PostUpdateEquips()
     {
         // Breath maximum is player-local. Never refill when increasing it.
-        Player.breathMax = TalentMath.ScaleInt(Player.breathMax, 1 + .1 * TalentMath.Level(L("Breath")));
+        Player.breathMax = Math.Min(int.MaxValue - 1024, TalentMath.ScaleInt(Player.breathMax, 1 + .1 * TalentMath.Level(L("Breath"))));
         Player.breath = Math.Min(Player.breath, Player.breathMax);
         if (Player.whoAmI == Main.myPlayer) {
             // Tool range and placement range are independently selected by held item.
             bool tool = Player.HeldItem.pick > 0 || Player.HeldItem.axe > 0 || Player.HeldItem.hammer > 0;
             int reach = (int)BigInteger.Min(L(tool ? "ToolReach" : "BuildReach"), Math.Max(Main.maxTilesX, Main.maxTilesY));
-            if (tool) { Player.tileRangeX += reach; Player.tileRangeY += reach; }
+            if (tool) { Player.tileRangeX = TalentMath.AddInt(Player.tileRangeX, reach); Player.tileRangeY = TalentMath.AddInt(Player.tileRangeY, reach); }
             else if (Player.HeldItem.createTile > -1 || Player.HeldItem.createWall > 0) Player.blockRange = TalentMath.AddInt(Player.blockRange, reach);
         }
     }

@@ -1,7 +1,7 @@
 # PROJECT_STATUS.md
 
 ## Current phase
-P1 completion 0.3.0 on `feat/p1-numeric-completion`, based on merged PR #3. 45 numeric entries are registered; local compilation and 2,822 core checks pass. Actual runtime checks are being executed in CI. See `docs/P1_COMPLETION_IMPLEMENTATION.md` for jump-height, complex drop-rule and multiplayer private-loot limits. No P2/P3 expansion.
+P1 completion 0.3.0 on `feat/p1-numeric-completion`, based on merged PR #3. 45 numeric entries are registered; local compilation and 2,822 core checks pass. Initial CI passed 135 native runtime checks; final reserved-slot regression result is on PR #4. See `docs/P1_COMPLETION_IMPLEMENTATION.md` for jump-height, complex drop-rule and multiplayer private-loot limits. No P2/P3 expansion.
 
 ## Repository state
 - Default branch: `main`; PR #1, #2 and #3 merged with explicit user approval.
@@ -84,7 +84,7 @@ P1 completion 0.3.0 on `feat/p1-numeric-completion`, based on merged PR #3. 45 n
 The core progression rules, P1 default balance direction, utility unlock pricing, and functional talent architecture are sufficiently defined to begin implementation. Remaining design questions can be handled as targeted follow-ups without blocking P0.
 
 ## Next implementation task
-Validate P1-A and fix reported issues. Continue the remaining P1 catalog in focused batches: crit chance / tiered crit, economy and resource attribution, and remaining base/recovery/combat entries. Confirm API incompatibilities instead of changing approved rules. No P2/P3 expansion in P1.
+Finish 0.3.0 runtime verification, then user acceptance. Remaining targeted work: confirm jump-height semantics, extend non-CommonDrop rule adapters and multiplayer private loot attribution. No P2/P3 expansion in this PR.
 
 ## Later implementation task
 Build the P2 `FunctionalTalentRegistry` before implementing the first permanent utility effects. Add `AccessoryTalentScanner` after the registry and core P2 effects are stable; the scanner must not block initial P2 delivery.

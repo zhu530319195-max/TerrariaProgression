@@ -303,6 +303,11 @@ public sealed class RuntimeChecks : ModSystem
         int clientItem=Item.NewItem(npc.GetSource_Loot(),p.Hitbox,ItemID.IronOre,3);
         Check(Main.item[clientItem].stack==3,"client NPC spawn cannot apply server loot multiplier");
         Main.netMode=NetmodeID.SinglePlayer;
+        for(int i=0;i<Main.maxItems;i++) { Main.item[i].active=false; Main.timeItemSlotCannotBeReusedFor[i]=90; }
+        var overflow=new Item(ItemID.CopperBroadsword);
+        EconomySystem.BoostWorld(overflow,new EntitySource_Misc("CI capacity"),10);
+        Check(overflow.stack==1 && !Main.item.Take(Main.maxItems).Any(i=>i.active) && Main.timeItemSlotCannotBeReusedFor.Take(Main.maxItems).All(t=>t==90),"bonus overflow preserves inactive but reserved private item slots");
+        for(int i=0;i<Main.maxItems;i++) Main.timeItemSlotCannotBeReusedFor[i]=0;
     }
     private void RunTalents()
     {

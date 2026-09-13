@@ -158,7 +158,7 @@ public sealed class EconomySystem : ModSystem
             // Bounded by the native world item pool; don't overwrite existing loot.
             while (remaining > 0) {
                 bool room = false;
-                for (int i = 0; i < Main.maxItems; i++) if (!Main.item[i].active) { room = true; break; }
+                for (int i = 0; i < Main.maxItems; i++) if (!Main.item[i].active && Main.timeItemSlotCannotBeReusedFor[i] == 0) { room = true; break; }
                 if (!room) { WarnCapacity(); break; }
                 int stack = Math.Min(remaining, Math.Max(1, item.maxStack));
                 var bonus = item.Clone(); bonus.stack = stack;
@@ -180,7 +180,7 @@ public sealed class EconomySystem : ModSystem
             bool old = SpawningBonus; SpawningBonus = true;
             try {
                 for (int n = 0; remainder > 0 && n < Main.maxItems; n++) {
-                    if (Main.item[n].active) continue;
+                    if (Main.item[n].active || Main.timeItemSlotCannotBeReusedFor[n] != 0) continue;
                     int stack = Math.Min(remainder, Math.Max(1, fish.maxStack));
                     Item.NewItem(player.GetSource_Misc("TerrariaProgression/FishingOverflow"), player.Hitbox, fish.type, stack);
                     remainder -= stack;
