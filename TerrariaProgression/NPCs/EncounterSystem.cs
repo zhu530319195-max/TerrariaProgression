@@ -16,7 +16,9 @@ internal sealed class NpcLifetime(NPC npc, Encounter group)
     internal readonly NPC Npc = npc;
     internal Encounter Group = group;
     internal bool Killed;
+    internal bool SawLethalHit;
     internal bool SharedRoot;
+    internal NpcLifetime? HealthRoot;
     internal int LifeMax = Math.Max(0, npc.lifeMax);
     internal bool Statue = npc.SpawnedFromStatue;
     internal bool Town = npc.townNPC;
@@ -68,8 +70,12 @@ public sealed class EncounterSystem : ModSystem
         node.Town |= npc.townNPC;
         if (npc.realLife >= 0 && npc.realLife < Main.maxNPCs && npc.realLife != npc.whoAmI) {
             var root = Main.npc[npc.realLife];
-            if (root.active) {
+            // Once linked, the same slot number must not bind a leftover body to a
+            // completely new NPC that reused its dead root's slot.
+            bool newHealthSlot = node.HealthRoot is null || node.HealthRoot.Npc.whoAmI != npc.realLife;
+            if (root.active && (newHealthSlot || ReferenceEquals(node.HealthRoot, lifetimes.GetValueOrDefault(npc.realLife)))) {
                 var rootNode = Get(root);
+                node.HealthRoot = rootNode;
                 rootNode.SharedRoot = true;
                 Link(node, rootNode);
             }
@@ -115,20 +121,23 @@ public sealed class EncounterSystem : ModSystem
         Observe(npc);
         Get(npc).Killed = true;
     }
-    public override void PostUpdateEverything()
+    public override void PostUpdateEverything() => UpdateEncounters(Main.GameUpdateCount);
+    internal static void UpdateEncounters(ulong tick)
     {
         if (!Authority) return;
         foreach (var group in groups.ToArray()) {
             bool alive = false;
             foreach (var node in group.Members) {
-                if (Current(node) && !node.Npc.active && node.Npc.life <= 0) node.Killed = true;
+                // Statue loot filtering can skip OnKill. Require a lethal hit witness
+                // before using the inactive fallback; despawn alone is not a kill.
+                if (node.SawLethalHit && !node.Npc.active && node.Npc.life <= 0) node.Killed = true;
                 if (Current(node) && node.Npc.active && !node.Killed) alive = true;
             }
             if (alive) { group.EmptySince = null; continue; }
-            group.EmptySince ??= Main.GameUpdateCount;
+            group.EmptySince ??= tick;
             // OnKill runs inside StrikeNPC, before OnHitByItem/Projectile. Settle later
             // so fatal hits, same-frame splits and transformations cannot be omitted.
-            if (Main.GameUpdateCount - group.EmptySince < 2) continue;
+            if (tick - group.EmptySince < 2) continue;
             bool completed = group.Members.All(n => n.Killed) || group.Members.Any(n => n.SharedRoot && n.Killed);
             if (!group.Settled && completed) Settle(group);
             group.Settled = true;

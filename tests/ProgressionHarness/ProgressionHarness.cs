@@ -11,10 +11,18 @@ using TerrariaProgression.Config;
 using TerrariaProgression.Core;
 using TerrariaProgression.NPCs;
 using TerrariaProgression.Players;
+using TerrariaProgression.Networking;
 
 namespace ProgressionHarness;
 
 public sealed class ProgressionHarness : Mod { }
+
+public sealed class CiCommand : ModCommand
+{
+    public override string Command => "tpci";
+    public override CommandType Type => CommandType.Console;
+    public override void Action(CommandCaller caller, string input, string[] args) => ModContent.GetInstance<RuntimeChecks>().RunFromConsole();
+}
 
 public sealed class RuntimeChecks : ModSystem
 {
@@ -54,20 +62,10 @@ public sealed class RuntimeChecks : ModSystem
         EncounterSystem.Observe(npc);
         return npc;
     }
-    private void Finish()
-    {
-        var system = ModContent.GetInstance<EncounterSystem>();
-        system.PostUpdateEverything();
-        foreach (var npc in Main.npc.Where(n => !n.active)) {
-            // Do not manufacture lifetimes for all unused slots.
-            if (npc.lifeMax <= 0) continue;
-        }
-    }
     private void Settle(params NPC[] members)
     {
-        var group = EncounterSystem.Get(members[0]).Group.Root;
-        group.EmptySince = Main.GameUpdateCount - 3;
-        ModContent.GetInstance<EncounterSystem>().PostUpdateEverything();
+        EncounterSystem.UpdateEncounters(Main.GameUpdateCount);
+        EncounterSystem.UpdateEncounters(Main.GameUpdateCount + 3);
     }
     private static NPC.HitInfo Hit(int damage) => new() { Damage = damage, SourceDamage = damage, DamageType = DamageClass.Generic, HideCombatText = true };
     private void Kill(NPC npc, int player = 0)
@@ -77,9 +75,9 @@ public sealed class RuntimeChecks : ModSystem
         // The game's item/projectile caller invokes the on-hit hook after StrikeNPC.
         NPCLoader.OnHitByItem(npc, Main.player[player], new Item(), hit, dealt);
     }
-    public override void PostUpdateEverything()
+    internal void RunFromConsole()
     {
-        if (ran || Main.GameUpdateCount < 10) return;
+        if (ran) return;
         ran = true;
         if (!Main.dedServ || Environment.GetEnvironmentVariable("TP_CI_HARNESS") != "1") {
             Console.WriteLine("CI HARNESS REFUSED: explicit environment flag required.");
@@ -118,6 +116,11 @@ public sealed class RuntimeChecks : ModSystem
         NPCLoader.OnKill(npc); Settle(npc);
         Check(A.State.TotalExperienceEarned == 1000 * Experience.Scale, "duplicate death callback pays once");
 
+        Reset(); npc = Spawn(1000);
+        EncounterSystem.ReportAttributedDamage(npc, Main.player[0], 100);
+        npc.life = 0; npc.active = false; Settle(npc);
+        Check(A.State.TotalExperienceEarned == 0, "unwitnessed despawn is not a death payout");
+
         Reset(); npc = Spawn(5); // Use actual rabbit so initial slime defaults cannot affect budget.
         npc.active = false;
         int rabbitSlot = NPC.NewNPC(new EntitySource_Misc("CI"), Main.spawnTileX * 16, Main.spawnTileY * 16, NPCID.Bunny);
@@ -143,6 +146,11 @@ public sealed class RuntimeChecks : ModSystem
         child.realLife = root.whoAmI; EncounterSystem.Observe(child);
         Kill(root); child.active = false; Settle(root);
         Check(A.State.TotalExperienceEarned == 1000 * Experience.Scale, "shared root kill with auto-removed body");
+        Reset(); root = Spawn(1000); child = Spawn(1000); child.realLife = root.whoAmI;
+        EncounterSystem.Observe(child); Kill(root);
+        var unrelated = Spawn(100);
+        EncounterSystem.Observe(child);
+        Check(!ReferenceEquals(EncounterSystem.Get(child).Group.Root, EncounterSystem.Get(unrelated).Group.Root), "recycled root slot does not absorb unrelated NPC");
         Reset(); root = Spawn(1000); child = Spawn(1000);
         root.aiStyle = child.aiStyle = NPCAIStyleID.Worm;
         root.ai[0] = child.whoAmI; child.ai[1] = root.whoAmI;
@@ -165,6 +173,34 @@ public sealed class RuntimeChecks : ModSystem
         Main.netMode = NetmodeID.Server;
         var message = Terraria.Localization.NetworkText.Empty;
         Check(!Config.AcceptClientChanges(Config, 0, ref message), "server rejects client rule edits");
+
+        Reset(); A.Award(1000 * Experience.Scale);
+        var imported = new ProgressionState(); imported.Award(10000 * Experience.Scale, 50000);
+        Main.netMode = NetmodeID.Server;
+        Receive(2, imported); // Client must never upload an authoritative snapshot.
+        Check(A.State.Level == 4, "server rejects client-authored snapshot");
+        Receive(1, imported);
+        Check(A.State.Level == 4, "duplicate join cannot overwrite session progress");
+        Main.netMode = NetmodeID.MultiplayerClient;
+        Receive(2, imported, padding: true);
+        Check(A.State.Level == imported.Level && A.SessionReady, "client accepts server snapshot from shared buffer");
+        Main.netMode = NetmodeID.SinglePlayer;
+        Check(A.State.TotalExperienceEarned == 10000 * Experience.Scale, "received MP progression survives SP transition");
+        Main.netMode = NetmodeID.Server; A.SessionReady = false;
+        using var invalid = new MemoryStream(new byte[] { 1, 1, 4, 0, 99, 0, 0, 0 });
+        ModContent.GetInstance<TerrariaProgression.TerrariaProgression>().HandlePacket(new BinaryReader(invalid), 0);
+        Check(!A.SessionReady && A.State.TotalExperienceEarned == 10000 * Experience.Scale, "malformed import rejected without erasing existing state");
+    }
+    private void Receive(byte kind, ProgressionState state, bool padding = false)
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, leaveOpen: true)) {
+            byte[] bytes = StateCodec.Encode(state);
+            writer.Write((byte)1); writer.Write(kind); writer.Write((ushort)bytes.Length); writer.Write(bytes);
+            if (padding) writer.Write(new byte[64]); // tML's underlying reader has bytes beyond the packet.
+        }
+        stream.Position = 0;
+        ProgressionNetwork.Receive(new BinaryReader(stream), 0);
     }
     private void ServerStrike(NPC npc, int sender, int damage)
     {

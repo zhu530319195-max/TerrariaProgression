@@ -29,6 +29,7 @@ public sealed class ProgressionNpc : GlobalNPC
     }
     public override void HitEffect(NPC npc, NPC.HitInfo hit)
     {
+        if (EncounterSystem.Authority && npc.life <= 0) EncounterSystem.Get(npc).SawLethalHit = true;
         if (Main.netMode == NetmodeID.Server) StrikeObserver.Confirm(npc, hit);
     }
     public override void OnKill(NPC npc)
