@@ -9,7 +9,7 @@ PR #1–#9 merged. P2 completion 0.7.0 was explicitly accepted by the user; PR #
 - Target remains tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
 - Save v3 retained, old IDs and paid-cost ledger unchanged. Protocol10 requires all peers on0.8.0.
 - New display taxonomy does not renumber legacy saved/network category values. Server validates new category/group refund scopes.
-- Local core checks:3060 passed. Official production/harness compilation succeeds; local native execution is blocked by runtime process-map access. Final native evidence must come from CI; do not count that blocked attempt as a pass.
+- CI 34779551529 on `b4d6de949720c2681aa970203e0cc29972658aa4` passed 3060 core checks and 431 native checks; production and harness builds each report zero warnings/errors. Local native execution was blocked by runtime process-map access and is not counted as a pass.
 - Final delivered commit, CI count and package hashes are recorded in PR/BUILD_INFO.
 - Real multiplayer, potion sickness/fishing yield, special/segmented/multi-stage Bosses and per-player private loot retain their individual unaccepted/incomplete states. Tiered crit remains user-deferred.
 - Liquid/honey movement assistance, wires, actuators and independent jump height removed from the future development scope by user. Existing swim/jump speed remains. Hover/dodge deferred. Abnormal damage strengthening and further attack debuffs are a separate future batch, not this release. P3 world operations remain unimplemented.

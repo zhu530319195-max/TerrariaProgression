@@ -49,4 +49,6 @@
 液体移动辅助/蜂蜜强化、电线、执行器、独立跳跃高度移出开发计划；悬停/闪避暂缓。异常伤害强化与更多异常另批，P3未开发，取消自动跳跃/世界宝箱强化继续有效。
 
 ### 固定版本鱼饵接口修正
-首轮CI34779384504发现原生消耗在启停下完全相同。核查固定版本PlayerLoader实现，CanConsumeBait错误地枚举HookCaughtFish，因此只有覆盖ModifyCaughtFish的ModPlayer才会进入该分派。改用官方GlobalItem.CanConsumeBait，移除ModPlayer同名覆盖，避免未来引擎修复后双重抽取。保持原生实际消耗测试及原有断言，重新验证。
+首轮CI34779384504发现原生消耗在启停下完全相同。核查固定版本PlayerLoader实现，CanConsumeBait错误地枚举HookCaughtFish，因此只有覆盖ModifyCaughtFish的ModPlayer才会进入该分派。改用官方GlobalItem.CanConsumeBait，移除ModPlayer同名覆盖，避免未来引擎修复后双重抽取。保持原生实际消耗测试及原有断言。修正提交 `b4d6de949720c2681aa970203e0cc29972658aa4` 在 [CI 34779551529](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34779551529) 通过3060项核心检查、431项原生检查，正式MOD与测试MOD编译均零警告、零错误。
+
+固定随机种子的原生样本：8000次鱼饵消耗尝试，未强化消耗885、Lv.10消耗460；装备渔具箱时815、叠加Lv.10时424。6000次普通水域原生鱼获选择，未强化宝匣608、Lv.10为2791；宝匣药水1472、药水叠加Lv.10为3305。这是自动运行证据，不代替玩家实机验收。
