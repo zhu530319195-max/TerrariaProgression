@@ -19,23 +19,30 @@ Goal: stable character-bound infinite leveling foundation.
 - Server-authoritative XP settlement
 - Configurable statue-spawn XP multiplier
 - Town-NPC XP exclusion
+- Store actual paid talent-point costs for safe refunds
+- Generic talent enabled/disabled state
 - Basic debug/test commands or diagnostics as needed
 
 ## P1 — Numeric Talents
-Goal: implement stable, mostly numeric talents first.
+Goal: implement stable numeric talents using the approved Lv.10 strong-state baseline.
 
 ### Base Stats
 - Max Life
 - Max Mana
 - Defense
 - Movement Speed
-- Optional jump/mobility numeric stats after verification
+- Movement acceleration
+- Jump height/speed where reliable
+- Breath capacity
+- Knockback resistance
 
 ### Recovery & Sustain
-- Life regeneration
-- Mana regeneration
-- Mana recovery behavior
-- Healing/mana restoration modifiers where safe
+- Fixed Life regeneration
+- Natural Life regeneration multiplier
+- Fixed Mana regeneration
+- Natural Mana regeneration multiplier
+- Healing/mana restoration modifiers
+- Potion sickness / Debuff duration reduction where reliable
 
 ### Combat
 - Global damage
@@ -44,48 +51,89 @@ Goal: implement stable, mostly numeric talents first.
 - Critical damage
 - Armor penetration
 - Knockback
+- Projectile speed where feasible
 - Ammo conservation
 - Mana cost reduction
-- Minion / sentry capacity where appropriate
+- Minion / sentry capacity
+- Invulnerability-frame enhancement if compatibility is acceptable
+- Layered critical behavior above 100% after compatibility validation
 
 ### Economy & Resources
 - Coin drop multiplier
 - Loot quantity multiplier
-- Drop chance multiplier
+- Dynamic drop-chance strengthening
 - Mining yield
 - Wood yield
-- Additional gathering multipliers after base implementation stabilizes
+- Herb / gem / fishing yield
+- Pickup range
+- Shop / sell / reforge modifiers where reliable
 
 ## P2 — Utility / Accessory-like Abilities
-Goal: grant vanilla-style utility effects without occupying accessory slots.
+Goal: grant permanent utility and accessory-style powers without occupying real accessory slots.
 
-- Extra jumps
-- Fall-damage immunity
-- Water breathing
+Architecture first:
+- `FunctionalTalentRegistry`
+- Implementation kinds: `NativeFlag`, `NativeSystem`, `AccessoryBridge`, `Custom`, `Composite`
+- Explicit stack/conflict/network policies
+- One-time `U` unlocks default to 2 talent points
+- Real equipped accessory + talent must not duplicate the same boolean/special effect by default
+
+### P2-A — Highest-confidence effects
+- No fall damage
+- Unlimited underwater breathing
 - Water walking
-- Lava walking / lava immunity
-- Hot-tile immunity
-- Information accessory functions
-- Debuff immunities
-- Dash / wall movement / flight only after compatibility review
+- Lava-surface walking
+- Lava immunity
+- Hot-tile/fire-block immunity
+- Auto jump
+- Multi-jump integration
+- Knockback immunity
+- All Information composite
+
+### P2-B — Movement / building / fishing
+- Dash
+- Wall climb/slide
+- Unlimited flight toggle
+- Ice traction
+- Selected building helpers
+- Fishing-line protection / lava-fishing eligibility where reliable
+
+### P2-C — Composite and combat-trigger effects
+- Common status-immunity composite
+- Selected on-hit/on-hurt accessory effects
+- Selected attack-inflicted vanilla Debuffs
+- Additional vanilla functions explicitly approved after testing
+
+### P2-D — Developer discovery tooling
+- `AccessoryTalentScanner`
+- Report unmapped vanilla accessory candidates
+- Scanner never auto-creates behavior or executes unknown third-party accessory logic
+- Third-party auto-import remains experimental/off by default
+
+Authoritative functional catalog:
+- `docs/FUNCTIONAL_TALENTS_v0.1.md`
 
 ## P3 — Transcendent / World Interaction
 Goal: high-power, high-risk abilities with strong multiplayer/world protections.
 
 - Extreme mining speed
 - Area mining with selectable active radius
-- Vein mining
+- Vein mining with scalable chain limit
 - One-action tree felling
 - Area harvesting
 - Auto-replanting
 - Attack-driven terrain destruction
+- Wall/building expansion helpers
 - Protected-object filters
 - Server master switches for world-altering abilities
+- `MaxBlocksPerAction` performance protection (default 1000; 0 = unlimited)
 
 ## Later / Optional
 - Presets / build profiles
 - Import/export of talent configurations
 - Additional mod compatibility adapters only when standard APIs are insufficient
+- Explicit support modules for popular content mods
+- Experimental third-party accessory bridging only after the vanilla functional registry is stable
 - Character statistics and achievements based on lifetime XP
 - Prestige/rebirth only if separately approved; it is not part of the current baseline
 
