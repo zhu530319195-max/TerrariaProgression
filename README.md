@@ -44,25 +44,12 @@ Terraria/tModLoader 独立角色成长系统。
 - `docs/PROGRESSION_DESIGN_v0.1.md` — 等级、经验、数值天赋与世界能力总设计
 - `docs/FUNCTIONAL_TALENTS_v0.1.md` — 功能天赋正式目录、Registry、Scanner 与兼容策略
 
-当前阶段：**P2 补全第一批 0.7.0**。P2-C 已验收，PR #8 已合并。本批新增飞行时间、飞行速度、游泳速度、夜视、自发光、危险感知、建造与墙壁放置速度，共 8 项，总目录 79 项。
+当前阶段：**0.8.0 二级天赋菜单、钓鱼与饰品扫描**。PR #9的0.7.0已验收合并。本版新增加鱼饵节约与宝匣概率，共81项。
 
-- 新增能力全部位于“功能能力”页；按 P 或 `/tptalents` 打开。
-- 5 项数值每级 1 点、可调当前强度；3 项视觉功能各 2 点解锁。
-- 飞行时间 +1 秒/级，飞行速度 +5%/级，游泳速度 +10%/级，两项放置速度各 +20%/级。
-- 飞行强化需要已有翅膀，不在空中补满时间；放置加速不改变材料消耗或放置条件。
-- 存档仍为 v3，协议升级为 9，所有客户端与服务器更新至 0.7.0。更新前备份角色。
-- [中文安装与验收](docs/P2Completion_TEST_GUIDE_zh-CN.md)
-- [实现、验证与限制](docs/P2Completion_IMPLEMENTATION.md)
-- [P2-C 历史说明](docs/P2C_IMPLEMENTATION.md)
-- 目标：tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8。
-
-## P1 补全测试版 0.3.0
-
-新增 24 项，共 45 项数值天赋；暴击率每级 +10 个百分点，新增多重暴击与可调攻击／工具／建造范围。
-
-- [安装与分组测试](docs/P1_COMPLETION_TEST_GUIDE_zh-CN.md)
-- [实现与明确未覆盖的项目](docs/P1_COMPLETION_IMPLEMENTATION.md)
-- [验证记录](docs/P1_COMPLETION_VALIDATION.md)
-
-### 0.3.1 P1 refinement
-Extra loot rolls, container quantities and vanilla thrust reach: [implementation and limits](docs/P1_REFINEMENT_0.3.1.md), [中文安装测试](docs/P1_REFINEMENT_TEST_GUIDE_zh-CN.md). Depends on PR #4; no automatic merge.
+- 六类二级目录、全局搜索、已购买/已启用筛选，菜单重开保留当前会话选择。
+- 分组/分类退款明确显示范围与实际投入；旧角色数据保留。
+- 开发指令 `/tpscanaccessories` 导出被动候选报告；`/tpfishsample` 提供单人钓鱼测试物资。
+- 存档v3、协议10；所有端更新至0.8.0。
+- [中文安装与验收](docs/P2MenuFishing_TEST_GUIDE_zh-CN.md)
+- [实现、验证与限制](docs/P2MenuFishing_IMPLEMENTATION.md)
+- 本版需单独实机验收与合并授权，之前暂缓项目仍按各自状态保留。

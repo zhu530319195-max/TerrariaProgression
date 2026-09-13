@@ -12,7 +12,7 @@ internal enum ProgressionMessage : byte { JoinCharacter = 1, Snapshot = 2, Talen
 
 internal static class ProgressionNetwork
 {
-    internal const byte ProtocolVersion = 9;
+    internal const byte ProtocolVersion = 10;
     private static ModPacket Packet(ProgressionMessage kind)
     {
         var packet = ModContent.GetInstance<TerrariaProgression>().GetPacket();
@@ -132,3 +132,4 @@ internal static class ProgressionNetwork
         }
     }
 }
+

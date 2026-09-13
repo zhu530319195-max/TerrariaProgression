@@ -14,6 +14,7 @@ public sealed class TalentUISystem : ModSystem
     private TalentUIState? panel;
     private GameTime lastTime = new();
     internal static bool Visible;
+    internal static bool IsTyping => Visible && ModContent.GetInstance<TalentUISystem>().panel?.SearchFocused == true;
     public override void Load()
     {
         ToggleKey = KeybindLoader.RegisterKeybind(Mod, "ToggleTalents", "P");
@@ -22,18 +23,19 @@ public sealed class TalentUISystem : ModSystem
         panel.Activate();
     }
     public override void Unload() { ToggleKey = null; Visible = false; userInterface = null; panel = null; }
-    public override void OnWorldUnload() { Visible = false; userInterface?.SetState(null); }
+    public override void OnWorldUnload() { panel?.EndSearch(); Visible = false; userInterface?.SetState(null); }
     internal static void Toggle()
     {
         if (Main.gameMenu || Main.dedServ) return;
         Visible = !Visible;
         var system = ModContent.GetInstance<TalentUISystem>();
+        if (!Visible) system.panel?.EndSearch();
         system.userInterface?.SetState(Visible ? system.panel : null);
     }
     public override void UpdateUI(GameTime gameTime)
     {
         lastTime = gameTime;
-        if (Main.gameMenu || Main.LocalPlayer.dead) { Visible = false; userInterface?.SetState(null); }
+        if (Main.gameMenu || Main.LocalPlayer.dead) { panel?.EndSearch(); Visible = false; userInterface?.SetState(null); }
         if (Visible) userInterface?.Update(gameTime);
     }
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -46,3 +48,4 @@ public sealed class TalentUISystem : ModSystem
         }, InterfaceScaleType.UI));
     }
 }
+

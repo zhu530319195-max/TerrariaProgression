@@ -92,7 +92,7 @@ Check(state.Invest("MaxLife", 1, BigInteger.Pow(10, 30)), "unlimited compressed 
 Check(state.Talents["MaxLife"].CostRuns.Count == 1 && StateCodec.Encode(state).Length < 512, "huge same-price levels fit a compact snapshot");
 copy = StateCodec.Decode(StateCodec.Encode(state));
 Check(copy.RefundOne("MaxLife") == 1 && copy.RefundAll("MaxLife") == BigInteger.Pow(10, 30) - 1, "constant-time huge refunds preserve exact costs");
-Check(NumericTalents.All.Count == 47 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "47 implemented unlimited numeric talents registered");
+Check(NumericTalents.All.Count == 49 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "49 implemented unlimited numeric talents registered");
 state = new(); state.Award(1000 * scale, 50000);
 var result = TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 1, out copy);
 Check(result == TalentResult.Success && copy.AvailableTalentPoints == 2 && state.AvailableTalentPoints == 3, "transaction copy commits without mutating original");
@@ -277,3 +277,57 @@ foreach(string id in new[]{"NightVision","SelfLight","DangerSense"}) {
     Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+2,"completion binary refund: "+id);
 }
 Console.WriteLine($"Final P2-Completion core checks passed: {checks}");
+
+
+// 0.8.0 navigation membership and atomic new-scope refunds, independent of old enums.
+var menuIds=TalentNavigation.Groups.SelectMany(g=>g.TalentIds).ToArray();
+Check(menuIds.Length==81 && menuIds.Distinct().Count()==81 && menuIds.Order().SequenceEqual(TalentCatalog.All.Select(t=>t.Id).Order()),"all 81 implemented talents appear once in the menu");
+Check(TalentNavigation.Categories.Count==6 && TalentNavigation.Groups.All(g=>g.TalentIds.Count>0&&TalentNavigation.Categories.Contains(g.CategoryId)),"six populated categories and no empty or orphan groups");
+Check(!menuIds.Contains("AutoJump")&&!menuIds.Contains("JumpHeight"),"cancelled jumps absent from navigation");
+state=new();state.Award(100000000*scale,50000);
+foreach(var id in menuIds)state.Invest(id,3);
+state.RefundAll("MaxLife");state.Invest("MaxLife",7,2);
+var snapshot=StateCodec.Encode(state);
+foreach(var scope in TalentNavigation.Categories) {
+    var amount=TalentNavigation.RefundAmount(state,scope,false);
+    Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuCategory,scope,TalentCategory.BaseStats,1,out copy)==TalentResult.Success,"new category refund accepted: "+scope);
+    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.TotalSpentTalentPoints==state.TotalSpentTalentPoints-amount,"category refund uses historical costs: "+scope);
+    Check(copy.Talents.Keys.All(id=>!TalentNavigation.InScope(id,scope,false)) && copy.Talents.Count==81-menuIds.Count(id=>TalentNavigation.InScope(id,scope,false)),"category refund exact membership: "+scope);
+}
+foreach(var g in TalentNavigation.Groups) {
+    var amount=TalentNavigation.RefundAmount(state,g.Id,true);
+    Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuGroup,g.Id,TalentCategory.Economy,1,out copy)==TalentResult.Success,"new subgroup refund accepted: "+g.Id);
+    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.Talents.Count==81-g.TalentIds.Count,"subgroup exact historical refund: "+g.Id);
+    Check(copy.Talents.Keys.All(id=>!g.TalentIds.Contains(id)) && snapshot.SequenceEqual(StateCodec.Encode(state)),"refund leaves source and other groups intact: "+g.Id);
+}
+foreach(var invalid in new[]{"","NotAGroup","AutoJump","../../Survival"}) {
+    Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuGroup,invalid,TalentCategory.BaseStats,1,out copy)==TalentResult.InvalidRequest && ReferenceEquals(copy,state),"invalid subgroup cannot mutate: "+invalid);
+}
+Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuGroup,"Survival",TalentCategory.BaseStats,1,out _) == TalentResult.InvalidRequest,"category cannot be used as subgroup");
+Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuCategory,"Vitals",TalentCategory.BaseStats,1,out _) == TalentResult.InvalidRequest,"subgroup cannot be used as category");
+Check(TalentNavigation.RefundAmount(state,"Vitals",true)==17,"different historical prices included in displayed refund");
+state=new();state.Award(1000000*scale,50000);state.Invest("MaxLife",1);state.Invest("FlightTime",1);state.Invest("BaitSaving",1,10);
+state.Talents["FlightTime"].Enabled=false;
+string LocalName(string id)=>id=="BaitSaving"?"鱼饵节约":id;
+Check(TalentNavigation.Visible(state,"Survival","Vitals","鱼饵",false,false,LocalName).SequenceEqual(new[]{"BaitSaving"}),"Chinese search is global across selected category");
+Check(TalentNavigation.Visible(state,"Survival","Vitals","bAiTsAvInG",false,false,LocalName).SequenceEqual(new[]{"BaitSaving"}),"case-insensitive internal-ID search");
+Check(TalentNavigation.Visible(state,"Movement","Flight","",true,false,LocalName).SequenceEqual(new[]{"FlightTime"}),"owned filter includes disabled talents");
+Check(TalentNavigation.Visible(state,"Movement","Flight","",false,true,LocalName).Count==0,"active filter excludes disabled and unpurchased talents");
+Check(TalentNavigation.Visible(state,"Survival","Vitals","",false,false,LocalName).SequenceEqual(new[]{"MaxLife","MaxMana"}),"clear search restores selected group");
+state.Talents["BaitSaving"].CurrentIntensity=0;
+Check(TalentNavigation.Visible(state,"Gathering","Fishing","",false,true,LocalName).Count==0,"zero-strength talent is excluded by active filter");
+foreach(string id in new[]{"BaitSaving","CrateChance"}) {
+    state=new();state.Award(1000000*scale,50000);
+    Check(TalentCatalog.TryGet(id,out var d)&&d.DefaultCost==1&&d.MaxLevel==0&&d.Adjustable,"new fishing contract: "+id);
+    TalentCatalog.Apply(state,TalentOperation.Upgrade,id,TalentCategory.Economy,10,out state);
+    TalentCatalog.Apply(state,TalentOperation.DecreaseIntensity,id,TalentCategory.Economy,7,out state);
+    copy=StateCodec.Decode(StateCodec.Encode(state));
+    Check(NumericTalents.ActiveLevel(copy,id)==3&&copy.Talents[id].InvestedPoints==10,"fishing adjustable strength roundtrip: "+id);
+    TalentCatalog.Apply(copy,TalentOperation.Disable,id,TalentCategory.Economy,1,out copy);
+    Check(NumericTalents.ActiveLevel(copy,id)==0&&copy.TotalSpentTalentPoints==10,"fishing disable does not refund: "+id);
+    TalentCatalog.Apply(copy,TalentOperation.RefundMenuGroup,"Fishing",TalentCategory.BaseStats,1,out copy);
+    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+10,"fishing group refunds purchased rather than active strength: "+id);
+}
+Check(Math.Abs(1-.9*TalentMath.Remaining(.95,10)-.4611367547)<1e-9,"10 percent native crate gate becomes 46.11367547 percent");
+Check(TalentMath.Remaining(.93,BigInteger.Pow(10,80))==0&&TalentMath.Remaining(.95,0)==1,"extreme and zero fishing levels are bounded without loops");
+Console.WriteLine($"Final P2-MenuFishing core checks passed: {checks}");

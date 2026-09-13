@@ -117,12 +117,12 @@ Architecture first:
 - Additional vanilla functions explicitly approved after testing
 
 ### P2 completion batch 1 — 0.7.0
-Implemented for acceptance: wing duration (+1s/level), wing speed (+5%/level), swimming speed (+10%/level), tile/wall placement speed (+20%/level each), night vision, personal light and dangersense. Adjustable numeric entries cost 1/level; binary entries cost 2 once. Native dangersense covers recognized traps without a second paid trap toggle. See `docs/P2Completion_IMPLEMENTATION.md`.
+Accepted and merged in PR #9: wing duration (+1s/level), wing speed (+5%/level), swimming speed (+10%/level), tile/wall placement speed (+20%/level each), night vision, personal light and dangersense. Adjustable numeric entries cost 1/level; binary entries cost 2 once. Native dangersense covers recognized traps without a second paid trap toggle. See `docs/P2Completion_IMPLEMENTATION.md`.
 
-Remaining catalog candidates include independent jump height, bait saving/crate chance, liquid utility/hover/actuator/wire helpers and dodge. This batch does not claim the entire P2 catalog is done. Tool destruction efficiency already shipped in P2-A and is not duplicate P3 work.
+0.8.0 implements bait saving/crate eligibility and menu navigation; see docs/P2MenuFishing_IMPLEMENTATION.md. Independent jump height, liquid/honey utility, actuator/wire helpers were removed from future scope by the user. Hover and dodge remain deferred. This batch does not claim the entire P2 catalog is done. Tool destruction efficiency already shipped in P2-A and is not duplicate P3 work.
 
-### P2-D — Developer discovery tooling
-- `AccessoryTalentScanner`
+### P2-D — Developer discovery tooling (0.8.0 implementation)
+- `AccessoryTalentScanner`: passive loaded metadata, JSON/CSV and explicit mapped/partial/unmapped report
 - Report unmapped vanilla accessory candidates
 - Scanner never auto-creates behavior or executes unknown third-party accessory logic
 - Third-party auto-import remains experimental/off by default
@@ -133,7 +133,7 @@ Authoritative functional catalog:
 ## P3 — Transcendent / World Interaction
 Goal: high-power, high-risk abilities with strong multiplayer/world protections.
 
-- Extreme mining speed
+- Tool destruction speed already shipped in P2-A; no duplicate speed talent
 - Area mining with selectable active radius
 - Vein mining with scalable chain limit
 - One-action tree felling
@@ -156,3 +156,4 @@ Goal: high-power, high-risk abilities with strong multiplayer/world protections.
 
 ## Development policy
 Each major roadmap item should be implemented in focused branches/PRs. Do not merge until the user explicitly accepts the in-game test result.
+

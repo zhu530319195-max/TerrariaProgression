@@ -85,7 +85,48 @@ Mods: {
   "ChildChilled": "Chilled",
   "ChildFrozen": "Frozen",
   "ChildStoned": "Stoned",
-  "ChildOnFire": "OnFire"
+  "ChildOnFire": "OnFire",
+  "MenuSurvival": "Survival & recovery",
+  "MenuBattle": "Combat & summons",
+  "MenuMovement": "Movement & exploration",
+  "MenuGathering": "Gathering & fishing",
+  "MenuBuilding": "Building & tools",
+  "MenuTrading": "Loot & trade",
+  "MenuGroupVitals": "Life & mana",
+  "MenuGroupRecovery": "Recovery & healing",
+  "MenuGroupDefense": "Defense & resistance",
+  "MenuGroupProtection": "Environment & status",
+  "MenuGroupOffense": "Offense",
+  "MenuGroupHandling": "Attack handling",
+  "MenuGroupSummoning": "Costs & summons",
+  "MenuGroupAfflictions": "Attack debuffs",
+  "MenuGroupRetaliation": "Retaliation",
+  "MenuGroupGround": "Ground movement",
+  "MenuGroupJumping": "Jumping & climbing",
+  "MenuGroupFlight": "Flight & swimming",
+  "MenuGroupVision": "Vision & information",
+  "MenuGroupResources": "Resource yield",
+  "MenuGroupFishing": "Fishing",
+  "MenuGroupHarvest": "Pickup & harvest",
+  "MenuGroupTools": "Tool efficiency",
+  "MenuGroupConstruction": "Construction",
+  "MenuGroupLoot": "Loot",
+  "MenuGroupCommerce": "Shops & reforging",
+  "Search": "Search all",
+  "ClearSearch": "Clear",
+  "OwnedOnly": "Owned",
+  "EnabledOnly": "Active",
+  "AllInCategory": "All",
+  "GlobalResults": "Global results: {0}",
+  "NoResults": "No matching talents",
+  "NoResultsHint": "Clear the search or turn off filters.",
+  "RefundOneAmount": "Refund level · {0} pts",
+  "RefundTalentAmount": "Refund talent · {0} pts",
+  "RefundGroupAmount": "Refund group [{0}] · {1} pts",
+  "RefundMenuAmount": "Refund category [{0}] · {1} pts",
+  "RefundAllAmount": "Refund all talents · {0} pts",
+  "BaitRemaining": "Original bait consumption chance ×{0}%",
+  "CrateRemaining": "Original crate-gate failure chance ×{0}%"
 }
     TalentNames: {
   "MaxLife": "Maximum life",
@@ -166,7 +207,9 @@ Mods: {
   "WallPlacementSpeed": "Wall placement speed",
   "NightVision": "Night vision",
   "SelfLight": "Personal light",
-  "DangerSense": "Danger sense"
+  "DangerSense": "Danger sense",
+  "BaitSaving": "Bait conservation",
+  "CrateChance": "Crate chance"
 }
     TalentHints: {
   "MaxLife": "+25 HP per level. Raising the maximum never heals; lowering it only clips current life.",
@@ -247,7 +290,9 @@ Mods: {
   "WallPlacementSpeed": "+20% wall placement speed per level; Lv.10 is 3x speed. Adjustable independently of tiles. No demolition bonus or material savings; native placement conditions apply; minimum one tick.",
   "NightVision": "2-point native night vision toggle. Does not emit light. Turning off preserves equipment/potion night vision.",
   "SelfLight": "2-point moving light using native Shine potion light strength/color. Independent toggle, no buff slot or healing.",
-  "DangerSense": "2-point native dangersense toggle for recognized hazards and traps. Not a full wire view; unknown mod traps are not guaranteed. Turning off preserves real potion effects."
+  "DangerSense": "2-point native dangersense toggle for recognized hazards and traps. Not a full wire view; unknown mod traps are not guaranteed. Turning off preserves real potion effects.",
+  "BaitSaving": "Original bait consumption probability ×0.93 per active level; Lv.10 saves about 51.6%. Stacks with native conservation and never forces consumption. Rod, bait and fishing conditions remain. Applies to valid bait including special bait. Adjustable.",
+  "CrateChance": "Original crate-gate failure probability ×0.95 per active level. A 10% gate becomes about 46.1% at Lv.10. Only changes crate eligibility; native rarity, biome, quests, enemies, pond and liquid rules remain. Honey is skipped; lava retains extra selection, so final crate yield can differ. Adjustable."
 }
     Messages: {
       LootLimit: "Extra loot reached the roll budget or item capacity; some extra rewards were not generated. Adjust the roll budget in Mod Config. Levels and points are unchanged."
@@ -298,3 +343,4 @@ Mods: {
     }
   }
 }
+
