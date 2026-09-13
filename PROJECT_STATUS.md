@@ -1,17 +1,17 @@
 # PROJECT_STATUS.md
 
 ## Current phase
-P0 Progression Core 0.1.0 implemented and automatically verified; PR #2 awaits user in-game acceptance. No merges performed.
+P0 Progression Core 0.1.0 implemented and automatically verified. On 2026-09-13 the user confirmed singleplayer XP, death persistence, restart persistence and world-change persistence, and explicitly authorized merging. Real multiplayer contribution and segmented/multi-stage Boss tests are deferred by the user, not passed.
 
 ## Repository state
 - Default branch: `main`
 - Bootstrap branch: `chore/project-bootstrap`
-- Open bootstrap PR: #1
-- P0 gameplay code is on `feat/progression-core`, based on the unmerged bootstrap branch. No PR has been merged by the implementation task.
+- Bootstrap documentation: PR #1 (dependency of P0 PR #2).
+- Integration order authorized by the user: bootstrap PR #1 into `main`, then P0 PR #2 retargeted from `chore/project-bootstrap` to `main`.
 - Official target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
 - Local official compilation and `.tmod` packaging: 0 errors, 0 warnings.
-- 1,537 core automated assertions and 28 native tModLoader runtime assertions passed in GitHub Actions run 34751256027. Actual two-client play and Boss encounters remain user acceptance items. See `docs/P0_VALIDATION.md`.
-- P0 PR: #2, targeting `chore/project-bootstrap`, explicitly dependent on PR #1. Await user confirmation before any merge.
+- 1,537 core automated assertions and 28 native tModLoader runtime assertions passed in GitHub Actions run 34751256027. Actual two-client play and segmented/multi-stage Boss encounters remain deferred validation items. See `docs/P0_VALIDATION.md`.
+- P0 PR: #2; user merge authorization recorded on 2026-09-13. See `docs/P0_VALIDATION.md` for the accepted scope and deferred checks.
 - Progression design baseline exists in `docs/PROGRESSION_DESIGN_v0.1.md`.
 - Functional/utility talent baseline exists in `docs/FUNCTIONAL_TALENTS_v0.1.md`.
 
@@ -86,7 +86,7 @@ P0 Progression Core 0.1.0 implemented and automatically verified; PR #2 awaits u
 The core progression rules, P1 default balance direction, utility unlock pricing, and functional talent architecture are sufficiently defined to begin implementation. Remaining design questions can be handled as targeted follow-ups without blocking P0.
 
 ## Next implementation task
-User in-game acceptance of P0 and fixes for any reported issues. Do not merge P0 or begin P1 until separately authorized. P0 contains the project skeleton, character save, XP/level/points, generic paid-cost/toggle model, config, owner snapshots and server contribution settlement. No formal talents or effects are registered.
+Address any reported P0 issues. P1 is the next planned phase, but requires a separate implementation instruction; P0 merge authorization does not start P1. P0 contains the project skeleton, character save, XP/level/points, generic paid-cost/toggle model, config, owner snapshots and server contribution settlement. No formal talents or effects are registered.
 
 ## Later implementation task
 Build the P2 `FunctionalTalentRegistry` before implementing the first permanent utility effects. Add `AccessoryTalentScanner` after the registry and core P2 effects are stable; the scanner must not block initial P2 delivery.
