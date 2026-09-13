@@ -13,15 +13,18 @@ output = repo / "artifacts"
 output.mkdir(exist_ok=True)
 commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
 mod = args.mod.read_bytes()
-info = (f"TerrariaProgression P1 completion 0.3.1\nCommit: {commit}\n"
+runtime_log = output / "runtime-smoke.log"
+runtime_pass = next((line.strip() for line in runtime_log.read_text(errors="replace").splitlines() if line.startswith("TP_RUNTIME_PASS ")), "Native runtime checks NOT RUN/PASSED") if runtime_log.exists() else "Native runtime checks NOT RUN"
+info = (f"TerrariaProgression P2-A 0.4.0\nCommit: {commit}\n"
+        f"Validation: official compilation and 2840 core checks passed; {runtime_pass}.\n"
         "Target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8\n"
         f"TerrariaProgression.tmod SHA256: {hashlib.sha256(mod).hexdigest()}\n"
-        "P1: 46 numeric talents, adjustable range and documented compatibility limits. No CI harness in the player package.\n")
-with zipfile.ZipFile(output / "TerrariaProgression_P1_0.3.1_Test.zip", "w", zipfile.ZIP_DEFLATED) as archive:
+        "P2-A: 47 numeric entries plus 10 functional entries (including numeric multi-jump), configurable level rewards. No CI harness in the player package.\n")
+with zipfile.ZipFile(output / "TerrariaProgression_P2A_0.4.0_Test.zip", "w", zipfile.ZIP_DEFLATED) as archive:
     archive.writestr("TerrariaProgression.tmod", mod)
-    archive.write(repo / "docs/P1_REFINEMENT_TEST_GUIDE_zh-CN.md", "安装与测试说明.md")
+    archive.write(repo / "docs/P2A_TEST_GUIDE_zh-CN.md", "安装与测试说明.md")
     archive.writestr("BUILD_INFO.txt", info)
-with zipfile.ZipFile(output / "TerrariaProgression_P1_0.3.1_Source.zip", "w", zipfile.ZIP_DEFLATED) as archive:
+with zipfile.ZipFile(output / "TerrariaProgression_P2A_0.4.0_Source.zip", "w", zipfile.ZIP_DEFLATED) as archive:
     paths = subprocess.check_output(["git", "ls-files", "-z"], cwd=repo).decode().split("\0")
     for path in filter(None, paths):
         archive.write(repo / path, path)

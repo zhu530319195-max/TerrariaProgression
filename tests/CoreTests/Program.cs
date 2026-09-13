@@ -92,34 +92,34 @@ Check(state.Invest("MaxLife", 1, BigInteger.Pow(10, 30)), "unlimited compressed 
 Check(state.Talents["MaxLife"].CostRuns.Count == 1 && StateCodec.Encode(state).Length < 512, "huge same-price levels fit a compact snapshot");
 copy = StateCodec.Decode(StateCodec.Encode(state));
 Check(copy.RefundOne("MaxLife") == 1 && copy.RefundAll("MaxLife") == BigInteger.Pow(10, 30) - 1, "constant-time huge refunds preserve exact costs");
-Check(NumericTalents.All.Count == 46 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "46 implemented unlimited numeric talents registered");
+Check(NumericTalents.All.Count == 47 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "47 implemented unlimited numeric talents registered");
 state = new(); state.Award(1000 * scale, 50000);
-var result = NumericTalents.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 1, out copy);
+var result = TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 1, out copy);
 Check(result == TalentResult.Success && copy.AvailableTalentPoints == 2 && state.AvailableTalentPoints == 3, "transaction copy commits without mutating original");
 state = copy;
-NumericTalents.Apply(state, TalentOperation.Disable, "MaxLife", TalentCategory.BaseStats, 1, out copy);
+TalentCatalog.Apply(state, TalentOperation.Disable, "MaxLife", TalentCategory.BaseStats, 1, out copy);
 Check(copy.AvailableTalentPoints == 2 && copy.TotalSpentTalentPoints == 1 && NumericTalents.ActiveLevel(copy,"MaxLife") == 0, "disable suppresses effect without refund");
-NumericTalents.Apply(copy, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 1, out state);
+TalentCatalog.Apply(copy, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 1, out state);
 Check(state.Talents["MaxLife"].TalentLevel == 2 && !state.Talents["MaxLife"].Enabled, "upgrading disabled talent does not silently enable it");
-Check(NumericTalents.Apply(state, TalentOperation.Upgrade, "MaxMana", TalentCategory.BaseStats, 2, out copy) == TalentResult.NotEnoughPoints && ReferenceEquals(state,copy), "insufficient batch purchase atomic");
-Check(NumericTalents.Apply(state, TalentOperation.Upgrade, "Unknown", TalentCategory.BaseStats, 1, out _) == TalentResult.UnknownTalent, "unknown talent rejected");
-Check(NumericTalents.Apply(state, (TalentOperation)99, "MaxLife", TalentCategory.BaseStats, 1, out _) == TalentResult.InvalidRequest, "invalid operation rejected");
-Check(NumericTalents.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 101, out _) == TalentResult.InvalidRequest, "unbounded request rejected");
-Check(!NumericTalents.ValidateImported(new ProgressionState { Talents = { ["Unknown"] = new TalentState() } }), "unregistered imported talent rejected");
+Check(TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxMana", TalentCategory.BaseStats, 2, out copy) == TalentResult.NotEnoughPoints && ReferenceEquals(state,copy), "insufficient batch purchase atomic");
+Check(TalentCatalog.Apply(state, TalentOperation.Upgrade, "Unknown", TalentCategory.BaseStats, 1, out _) == TalentResult.UnknownTalent, "unknown talent rejected");
+Check(TalentCatalog.Apply(state, (TalentOperation)99, "MaxLife", TalentCategory.BaseStats, 1, out _) == TalentResult.InvalidRequest, "invalid operation rejected");
+Check(TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 101, out _) == TalentResult.InvalidRequest, "unbounded request rejected");
+Check(!TalentCatalog.ValidateImported(new ProgressionState { Talents = { ["Unknown"] = new TalentState() } }), "unregistered imported talent rejected");
 state = new(); state.Award(1000000 * scale, 50000);
 for (int i = 0; i < 500; i++) {
     var def = NumericTalents.All[random.Next(NumericTalents.All.Count)];
     var op = (TalentOperation)random.Next(12);
-    NumericTalents.Apply(state, op, def.Id, def.Category, 1, out state);
+    TalentCatalog.Apply(state, op, def.Id, def.Category, 1, out state);
     copy = StateCodec.Decode(StateCodec.Encode(state));
     Check(copy.AvailableTalentPoints + copy.TotalSpentTalentPoints == copy.Level - 1 && copy.TotalSpentTalentPoints == copy.Talents.Values.Aggregate(BigInteger.Zero,(sum,t)=>sum+t.InvestedPoints), "random purchase/refund/toggle preserves point conservation");
 }
 state = new(); state.Award(10000 * scale, 50000); state.Invest("MaxLife", 2); state.Invest("MaxLife", 3); state.Invest("Damage",1);
-NumericTalents.Apply(state,TalentOperation.RefundCategory,"",TalentCategory.BaseStats,1,out copy);
+TalentCatalog.Apply(state,TalentOperation.RefundCategory,"",TalentCategory.BaseStats,1,out copy);
 Check(copy.TotalSpentTalentPoints == 1 && copy.Talents.ContainsKey("Damage") && !copy.Talents.ContainsKey("MaxLife"),"category refund preserves other categories and historic costs");
-NumericTalents.Apply(copy,TalentOperation.DisableEverything,"",TalentCategory.BaseStats,1,out state);
+TalentCatalog.Apply(copy,TalentOperation.DisableEverything,"",TalentCategory.BaseStats,1,out state);
 Check(!state.Talents["Damage"].Enabled && state.TotalSpentTalentPoints == 1,"disable all retains investments");
-NumericTalents.Apply(state,TalentOperation.RefundEverything,"",TalentCategory.BaseStats,1,out copy);
+TalentCatalog.Apply(state,TalentOperation.RefundEverything,"",TalentCategory.BaseStats,1,out copy);
 Check(copy.TotalSpentTalentPoints == 0 && copy.Talents.Count == 0,"refund all returns all actual points");
 double carry = 0; int mana = 0;
 for(int tick = 0; tick < 60; tick++) mana = TalentMath.Recover(mana, 100, 2, ref carry);
@@ -147,16 +147,16 @@ for (int denominator = 1; denominator <= 250; denominator++) {
     }
 }
 state = new(); state.Award(1000000 * scale, 50000); state.Invest("MeleeRange", 1, 10);
-NumericTalents.Apply(state,TalentOperation.DecreaseIntensity,"MeleeRange",TalentCategory.Combat,5,out copy);
+TalentCatalog.Apply(state,TalentOperation.DecreaseIntensity,"MeleeRange",TalentCategory.Combat,5,out copy);
 Check(NumericTalents.ActiveLevel(copy,"MeleeRange")==5 && copy.TotalSpentTalentPoints==10 && state.Talents["MeleeRange"].CurrentIntensity==null,"mode changes are atomic without refund");
-Check(NumericTalents.ValidateImported(StateCodec.Decode(StateCodec.Encode(copy))),"intensity survives save and validated import");
-NumericTalents.Apply(copy,TalentOperation.MaximumIntensity,"MeleeRange",TalentCategory.Combat,1,out state);
+Check(TalentCatalog.ValidateImported(StateCodec.Decode(StateCodec.Encode(copy))),"intensity survives save and validated import");
+TalentCatalog.Apply(copy,TalentOperation.MaximumIntensity,"MeleeRange",TalentCategory.Combat,1,out state);
 Check(NumericTalents.ActiveLevel(state,"MeleeRange")==10,"maximum mode restores purchased strength");
 copy.Talents["MeleeRange"].CurrentIntensity=11;
-Check(!NumericTalents.ValidateImported(copy),"over-level imported intensity rejected");
+Check(!TalentCatalog.ValidateImported(copy),"over-level imported intensity rejected");
 copy.Talents["MeleeRange"].CurrentIntensity=.5m;
-Check(!NumericTalents.ValidateImported(copy),"fractional active level rejected");
-Check(NumericTalents.Apply(state,TalentOperation.DecreaseIntensity,"Damage",TalentCategory.Combat,1,out _)==TalentResult.InvalidRequest,"unsupported intensity change rejected");
+Check(!TalentCatalog.ValidateImported(copy),"fractional active level rejected");
+Check(TalentCatalog.Apply(state,TalentOperation.DecreaseIntensity,"Damage",TalentCategory.Combat,1,out _)==TalentResult.InvalidRequest,"unsupported intensity change rejected");
 Console.WriteLine($"PASS: {checks} core checks (formulas, capped/uncapped multi-level, precision, save validation, refunds, multiplayer allocation).");
 
 Check(TalentMath.ExtraRolls(0, 0) == 0, "zero extra rolls");
@@ -164,3 +164,38 @@ Check(TalentMath.ExtraRolls(5, .49) == 1 && TalentMath.ExtraRolls(5, .5) == 0, "
 Check(TalentMath.ExtraRolls(10, .9) == 1 && TalentMath.ExtraRolls(20, .9) == 2, "whole additional loot rolls");
 Check(TalentMath.ExtraRolls(BigInteger.Pow(10, 80), .5) == BigInteger.Pow(10, 79), "unbounded level roll arithmetic");
 Console.WriteLine($"Final core checks passed: {checks}");
+
+// P2: variable lifetime rewards, old v2 import, binary purchases and child settings.
+state = new(); state.Award(1000 * scale, 50000, 5);
+Check(state.Level == 4 && state.TotalTalentPointsEarned == 15 && state.AvailableTalentPoints == 15, "three new levels pay configured five points");
+state.Award(Experience.Requirement(state.Level,50000)-state.CurrentExperience,50000,BigInteger.Pow(10,50));
+Check(state.TotalTalentPointsEarned == 15+BigInteger.Pow(10,50), "huge reward has no int ceiling and preserves historic awards");
+state.Award(Experience.Requirement(state.Level,50000),50000,0);
+Check(state.Level == 6 && state.TotalTalentPointsEarned == 15+BigInteger.Pow(10,50), "zero reward still advances level");
+Check(StateCodec.Decode(StateCodec.Encode(state)).TotalTalentPointsEarned == state.TotalTalentPointsEarned, "variable reward ledger round trip");
+using (var legacy = new MemoryStream()) {
+    using var writer = new BinaryWriter(legacy, System.Text.Encoding.UTF8, true);
+    writer.Write(2);
+    foreach (BigInteger n in new BigInteger[]{4,50*scale,1000*scale,1,2}) StateCodec.WriteInteger(writer,n);
+    writer.Write(1); writer.Write("MaxLife"); writer.Write(false); writer.Write(false); writer.Write(1);
+    StateCodec.WriteInteger(writer,2); StateCodec.WriteInteger(writer,1); writer.Flush();
+    var migrated = StateCodec.Decode(legacy.ToArray());
+    Check(migrated.TotalTalentPointsEarned == 3 && migrated.RefundAll("MaxLife") == 2 && migrated.AvailableTalentPoints == 3, "v2 paid costs and total rewards migrate exactly");
+}
+state = new(); state.Award(10000*scale,50000);
+Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,"NoFallDamage",TalentCategory.Utility,1,out copy)==TalentResult.Success && copy.TotalSpentTalentPoints==2,"binary unlock costs two points");
+Check(TalentCatalog.Apply(copy,TalentOperation.Upgrade,"NoFallDamage",TalentCategory.Utility,1,out _)==TalentResult.NoChange,"binary repurchase forbidden");
+TalentCatalog.Apply(copy,TalentOperation.RefundTalent,"NoFallDamage",TalentCategory.Utility,1,out state);
+Check(state.TotalSpentTalentPoints==0 && state.AvailableTalentPoints==state.TotalTalentPointsEarned,"binary refund returns two paid points");
+TalentCatalog.Apply(state,TalentOperation.Upgrade,"AllInformation",TalentCategory.Utility,1,out state);
+TalentCatalog.Apply(state,TalentOperation.ToggleChild,"AllInformation",TalentCategory.Utility,3,out copy);
+Check(!FunctionalTalentRegistry.ChildEnabled(copy,"AllInformation","Compass") && FunctionalTalentRegistry.ChildEnabled(copy,"AllInformation","Time") && copy.TotalSpentTalentPoints==2,"free child toggle preserves other effects and paid cost");
+Check(!FunctionalTalentRegistry.ChildEnabled(StateCodec.Decode(StateCodec.Encode(copy)),"AllInformation","Compass"),"child state persisted");
+Check(TalentCatalog.Apply(copy,TalentOperation.ToggleChild,"AllInformation",TalentCategory.Utility,13,out _)==TalentResult.InvalidRequest,"invalid child index rejected");
+copy.Talents["AllInformation"].DisabledEffects.Add("Unknown"); Check(!TalentCatalog.ValidateImported(copy),"unknown imported child rejected");
+state=new(); state.Award(1000000*scale,50000); state.Invest("MultiJump",1,10);
+TalentCatalog.Apply(state,TalentOperation.DecreaseIntensity,"MultiJump",TalentCategory.Utility,7,out copy);
+Check(NumericTalents.ActiveLevel(copy,"MultiJump")==3 && copy.TotalSpentTalentPoints==10,"jump active intensity independent of purchased count");
+state.Talents["NoFallDamage"]=new TalentState(); state.Talents["NoFallDamage"].AddCost(2,2);
+Check(!TalentCatalog.ValidateImported(state),"import cannot exceed binary level cap");
+Console.WriteLine($"Final P2 core checks passed: {checks}");

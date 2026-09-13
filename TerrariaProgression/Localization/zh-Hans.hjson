@@ -47,7 +47,29 @@ Mods: {
   "DecreaseIntensity": "强度 −1",
   "IncreaseIntensity": "强度 +1",
   "MaximumIntensity": "使用最大强度",
-  "Intensity": "当前使用等级：{0}（强度调整不退款）"
+  "Intensity": "当前使用等级：{0}（强度调整不退款）",
+  "UnlockCost": "解锁（{0} 点）",
+  "UpgradeCost": "升级 +1（{0} 点）",
+  "Unlocked": "已解锁",
+  "Locked": "未解锁",
+  "UnlockDetail": "状态：{0}\n当前：{1}\n一次性解锁：{2} 点\n实际投入：{3} 点\n回退返还实际支付点数。",
+  "GroupMovement": "移动",
+  "GroupEnvironment": "环境",
+  "GroupImmunity": "异常免疫",
+  "GroupInformation": "信息",
+  "GroupTools": "建筑／工具",
+  "ChildTime": "时间",
+  "ChildDepth": "深度",
+  "ChildCompass": "罗盘",
+  "ChildWeather": "天气",
+  "ChildMoon": "月相",
+  "ChildFishing": "渔力",
+  "ChildRadar": "附近敌人",
+  "ChildDps": "DPS",
+  "ChildRareCreatures": "稀有生物",
+  "ChildOre": "矿物探测",
+  "ChildTreasure": "宝藏探测",
+  "ChildKillCount": "击杀计数"
 }
     TalentNames: {
   "MaxLife": "最大生命",
@@ -95,7 +117,18 @@ Mods: {
   "BuyDiscount": "商店购买折扣",
   "ReforgeDiscount": "重铸折扣",
   "ToolReach": "工具使用距离",
-  "BuildReach": "建造距离"
+  "BuildReach": "建造距离",
+  "NoFallDamage": "无坠落伤害",
+  "AutoJump": "自动跳跃",
+  "MultiJump": "多段跳",
+  "WaterWalking": "水上行走",
+  "LavaWalking": "岩浆表面行走",
+  "UnderwaterBreathing": "水下无限呼吸",
+  "LavaImmunity": "岩浆免疫",
+  "HotTileImmunity": "炽热方块免疫",
+  "KnockbackImmunity": "击退免疫",
+  "AllInformation": "全信息显示",
+  "ToolSpeed": "方块破坏效率"
 }
     TalentHints: {
   "MaxLife": "每级 +25 HP。提高上限不会补血；降低上限仅截断当前生命。",
@@ -143,7 +176,18 @@ Mods: {
   "BuyDiscount": "每级令购买价格 ×0.95，保留装备／幸福度修正。普通非免费商品最低 1 铜币。",
   "ReforgeDiscount": "每级令重铸计价基础 ×0.95，仍由原生重铸流程结算与取整。",
   "ToolReach": "每级 +1 格镐／斧／锤使用距离。保留工具强度与挖掘速度，不增加一次挖掉的方块数量。可调低当前强度。",
-  "BuildReach": "每级 +1 格方块／墙壁放置距离，与工具距离分别生效。可调低当前强度。"
+  "BuildReach": "每级 +1 格方块／墙壁放置距离，与工具距离分别生效。可调低当前强度。",
+  "NoFallDamage": "免除原生坠落伤害。与真实饰品同时存在不会重复叠加。",
+  "AutoJump": "按住跳跃键可自动连续跳跃；沿用原生跳跃规则。",
+  "MultiJump": "每级 +1 次空中额外跳跃，与真实额外跳跃饰品加算。当前次数可调低。按松后再按跳跃；落地／原生抓钩刷新时恢复次数，空中开关不补次数。",
+  "WaterWalking": "可在水和蜂蜜表面行走；按下可沉入。不会附带岩浆行走或岩浆免疫。",
+  "LavaWalking": "可在岩浆表面行走；不附带水上行走或岩浆免疫。仅普通重力方向，仍需留意接触岩浆造成的伤害。",
+  "UnderwaterBreathing": "启用时暂停溺水判定，不消耗也不补充呼吸槽；关闭后按当前呼吸量继续。兼容特殊种子的空气环境。",
+  "LavaImmunity": "免除原生岩浆伤害。不自动提供岩浆表面行走或异常状态免疫集合。",
+  "HotTileImmunity": "免除原生炽热方块的接触伤害。不等于免疫所有火焰攻击。",
+  "KnockbackImmunity": "免除原生受击击退。关闭后保留装备已有的击退免疫。",
+  "AllInformation": "一次解锁时间、深度、罗盘、天气、月相、渔力、敌人数、DPS、稀有生物、矿物、宝藏与击杀计数。下方逐项开关免费；关闭仅停止天赋来源，不遮蔽真实装备或队友提供的信息。",
+  "ToolSpeed": "每级 +20% 工具破坏效率：间隔 ÷(1+0.2×当前等级)。10级约为3倍效率。作用于原生镐、斧、锤的挖掘／伐木／拆墙；不增加工具强度，不绕过保护，不提高放置速度。受至少1帧限制。"
 }
     Messages: {
       LootLimit: "额外战利品达到单次抽取保护或物品容量，部分额外奖励未生成；可在 MOD 配置调整抽取保护。天赋等级与点数不变。"
@@ -169,6 +213,7 @@ Mods: {
         BoostMounts: { Label: "允许增益：坐骑", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
         BoostPets: { Label: "允许增益：宠物", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
         BoostModItems: { Label: "允许增益：MOD 物品", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
+        TalentPointsPerLevel: { Label: "每级获得天赋点", Tooltip: "直接填写非负整数，默认1，无玩法数值上限；0为停止发点。仅影响今后升级，不追溯补发或扣除旧点数。不支持小数、负数或科学记数法，输入无效恢复1。" }
         HpToXpMultiplier: {
           Label: 每点最大生命对应经验
           Tooltip: "使用 NPC.lifeMax 计算，范围 0.01～10.00。"

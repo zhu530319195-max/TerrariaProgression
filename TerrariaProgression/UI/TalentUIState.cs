@@ -33,6 +33,8 @@ internal sealed class TalentUIState : UIState
     private string selected = "MaxLife";
     private float lastWidth, lastHeight;
     private TalentButton? resync;
+    private readonly List<TalentButton> childButtons = new();
+    private string childSelection = "";
     private ProgressionPlayer Player => Main.LocalPlayer.GetModPlayer<ProgressionPlayer>();
     internal static string Text(string key, params object[] args) => Language.GetTextValue("Mods.TerrariaProgression.TalentsUI." + key, args);
     private static string Name(string id) => Language.GetTextValue("Mods.TerrariaProgression.TalentNames." + id);
@@ -79,14 +81,19 @@ internal sealed class TalentUIState : UIState
         Place(detail, detailCard, 0, 32, 1, 0, 0); detail.IsWrapped = true;
         Place(hint, detailCard, 0, 140, 1, 0, 0); hint.IsWrapped = true;
         actions.Width.Set(0, 1); actions.Height.Set(106, 0); actions.Top.Set(-106, 1); rightArea.Append(actions);
-        ActionButton(actions, "Upgrade", () => Request(TalentOperation.Upgrade), () => CanAct && Player.State.AvailableTalentPoints > 0 && NumericTalents.TryGet(selected, out _));
+        var purchase = new TalentButton(() => TalentCatalog.TryGet(selected, out var d)
+            ? Text(d.MaxLevel == 1 ? "UnlockCost" : "UpgradeCost", d.DefaultCost) : Text("Upgrade"),
+            () => Request(TalentOperation.Upgrade), () => CanAct && TalentCatalog.TryGet(selected, out var d)
+                && Player.State.AvailableTalentPoints >= d.DefaultCost
+                && (d.MaxLevel == 0 || (Player.State.Talents.GetValueOrDefault(selected)?.TalentLevel ?? 0) < d.MaxLevel));
+        actionButtons.Add(purchase); actions.Append(purchase);
         ActionButton(actions, "RefundOne", () => Request(TalentOperation.RefundOne), () => CanAct && HasSelected);
         ActionButton(actions, "RefundTalent", () => Request(TalentOperation.RefundTalent), () => CanAct && HasSelected);
         ActionButton(actions, "Enable", () => Request(TalentOperation.Enable), () => CanAct && HasSelected && !Player.State.Talents[selected].Enabled);
         ActionButton(actions, "Disable", () => Request(TalentOperation.Disable), () => CanAct && HasSelected && Player.State.Talents[selected].Enabled);
-        ActionButton(actions, "RefundCategory", () => Player.RequestTalent(TalentOperation.RefundCategory, category: category), () => CanAct && Player.State.Talents.Keys.Any(id => NumericTalents.TryGet(id, out var d) && d.Category == category));
+        ActionButton(actions, "RefundCategory", () => Player.RequestTalent(TalentOperation.RefundCategory, category: category), () => CanAct && Player.State.Talents.Keys.Any(id => TalentCatalog.TryGet(id, out var d) && d.Category == category));
         foreach (var op in new[] { TalentOperation.DecreaseIntensity, TalentOperation.IncreaseIntensity, TalentOperation.MaximumIntensity })
-            ActionButton(actions, op.ToString(), () => Request(op), () => CanAct && HasSelected && NumericTalents.TryGet(selected, out var d) && d.Adjustable);
+            ActionButton(actions, op.ToString(), () => Request(op), () => CanAct && HasSelected && TalentCatalog.TryGet(selected, out var d) && d.Adjustable);
         var footerOps = new[] { TalentOperation.EnableEverything, TalentOperation.DisableEverything, TalentOperation.RefundEverything };
         for (int i = 0; i < footerOps.Length; i++) {
             var op = footerOps[i];
@@ -105,13 +112,19 @@ internal sealed class TalentUIState : UIState
         list.Clear();
         list.ViewPosition = 0;
         detailsList.ViewPosition = 0;
-        var talents = NumericTalents.All.Where(t => t.Category == category).ToArray();
+        var talents = TalentCatalog.All.Where(t => t.Category == category).ToArray();
         selected = talents.FirstOrDefault()?.Id ?? "";
-        foreach (var definition in talents) {
+        string? lastGroup = null;
+        foreach (var definition in talents.OrderBy(t => category == TalentCategory.Utility ? FunctionalTalentRegistry.GroupOf(t.Id) : "")) {
+            if (category == TalentCategory.Utility && lastGroup != FunctionalTalentRegistry.GroupOf(definition.Id)) {
+                lastGroup = FunctionalTalentRegistry.GroupOf(definition.Id);
+                var group = new UIText(Text("Group" + lastGroup), .75f) { TextColor = new Color(229,199,132) };
+                group.Width.Set(0,1); group.Height.Set(25,0); list.Add(group);
+            }
             var id = definition.Id;
             var entry = new TalentButton(() => {
                 var owned = Player.State.Talents.GetValueOrDefault(id);
-                return Name(id) + "  " + Compact(owned?.TalentLevel ?? 0);
+                return Name(id) + "  " + (definition.MaxLevel == 1 ? Text(owned == null ? "Locked" : "Unlocked") : Compact(owned?.TalentLevel ?? 0));
             }, () => { selected = id; detailsList.ViewPosition = 0; }, () => true, () => selected == id);
             entry.Width.Set(0, 1); entry.Height.Set(32, 0);
             entry.TextHAlign = 0; entry.PaddingLeft = 10;
@@ -135,8 +148,9 @@ internal sealed class TalentUIState : UIState
         string value = Experience.Format(units);
         return value.Length <= 12 ? value : Compact(units / Experience.Scale);
     }
-    private static string Effect(NumericTalent definition, BigInteger level)
+    private static string Effect(TalentDefinition definition, BigInteger level)
     {
+        if (definition.Unit == EffectUnit.Flag) return Text(level > 0 ? "On" : "Off");
         if (definition.Unit == EffectUnit.RemainingMultiplier)
             return Text("Remaining", (100 * TalentMath.Remaining((double)definition.PerLevel, level)).ToString("0.##", CultureInfo.InvariantCulture));
         // Defaults have at most two decimal places, preserving huge integer levels.
@@ -175,6 +189,19 @@ internal sealed class TalentUIState : UIState
         float hintTop = detail.Top.Pixels + detail.MinHeight.Pixels + 12;
         hint.Top.Set(hintTop, 0); hint.Recalculate();
         float height = hintTop + hint.MinHeight.Pixels + 8;
+        if (childSelection != selected) {
+            foreach (var button in childButtons) button.Remove();
+            childButtons.Clear(); childSelection = selected;
+            if (FunctionalTalentRegistry.TryGet(selected, out var functional))
+                for (int i = 0; i < functional.ChildEffects.Count; i++) {
+                    int index = i + 1; string child = functional.ChildEffects[i]; string parent = selected;
+                    var button = new TalentButton(() => Text("Child" + child) + " · " + Text(FunctionalTalentRegistry.ChildEnabled(Player.State,parent,child) ? "On" : "Off"),
+                        () => Player.RequestTalent(TalentOperation.ToggleChild,parent,category,index), () => CanAct && Player.State.Talents.ContainsKey(parent));
+                    button.Width.Set(0,1); childButtons.Add(button); detailCard.Append(button);
+                }
+        }
+        for (int i = 0; i < childButtons.Count; i++) { childButtons[i].Top.Set(height + i * 36,0); childButtons[i].Recalculate(); }
+        height += childButtons.Count * 36;
         if (Math.Abs(detailCard.Height.Pixels - height) > .1f) {
             detailCard.Height.Set(height, 0);
             detailsList.Recalculate();
@@ -205,11 +232,13 @@ internal sealed class TalentUIState : UIState
         var cap = ModContent.GetInstance<ProgressionConfig>().ExperienceRequirementCap;
         header.SetText(Text("Header", Compact(s.Level), Xp(s.CurrentExperience), Xp(Experience.Requirement(s.Level, cap))));
         totals.SetText(Text("Totals", Compact(s.AvailableTalentPoints), Compact(s.TotalSpentTalentPoints), Xp(s.TotalExperienceEarned)));
-        if (NumericTalents.TryGet(selected, out var definition)) {
+        if (TalentCatalog.TryGet(selected, out var definition)) {
             var owned = s.Talents.GetValueOrDefault(selected);
             var level = owned?.TalentLevel ?? 0;
             title.SetText(Name(selected));
-            detail.SetText(Text("Detail", Compact(level), owned?.Enabled == false ? Text("Off") : level > 0 ? Text("On") : Text("Unlearned"),
+            if (definition.MaxLevel == 1) detail.SetText(Text("UnlockDetail", Text(level > 0 ? "Unlocked" : "Locked"),
+                Text(owned?.Enabled == true ? "On" : "Off"), definition.DefaultCost, Compact(owned?.InvestedPoints ?? 0)));
+            else detail.SetText(Text("Detail", Compact(level), owned?.Enabled == false ? Text("Off") : level > 0 ? Text("On") : Text("Unlearned"),
                 Effect(definition, NumericTalents.ActiveLevel(s, selected)), Effect(definition, level + 1), definition.DefaultCost, Compact(owned?.InvestedPoints ?? 0)));
             hint.SetText(Language.GetTextValue("Mods.TerrariaProgression.TalentHints." + selected) +
                 (definition.Adjustable ? "\n" + Text("Intensity", Compact(owned == null ? 0 : NumericTalents.EffectiveLevel(owned))) : ""));

@@ -1,17 +1,15 @@
 # PROJECT_STATUS.md
 
 ## Current phase
-P1 refinement 0.3.1 on `feat/p1-loot-and-reach`, based on PR #4 head b2eb14f1671eacb30ad08934d3618428aa1e54af. PR #4 / 0.3.0 is user-accepted as a stage; not merged. New scope: extra loot rolls replacing DropChance semantics, BagQuantity, vanilla thrust/spear reach and firing-speed verification. 46 numeric entries. User confirmed all four 0.3.1 feature groups passed in-game testing; PR #5 awaits explicit merge authorization. See `docs/P1_REFINEMENT_0.3.1.md` for validation and limits. No P2/P3.
+P2-A 0.4.0 on `feat/p2a-functional-talents`, based on main `30e4da33647afc3b4d25e9b7990bbacf8150b377`. User explicitly authorized P2-A after PR #4/#5 acceptance and merge. Implements the ten first functional entries, tool efficiency and configurable points per level. Local implementation committed; official MOD and harness builds pass (0 warnings/errors), 2840 core checks pass. User explicitly authorized pushing P2-A, creating its PR and continuing automatic tests on 2026-09-13. Runtime CI and in-game acceptance pending; do not merge.
 
 ## Repository state
-- Default branch: `main`; PR #1, #2 and #3 merged with explicit user approval.
-- P1 completion branch: `feat/p1-numeric-completion`, based on main `5f23b0fa544726106e88cb2b9d5db999c7a8b797`.
-- Official target unchanged: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
-- P0 user-confirmed: correct XP; death/restart/world-change persistence. Real multiplayer contribution and segmented/multi-stage Boss tests deferred by user.
-- P1 save format v2 imports v1 and compresses historical costs; old P0 cannot load a newly saved v2 character.
-- P1 numeric operations are server-confirmed. GUI: P (rebindable) or `/tptalents`.
-- See `docs/P1_IMPLEMENTATION.md`, `docs/P1_VALIDATION.md` and `docs/P1_TEST_GUIDE_zh-CN.md`.
-- Do not merge P1 until separately authorized after in-game acceptance.
+- PR #1–#5 are merged. PR #4/#5 merged 2026-09-13 after explicit user instruction “验收通过，可以合并 PR #4、#5”. Earlier historical statements that they await merge are superseded.
+- Target unchanged: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
+- P1 accepted groups remain accepted; real multiplayer, special bosses, potion sickness/fishing and user-deferred tiered crit remain unverified/deferred.
+- Save v3 imports v1/v2 and preserves paid points; once saved in v3, use a backup to return to older MOD versions.
+- Protocol 5; all peers must update. Server confirms talent purchases, child toggles and level rewards. Native movement/mining retains the engine's owner-client behavior.
+- P2-A implementation and limits: `docs/P2A_IMPLEMENTATION.md`; Chinese tests: `docs/P2A_TEST_GUIDE_zh-CN.md`.
 
 ## Confirmed core rules
 - Initial level: 1.
@@ -96,7 +94,7 @@ The core progression rules, P1 default balance direction, utility unlock pricing
 - PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
 
 ## Next implementation task
-0.3.1 test and source packages delivered; the four feature groups passed real-game testing. Await explicit merge authorization for PR #4 and PR #5. Exact jump height, other special projectile reach and multiplayer private drops remain scoped follow-ups; tiered crit remains deferred.
+0.4.0 local test/source packages prepared. Next: push the authorized P2-A branch, create PR, run native CI, resolve any failures, then in-game acceptance. Do not begin P2-B/C or P3 until the current batch is reviewed. P2-A contains 47 numeric registry entries and 10 functional registry entries (nine binary unlocks and numeric MultiJump), 57 total.
 
-## Later implementation task
-Build the P2 `FunctionalTalentRegistry` before implementing the first permanent utility effects. Add `AccessoryTalentScanner` after the registry and core P2 effects are stable; the scanner must not block initial P2 delivery.
+## P1 merge authorization supersedes earlier notes
+The earlier acceptance sections above record history at the time of feedback. PR #4 and #5 were subsequently explicitly authorized and merged. Their tested code is the P2-A base.

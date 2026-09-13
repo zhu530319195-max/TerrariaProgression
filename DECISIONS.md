@@ -98,3 +98,9 @@ Replace DropChance behavior with independent extra native rolls: floor(L/10) plu
 
 ## D031 — P1 refinement scope and implementation limits
 P1 refinement precedes P2: extra rolls, container quantity, vanilla shortsword/spear reach, and native gun/bow/magic use-time verification. Preserve user-deferred tiered crit. PR #4 is stage-accepted but has not been merged; the new branch depends on #4. Extra rules use an explicit native-family allowlist. Original unknown rules still execute once. Runtime protection: server config MaxExtraLootRollsPerEvent defaults to 1000 (1–100000), with a 100000-rule-call cycle guard and native item-capacity guard; excess produces a notice/log and does not change levels/points. Container opening follows native owner-client item flow, not a new claim of server-verified item consumption. Multiplayer private-drop replay remains excluded.
+
+## D032 — P1 merge and P2-A authorization (2026-09-13)
+User explicitly accepted and authorized merging PR #4 and #5, now merged. User then requested P2-A and added tool destruction efficiency (mining, chopping, building demolition) and a server setting for talent points per level, default 1 and no upper gameplay limit. Existing +20%/level adjustable ToolSpeed implementation is the proposed initial default, awaiting in-game acceptance; it changes action interval, not tool strength, area or placement speed.
+
+## D033 — Lifetime point ledger and functional state
+Server reward settings affect future level gains only. Save v3 records lifetime points actually earned, imports v1/v2 as Level−1, and keeps actual paid-cost refunds. Text input uses BigInteger (0 allowed; invalid input becomes 1), retaining existing bounded transport safety; no silent reward clamping. Binary unlocks cost 2 once, numeric MultiJump costs 1 per extra jump. Information sub-toggles are free and persist in the parent talent. Protocol 5 requires same-version peers.

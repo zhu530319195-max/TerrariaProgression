@@ -93,7 +93,7 @@ public sealed partial class RuntimeChecks
         Check(Count(ItemID.SlimeGun) + Count(ItemID.SlimeHook) == 6,
             "actual King Slime weapon pool keeps independent options across three draws");
         var tag = new TagCompound(); A.SaveData(tag); B.LoadData(tag);
-        Check(B.State.Talents["DropChance"].TalentLevel == 20 && B.State.Talents["BagQuantity"].TalentLevel == 10 && NumericTalents.ValidateImported(B.State),
+        Check(B.State.Talents["DropChance"].TalentLevel == 20 && B.State.Talents["BagQuantity"].TalentLevel == 10 && TalentCatalog.ValidateImported(B.State),
             "legacy drop ID and new bag talent round trip through native save");
         Main.netMode = NetmodeID.Server;
         Check(!BagLootSystem.CanBoost(p.GetSource_OpenItem(ItemID.WoodenCrate)), "server does not reapply owner-client bag quantity");

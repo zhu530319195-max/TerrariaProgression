@@ -1,5 +1,8 @@
 using System;
 using System.ComponentModel;
+using System.Globalization;
+using System.Numerics;
+using Newtonsoft.Json;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
@@ -22,6 +25,11 @@ public sealed class ProgressionConfig : ModConfig
     [DefaultValue(false)]
     public bool LogExperienceSettlements;
 
+    // Text entry avoids the int/float slider ceiling and rounding of large rewards.
+    [DefaultValue("1")]
+    public string TalentPointsPerLevel = "1";
+    [JsonIgnore] public BigInteger PointsPerLevel => BigInteger.TryParse(TalentPointsPerLevel, NumberStyles.None, CultureInfo.InvariantCulture, out var n) && n >= 0 ? n : BigInteger.One;
+
     [DefaultValue(1000), Range(1, 100000)]
     public int MaxExtraLootRollsPerEvent = 1000;
 
@@ -40,6 +48,9 @@ public sealed class ProgressionConfig : ModConfig
 
     public override void OnChanged()
     {
+        if (!BigInteger.TryParse(TalentPointsPerLevel, NumberStyles.None, CultureInfo.InvariantCulture, out var points) || points < 0)
+            TalentPointsPerLevel = "1";
+        else TalentPointsPerLevel = points.ToString(CultureInfo.InvariantCulture);
         HpToXpMultiplier = float.IsFinite(HpToXpMultiplier) ? Math.Clamp(HpToXpMultiplier, 0.01f, 10f) : 1f;
         StatueExperienceMultiplier = float.IsFinite(StatueExperienceMultiplier) ? Math.Clamp(StatueExperienceMultiplier, 0f, 10f) : 0f;
         ExperienceRequirementCap = Math.Max(0, ExperienceRequirementCap);

@@ -42,7 +42,7 @@ public sealed class ProgressionPlayer : ModPlayer
     public override void LoadData(TagCompound tag)
     {
         if (!tag.ContainsKey("DataVersion")) { State = new(); return; }
-        if (tag.GetInt("DataVersion") is not (1 or ProgressionState.DataVersion))
+        if (tag.GetInt("DataVersion") is not (1 or 2 or ProgressionState.DataVersion))
             throw new InvalidDataException("Unsupported TerrariaProgression save version; save was not reset.");
         State = StateCodec.Decode(tag.GetByteArray("Progression"));
     }
@@ -69,14 +69,19 @@ public sealed class ProgressionPlayer : ModPlayer
     internal BigInteger Award(BigInteger units)
     {
         if (Main.netMode == NetmodeID.MultiplayerClient || !SessionReady) return 0;
-        var levels = State.Award(units, ModContent.GetInstance<ProgressionConfig>().ExperienceRequirementCap);
+        var config = ModContent.GetInstance<ProgressionConfig>();
+        // Validate transport capacity before committing, preserving the old state on failure.
+        var next = StateCodec.Decode(StateCodec.Encode(State));
+        var levels = next.Award(units, config.ExperienceRequirementCap, config.PointsPerLevel);
+        StateCodec.Encode(next);
+        State = next;
         if (Main.netMode == NetmodeID.Server) ProgressionNetwork.SendSnapshot(this);
         return levels;
     }
     internal TalentResult ApplyTalent(TalentOperation operation, string id, TalentCategory category, int count)
     {
         if (Main.netMode == NetmodeID.MultiplayerClient || !SessionReady || Player.dead) return TalentResult.NotReady;
-        var result = NumericTalents.Apply(State, operation, id, category, count, out var updated);
+        var result = TalentCatalog.Apply(State, operation, id, category, count, out var updated);
         if (result == TalentResult.Success) { State = updated; TalentRevision++; }
         return result;
     }

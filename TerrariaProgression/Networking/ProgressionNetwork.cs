@@ -12,7 +12,7 @@ internal enum ProgressionMessage : byte { JoinCharacter = 1, Snapshot = 2, Talen
 
 internal static class ProgressionNetwork
 {
-    internal const byte ProtocolVersion = 4;
+    internal const byte ProtocolVersion = 5;
     private static ModPacket Packet(ProgressionMessage kind)
     {
         var packet = ModContent.GetInstance<TerrariaProgression>().GetPacket();
@@ -78,7 +78,7 @@ internal static class ProgressionNetwork
             if (kind == ProgressionMessage.JoinCharacter) {
                 if (player.SessionReady) return;
                 var imported = ReadState(reader);
-                if (!NumericTalents.ValidateImported(imported)) throw new InvalidDataException("Unregistered or unsupported talent in character import.");
+                if (!TalentCatalog.ValidateImported(imported)) throw new InvalidDataException("Unregistered or unsupported talent in character import.");
                 player.State = imported;
                 player.SessionId = Guid.NewGuid();
                 player.TalentRevision = 0;
@@ -121,7 +121,7 @@ internal static class ProgressionNetwork
             uint acknowledgement = reader.ReadUInt32();
             var result = (TalentResult)reader.ReadByte();
             var state = ReadState(reader);
-            if (slot >= Main.maxPlayers || !NumericTalents.ValidateImported(state)) throw new InvalidDataException("Invalid server talent snapshot.");
+            if (slot >= Main.maxPlayers || !TalentCatalog.ValidateImported(state)) throw new InvalidDataException("Invalid server talent snapshot.");
             var player = Main.player[slot].GetModPlayer<ProgressionPlayer>();
             if (player.SessionReady && player.SessionId == session && revision < player.TalentRevision) return;
             player.State = state;

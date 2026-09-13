@@ -3,7 +3,7 @@
 ## P0 — Progression Core
 Goal: stable character-bound infinite leveling foundation.
 
-Implementation status: P0 0.1.0 is delivered through PR #2 (bootstrap dependency #1); official compilation, 1,537 core assertions and 28 tModLoader runtime assertions passed. On 2026-09-13 the user confirmed singleplayer XP and persistence across death, restart and world changes, and authorized merging. Real multiplayer contribution and segmented/multi-stage Boss tests are explicitly deferred, not passed. See `docs/P0_VALIDATION.md`. P0 is merged; see P1 below. P2/P3 remain unimplemented.
+Implementation status: P0 0.1.0 is delivered through PR #2 (bootstrap dependency #1); official compilation, 1,537 core assertions and 28 tModLoader runtime assertions passed. On 2026-09-13 the user confirmed singleplayer XP and persistence across death, restart and world changes, and authorized merging. Real multiplayer contribution and segmented/multi-stage Boss tests are explicitly deferred, not passed. See `docs/P0_VALIDATION.md`. P0 is merged; see P1 below. P2-A implementation now follows below; P3 remains unimplemented.
 
 - tModLoader project skeleton
 - `ModPlayer` progression data
@@ -87,6 +87,7 @@ Architecture first:
 - Real equipped accessory + talent must not duplicate the same boolean/special effect by default
 
 ### P2-A — Highest-confidence effects
+0.4.0 implementation: the ten entries below, plus numeric tool destruction efficiency (+20%/level, adjustable) and server points-per-level (default 1, direct integer entry, no gameplay cap). Runtime CI and real-game acceptance are recorded separately in `docs/P2A_IMPLEMENTATION.md`.
 - No fall damage
 - Unlimited underwater breathing
 - Water walking
