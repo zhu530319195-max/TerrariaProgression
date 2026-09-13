@@ -112,6 +112,11 @@ internal sealed class TalentUIState : UIState
         item.Left.Set(x, 0); item.Top.Set(y, topPercent); item.Width.Set(widthPixels, widthPercent); item.Height.Set(height, 0); parent.Append(item);
     }
     internal static string Compact(BigInteger value) => value.ToString().Length <= 10 ? value.ToString() : value.ToString()[..4] + "… (" + value.ToString().Length + Text("Digits") + ")";
+    private static string Xp(BigInteger units)
+    {
+        string value = Experience.Format(units);
+        return value.Length <= 12 ? value : Compact(units / Experience.Scale);
+    }
     private static string Effect(NumericTalent definition, BigInteger level)
     {
         if (definition.Unit == EffectUnit.RemainingMultiplier)
@@ -139,8 +144,8 @@ internal sealed class TalentUIState : UIState
         }
         var s = Player.State;
         var cap = ModContent.GetInstance<ProgressionConfig>().ExperienceRequirementCap;
-        header.SetText(Text("Header", Compact(s.Level), Experience.Format(s.CurrentExperience), Experience.Format(Experience.Requirement(s.Level, cap))));
-        totals.SetText(Text("Totals", Compact(s.AvailableTalentPoints), Compact(s.TotalSpentTalentPoints), Experience.Format(s.TotalExperienceEarned)));
+        header.SetText(Text("Header", Compact(s.Level), Xp(s.CurrentExperience), Xp(Experience.Requirement(s.Level, cap))));
+        totals.SetText(Text("Totals", Compact(s.AvailableTalentPoints), Compact(s.TotalSpentTalentPoints), Xp(s.TotalExperienceEarned)));
         if (NumericTalents.TryGet(selected, out var definition)) {
             var owned = s.Talents.GetValueOrDefault(selected);
             var level = owned?.TalentLevel ?? 0;

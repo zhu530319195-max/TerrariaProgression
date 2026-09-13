@@ -49,6 +49,8 @@ public sealed class RuntimeChecks : ModSystem
         for (int i = 0; i < 2; i++) {
             Main.player[i] = new Player { whoAmI = i };
             Main.player[i].active = true;
+            Netplay.Clients[i].Socket = new RecordingSocket();
+            NetMessage.buffer[i].broadcast = true;
             Main.player[i].dead = false;
             Main.player[i].GetModPlayer<ProgressionPlayer>().Initialize();
             Main.player[i].GetModPlayer<ProgressionPlayer>().SessionReady = true;
@@ -232,6 +234,8 @@ public sealed class RuntimeChecks : ModSystem
         Check(p.statMana==12,"natural mana adds 100% of vanilla 12 MP/sec at level 10");
         var tag = new TagCompound(); A.SaveData(tag); B.LoadData(tag);
         Check(B.State.Talents.Count==21 && !B.State.Talents["ManaRegen"].Enabled,"real SaveData / LoadData preserve all talents and toggle state");
+        p.dead=true; PlayerLoader.UpdateDead(p); p.dead=false;
+        Check(A.State.Talents.Count==21 && A.State.TotalSpentTalentPoints==210,"death retains purchased talent levels and invested points");
         A.ApplyTalent(TalentOperation.DisableEverything,"",TalentCategory.BaseStats,1);
         p.statLife=300; p.statMana=200; p.ResetEffects(); effects.ClampResources();
         Check(p.statLife==100 && p.statMana==20,"disabling maximum stats clips resources without damage or healing");
@@ -250,6 +254,7 @@ public sealed class RuntimeChecks : ModSystem
         A.HasActionTick=false;
         SendTalentAction(A.SessionId,revision,TalentOperation.Upgrade,"MaxLife",1);
         Check(A.State.Talents["MaxLife"].TalentLevel==1,"duplicate revision cannot spend twice");
+        Check(((RecordingSocket)Netplay.Clients[0].Socket).Sent > 0, "rejected request sends a real ModPacket response");
         A.HasActionTick=false;
         SendTalentAction(Guid.NewGuid(),A.TalentRevision,TalentOperation.RefundTalent,"MaxLife",1);
         Check(A.State.Talents.ContainsKey("MaxLife"),"old session token cannot refund current character");
@@ -308,4 +313,25 @@ public sealed class RuntimeChecks : ModSystem
         npc.StrikeNPC(Hit(damage), fromNet: true);
         Netplay.Clients[sender].State = 0;
     }
+}
+
+// Implements tML's public transport interface for the disposable simulated clients.
+// This receives actual ModPacket bytes; no production packet path is bypassed.
+internal sealed class RecordingSocket : Terraria.Net.Sockets.ISocket
+{
+    internal byte[] LastPacket = Array.Empty<byte>();
+    internal int Sent;
+    public void AsyncSend(byte[] data, int offset, int size, Terraria.Net.Sockets.SocketSendCallback callback, object state = null!)
+    {
+        LastPacket = data.AsSpan(offset,size).ToArray(); Sent++; callback(state);
+    }
+    public void AsyncReceive(byte[] data, int offset, int size, Terraria.Net.Sockets.SocketReceiveCallback callback, object state = null!) { }
+    public void Close() { }
+    public void Connect(Terraria.Net.RemoteAddress address) { }
+    public bool IsConnected() => true;
+    public bool IsDataAvailable() => false;
+    public void SendQueuedPackets() { }
+    public bool StartListening(Terraria.Net.Sockets.SocketConnectionAccepted callback) => false;
+    public void StopListening() { }
+    public Terraria.Net.RemoteAddress GetRemoteAddress() => new Terraria.Net.TcpAddress(System.Net.IPAddress.Loopback, 7789);
 }

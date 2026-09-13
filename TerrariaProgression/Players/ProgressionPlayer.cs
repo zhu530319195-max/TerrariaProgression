@@ -97,7 +97,7 @@ public sealed class ProgressionPlayer : ModPlayer
     }
     internal void Acknowledge(uint request, TalentResult result)
     {
-        if (request == PendingRequest || (request == 0 && RequestTimedOut)) {
+        if ((request != 0 && request == PendingRequest) || (request == 0 && RequestTimedOut)) {
             PendingRequest = 0;
             LastResult = result;
             HasResult = true;
