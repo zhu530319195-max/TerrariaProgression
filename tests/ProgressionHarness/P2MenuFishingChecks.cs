@@ -57,10 +57,10 @@ public sealed partial class RuntimeChecks
         p.inventory[1]=new Item();var noBait=new object[]{bobber,false,0};consume.Invoke(p,noBait);
         Check(!(bool)noBait[1] && (int)noBait[2]==0,"conservation never supplies missing bait");
         Main.netMode=NetmodeID.Server;
-        Check(fishing.CanConsumeBait(new Item(ItemID.MasterBait))==null,"server copy does not repeat owner bait roll");
+        Check(ItemLoader.CanConsumeBait(p,new Item(ItemID.MasterBait))==null,"server copy does not repeat owner bait roll");
         Main.netMode=NetmodeID.SinglePlayer;Main.myPlayer=1;
-        Check(fishing.CanConsumeBait(new Item(ItemID.MasterBait))==null,"spectator copy does not repeat bait roll");Main.myPlayer=0;
-        A.SessionReady=false;Check(fishing.CanConsumeBait(new Item(ItemID.MasterBait))==null,"unconfirmed character cannot apply bait talent");A.SessionReady=true;
+        Check(ItemLoader.CanConsumeBait(p,new Item(ItemID.MasterBait))==null,"spectator copy does not repeat bait roll");Main.myPlayer=0;
+        A.SessionReady=false;Check(ItemLoader.CanConsumeBait(p,new Item(ItemID.MasterBait))==null,"unconfirmed character cannot apply bait talent");A.SessionReady=true;
 
         var roll=typeof(Projectile).GetMethod("FishingCheck_RollDropLevels",BindingFlags.Instance|BindingFlags.NonPublic)!;
         var drop=typeof(Projectile).GetMethod("FishingCheck_RollItemDrop",BindingFlags.Instance|BindingFlags.NonPublic)!;

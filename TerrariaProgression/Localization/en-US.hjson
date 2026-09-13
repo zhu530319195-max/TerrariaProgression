@@ -126,7 +126,8 @@ Mods: {
   "RefundMenuAmount": "Refund category [{0}] · {1} pts",
   "RefundAllAmount": "Refund all talents · {0} pts",
   "BaitRemaining": "Original bait consumption chance ×{0}%",
-  "CrateRemaining": "Original crate-gate failure chance ×{0}%"
+  "CrateRemaining": "Original crate-gate failure chance ×{0}%",
+  "NoSelection": "No selection"
 }
     TalentNames: {
   "MaxLife": "Maximum life",

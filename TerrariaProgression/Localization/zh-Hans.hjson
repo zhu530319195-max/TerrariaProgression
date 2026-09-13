@@ -126,7 +126,8 @@ Mods: {
   "RefundMenuAmount": "退款分类【{0}】· {1}点",
   "RefundAllAmount": "退款全部天赋 · {0}点",
   "BaitRemaining": "原鱼饵消耗概率 ×{0}%",
-  "CrateRemaining": "原宝匣判定失败概率 ×{0}%"
+  "CrateRemaining": "原宝匣判定失败概率 ×{0}%",
+  "NoSelection": "未选择"
 }
     TalentNames: {
   "MaxLife": "最大生命",

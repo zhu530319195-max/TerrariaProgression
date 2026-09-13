@@ -76,9 +76,9 @@ internal sealed class TalentUIState : UIState
         AddAction(()=>Text("Disable"),()=>Request(TalentOperation.Disable),()=>CanAct&&HasSelected&&Player.State.Talents[selected].Enabled);
         foreach(var op in new[]{TalentOperation.DecreaseIntensity,TalentOperation.IncreaseIntensity,TalentOperation.MaximumIntensity})
             AddAction(()=>Text(op.ToString()),()=>Request(op),()=>CanAct&&HasSelected&&TalentCatalog.TryGet(selected,out var d)&&d.Adjustable);
-        AddAction(()=>Text("RefundGroupAmount",Text("MenuGroup"+RefundScope(true)),Compact(TalentNavigation.RefundAmount(Player.State,RefundScope(true),true))),
+        AddAction(()=>Text("RefundGroupAmount",ScopeLabel(true),Compact(TalentNavigation.RefundAmount(Player.State,RefundScope(true),true))),
             ()=>Player.RequestTalent(TalentOperation.RefundMenuGroup,RefundScope(true)),()=>CanAct&&TalentNavigation.RefundAmount(Player.State,RefundScope(true),true)>0);
-        AddAction(()=>Text("RefundMenuAmount",Text("Menu"+RefundScope(false)),Compact(TalentNavigation.RefundAmount(Player.State,RefundScope(false),false))),
+        AddAction(()=>Text("RefundMenuAmount",ScopeLabel(false),Compact(TalentNavigation.RefundAmount(Player.State,RefundScope(false),false))),
             ()=>Player.RequestTalent(TalentOperation.RefundMenuCategory,RefundScope(false)),()=>CanAct&&TalentNavigation.RefundAmount(Player.State,RefundScope(false),false)>0);
         var footerOps=new[]{TalentOperation.EnableEverything,TalentOperation.DisableEverything,TalentOperation.RefundEverything};
         for(int i=0;i<footerOps.Length;i++) {
@@ -98,11 +98,12 @@ internal sealed class TalentUIState : UIState
     }
     internal void EndSearch() { if(SearchFocused) {SearchFocused=false; Main.blockInput=false; PlayerInput.WritingText=false;} }
     public override void OnDeactivate() { EndSearch(); base.OnDeactivate(); }
+    private string ScopeLabel(bool group) => RefundScope(group).Length == 0 ? Text("NoSelection") : Text((group ? "MenuGroup" : "Menu") + RefundScope(group));
     private string RefundScope(bool group)
     {
         var location=TalentNavigation.Find(selected);
         // Search is global: scope labels and requests follow the selected result.
-        if(query.Trim().Length>0 && location!=null) return group?location.Id:location.CategoryId;
+        if(query.Trim().Length>0) return location==null?"":group?location.Id:location.CategoryId;
         return group?(menuGroup.Length>0?menuGroup:location?.Id??""):menuCategory;
     }
     private void Request(TalentOperation operation) => Player.RequestTalent(operation,selected,category);
@@ -305,7 +306,7 @@ internal sealed class TalentButton : UITextPanel<string>
 // A full-length scrollbar adds noise when a category already fits in the viewport.
 internal sealed class TalentScrollbar(UIList list) : UIScrollbar
 {
-    public override void Draw(SpriteBatch spriteBatch)
+    protected override void DrawSelf(SpriteBatch spriteBatch)
     {
         if (list.GetTotalHeight() > list.GetInnerDimensions().Height + 1) base.DrawSelf(spriteBatch);
     }

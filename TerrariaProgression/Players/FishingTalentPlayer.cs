@@ -8,7 +8,7 @@ namespace TerrariaProgression.Players;
 
 public sealed class FishingTalentPlayer : ModPlayer
 {
-    public override bool? CanConsumeBait(Item bait)
+    internal bool? ConserveBait()
     {
         if (Main.netMode == NetmodeID.Server || Player.whoAmI != Main.myPlayer) return null;
         var level = ExtendedTalentPlayer.Level(Player, "BaitSaving");
