@@ -115,16 +115,20 @@ public sealed partial class RuntimeChecks
         p.inventory[0]=new Item(ItemID.WoodWall){stack=1}; p.selectedItem=0;
         p.inventory[1]=new Item(ItemID.RedPaint){stack=10}; p.builderAccStatus[3]=0;
         Player.tileTargetX=x; Player.tileTargetY=y;
+        void PlaceWall() {
+            p.itemTime=0; p.itemAnimation=20; p.controlUseItem=true;
+            Native(p,"PlaceThing_Walls");
+        }
         Main.tile[x,y].ClearEverything(); Main.tile[x,y+1].ResetToType(TileID.Stone);
-        Native(p,"PlaceThing_Walls");
+        PlaceWall();
         Check(Main.tile[x,y].WallType==WallID.Wood && Main.tile[x,y].WallColor==p.inventory[1].paint && p.inventory[1].stack==9,"native wall placement paints and consumes exactly one paint");
-        Main.tile[x,y].ClearEverything(); p.builderAccStatus[3]=1; Native(p,"PlaceThing_Walls");
+        Main.tile[x,y].ClearEverything(); p.builderAccStatus[3]=1; PlaceWall();
         Check(Main.tile[x,y].WallType==WallID.Wood && Main.tile[x,y].WallColor==PaintID.None && p.inventory[1].stack==9,"native builder paint off preserves paint and still places wall");
         p.builderAccStatus[3]=0; Toggle("AutoPaint",false); p.ResetEffects(); PlayerLoader.UpdateEquips(p);
-        Main.tile[x,y].ClearEverything(); Native(p,"PlaceThing_Walls");
+        Main.tile[x,y].ClearEverything(); PlaceWall();
         Check(Main.tile[x,y].WallColor==PaintID.None && p.inventory[1].stack==9,"disabled paint talent has no placement effect");
         Toggle("AutoPaint",true); p.inventory[1]=new Item(); p.ResetEffects(); PlayerLoader.UpdateEquips(p);
-        Main.tile[x,y].ClearEverything(); Native(p,"PlaceThing_Walls");
+        Main.tile[x,y].ClearEverything(); PlaceWall();
         Check(Main.tile[x,y].WallType==WallID.Wood && Main.tile[x,y].WallColor==PaintID.None,"building without paint succeeds normally");
 
         var saved=new TagCompound(); A.SaveData(saved); B.LoadData(saved);
