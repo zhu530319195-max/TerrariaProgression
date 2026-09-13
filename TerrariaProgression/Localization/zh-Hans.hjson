@@ -1,0 +1,36 @@
+Mods: {
+  TerrariaProgression: {
+    Messages: {
+      Status: "等级 {0}｜当前经验 {1} / {2}｜累计经验 {3}｜可用天赋点 {4}｜已投入 {5}"
+      Waiting: "正在等待服务器确认角色成长数据。"
+      DebugDisabled: "请先在本 MOD 配置中开启“开发测试命令”。"
+      ConsoleOnly: "联机添加经验仅允许在专用服务器控制台执行。"
+      ServerConfigLocked: "请在开服前设置成长规则；专用服务器请修改配置文件后重启。"
+    }
+    Configs: {
+      ProgressionConfig: {
+        DisplayName: 成长规则（服务器）
+        HpToXpMultiplier: {
+          Label: 每点最大生命对应经验
+          Tooltip: "使用 NPC.lifeMax 计算，范围 0.01～10.00。"
+        }
+        ExperienceRequirementCap: {
+          Label: 单级所需经验上限
+          Tooltip: "默认 50000；0 表示不封顶。角色等级始终不设游戏上限。"
+        }
+        StatueExperienceMultiplier: {
+          Label: 雕像生成单位经验倍率
+          Tooltip: "0 不给经验；0.5 一半；1 正常；2 双倍。范围 0～10。"
+        }
+        EnableDebugCommands: {
+          Label: 开发测试命令
+          Tooltip: "默认关闭。开启后可单人使用 /tpgivexp，或由专用服务器控制台添加经验；联机普通客户端仍禁止。"
+        }
+        LogExperienceSettlements: {
+          Label: 记录经验结算日志
+          Tooltip: "在 client.log / server.log 记录分组数量、最大生命、分配经验和玩家槽位，用于排查联机或多节 Boss。"
+        }
+      }
+    }
+  }
+}

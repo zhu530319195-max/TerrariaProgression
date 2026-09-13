@@ -1,0 +1,1 @@
+CI-only test harness. Uses a disposable world, runs tests and terminates the server. Never distribute with the player test package.

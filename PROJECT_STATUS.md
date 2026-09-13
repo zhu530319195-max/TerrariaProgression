@@ -1,13 +1,16 @@
 # PROJECT_STATUS.md
 
 ## Current phase
-Project bootstrap / design freeze before implementation.
+P0 Progression Core 0.1.0 implemented on `feat/progression-core`; verification and user acceptance in progress.
 
 ## Repository state
 - Default branch: `main`
 - Bootstrap branch: `chore/project-bootstrap`
 - Open bootstrap PR: #1
-- No gameplay code implemented yet.
+- P0 gameplay code is on `feat/progression-core`, based on the unmerged bootstrap branch. No PR has been merged by the implementation task.
+- Official target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
+- Local official compilation and `.tmod` packaging: 0 errors, 0 warnings.
+- 1,537 core automated assertions passed. Native runtime/CI and real multiplayer acceptance are tracked separately; see `docs/P0_IMPLEMENTATION.md` and `docs/P0_TEST_GUIDE_zh-CN.md`.
 - Progression design baseline exists in `docs/PROGRESSION_DESIGN_v0.1.md`.
 - Functional/utility talent baseline exists in `docs/FUNCTIONAL_TALENTS_v0.1.md`.
 
@@ -82,7 +85,7 @@ Project bootstrap / design freeze before implementation.
 The core progression rules, P1 default balance direction, utility unlock pricing, and functional talent architecture are sufficiently defined to begin implementation. Remaining design questions can be handled as targeted follow-ups without blocking P0.
 
 ## Next implementation task
-Create the tModLoader project skeleton and P0 progression core: player save data, XP calculation, level-up loop, configurable XP cap, talent point storage, save/load, refund bookkeeping, toggle state, configuration scaffolding, and multiplayer synchronization foundations.
+Finish P0 runtime verification and user acceptance. Do not merge P0 or begin P1 until separately authorized. P0 contains the project skeleton, character save, XP/level/points, generic paid-cost/toggle model, config, owner snapshots and server contribution settlement. No formal talents or effects are registered.
 
 ## Later implementation task
 Build the P2 `FunctionalTalentRegistry` before implementing the first permanent utility effects. Add `AccessoryTalentScanner` after the registry and core P2 effects are stable; the scanner must not block initial P2 delivery.

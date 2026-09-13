@@ -1,0 +1,36 @@
+Mods: {
+  TerrariaProgression: {
+    Messages: {
+      Status: "Level {0} | XP {1} / {2} | Total XP {3} | Available talent points {4} | Spent {5}"
+      Waiting: "Waiting for the server to confirm character progression."
+      DebugDisabled: "Enable developer commands in the mod configuration first."
+      ConsoleOnly: "Multiplayer XP testing is restricted to the dedicated server console."
+      ServerConfigLocked: "Set progression rules before hosting, or edit the dedicated server config and restart."
+    }
+    Configs: {
+      ProgressionConfig: {
+        DisplayName: Progression rules (server)
+        HpToXpMultiplier: {
+          Label: XP per maximum HP
+          Tooltip: "NPC.lifeMax × this multiplier. Range 0.01–10.00."
+        }
+        ExperienceRequirementCap: {
+          Label: XP requirement cap per level
+          Tooltip: "Default 50000. 0 = uncapped. Character levels remain unlimited."
+        }
+        StatueExperienceMultiplier: {
+          Label: Statue NPC experience multiplier
+          Tooltip: "0 = none; 0.5 = half; 1 = normal; 2 = double. Range 0–10."
+        }
+        EnableDebugCommands: {
+          Label: Enable developer commands
+          Tooltip: "Enables /tpgivexp in singleplayer and tpgivexp in the server console. Does not permit multiplayer clients to grant XP."
+        }
+        LogExperienceSettlements: {
+          Label: Log experience settlements
+          Tooltip: "Records grouped NPC count, lifeMax, XP shares and recipient slots to client.log/server.log."
+        }
+      }
+    }
+  }
+}

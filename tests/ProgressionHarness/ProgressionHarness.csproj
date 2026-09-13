@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><Nullable>enable</Nullable></PropertyGroup>
+  <Import Project="$(TmlInstallPath)/tMLMod.targets" />
+  <ItemGroup>
+    <Reference Include="TerrariaProgression"><HintPath>../../TerrariaProgression/bin/Release/net8.0/TerrariaProgression.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,46 @@
+name: P0 build and verification
+on:
+  push:
+    branches: [feat/progression-core, main]
+  pull_request:
+    branches: [main, chore/project-bootstrap]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      TML_PATH: ${{ github.workspace }}/.tools/tml
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Core checks
+        run: bash scripts/test.sh
+      - name: Download pinned official tModLoader
+        shell: python
+        run: |
+          import hashlib, pathlib, urllib.request, zipfile
+          archive = pathlib.Path(".tools/tModLoader.zip")
+          archive.parent.mkdir(exist_ok=True)
+          urllib.request.urlretrieve("https://github.com/tModLoader/tModLoader/releases/download/v2026.07.3.0/tModLoader.zip", archive)
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == "6f51610f4b0f167d1620d0e8c83264ba14e047421e97d9f8053eb40e3d764e1a"
+          with zipfile.ZipFile(archive) as z: z.extractall(".tools/tml")
+      - name: Build and package mod
+        run: bash scripts/build.sh
+      - name: Build isolated runtime harness
+        run: dotnet build tests/ProgressionHarness/ProgressionHarness.csproj -c Release -p:TmlInstallPath="$TML_PATH"
+      - name: Dedicated server runtime checks
+        run: python3 scripts/runtime-smoke.py
+      - name: Upload player mod and verification logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TerrariaProgression-P0
+          if-no-files-found: warn
+          path: |
+            ~/.local/share/Terraria/tModLoader/Mods/TerrariaProgression.tmod
+            artifacts/*.log
