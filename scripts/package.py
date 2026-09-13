@@ -13,15 +13,15 @@ output = repo / "artifacts"
 output.mkdir(exist_ok=True)
 commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
 mod = args.mod.read_bytes()
-info = (f"TerrariaProgression P0 0.1.0\nCommit: {commit}\n"
+info = (f"TerrariaProgression P1-A 0.2.0\nCommit: {commit}\n"
         "Target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8\n"
         f"TerrariaProgression.tmod SHA256: {hashlib.sha256(mod).hexdigest()}\n"
-        "P0 only. No implemented talent effects. No CI harness in the player package.\n")
-with zipfile.ZipFile(output / "TerrariaProgression_P0_0.1.0_Test.zip", "w", zipfile.ZIP_DEFLATED) as archive:
+        "P1-A: 21 numeric talents and talent panel. No CI harness in the player package.\n")
+with zipfile.ZipFile(output / "TerrariaProgression_P1_0.2.0_Test.zip", "w", zipfile.ZIP_DEFLATED) as archive:
     archive.writestr("TerrariaProgression.tmod", mod)
-    archive.write(repo / "docs/P0_TEST_GUIDE_zh-CN.md", "安装与测试说明.md")
+    archive.write(repo / "docs/P1_TEST_GUIDE_zh-CN.md", "安装与测试说明.md")
     archive.writestr("BUILD_INFO.txt", info)
-with zipfile.ZipFile(output / "TerrariaProgression_P0_0.1.0_Source.zip", "w", zipfile.ZIP_DEFLATED) as archive:
+with zipfile.ZipFile(output / "TerrariaProgression_P1_0.2.0_Source.zip", "w", zipfile.ZIP_DEFLATED) as archive:
     paths = subprocess.check_output(["git", "ls-files", "-z"], cwd=repo).decode().split("\0")
     for path in filter(None, paths):
         archive.write(repo / path, path)

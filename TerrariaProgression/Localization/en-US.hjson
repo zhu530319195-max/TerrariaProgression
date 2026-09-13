@@ -1,5 +1,96 @@
 Mods: {
   TerrariaProgression: {
+    Keybinds: {
+  "ToggleTalents": {
+    "DisplayName": "Toggle talent panel"
+  }
+}
+    TalentsUI: {
+  "Close": "Close",
+  "Category0": "Base stats",
+  "Category1": "Recovery",
+  "Category2": "Combat",
+  "Category3": "Economy",
+  "Category4": "Utility",
+  "Category5": "World powers",
+  "Upgrade": "Upgrade +1 (1 point)",
+  "RefundOne": "Refund one level",
+  "Enable": "Enable",
+  "Disable": "Disable (no refund)",
+  "RefundTalent": "Refund this talent",
+  "RefundCategory": "Refund category",
+  "EnableEverything": "Enable all",
+  "DisableEverything": "Disable all (no refund)",
+  "RefundEverything": "Refund all talents",
+  "Resync": "Resync",
+  "Digits": " digits",
+  "Remaining": "Consumption probability / ratio ×{0}%",
+  "PerSecond": " / sec",
+  "Header": "Talents  ·  Lv.{0}   |   XP {1} / {2}",
+  "Totals": "Available {0}   ·   Invested {1}   ·   Lifetime XP {2}",
+  "Detail": "Talent level: {0} (unlimited) · {1}\nActive effect: {2}\nNext unlocked effect: {3}\nUpgrade cost: {4} point\nTotal invested: {5} points",
+  "Off": "Disabled",
+  "On": "Enabled",
+  "Unlearned": "Not learned",
+  "ComingLater": "Talents in this category will arrive in a later phase.",
+  "Waiting": "Waiting for server confirmation…",
+  "Timeout": "No confirmation yet. Resync before trying again.",
+  "Help": "P toggles this panel; rebind in Controls. Disabling does not refund.",
+  "ResultSuccess": "Done.",
+  "ResultNotReady": "Character not ready or dead.",
+  "ResultUnknownTalent": "Talent not available.",
+  "ResultInvalidRequest": "Invalid request.",
+  "ResultNotEnoughPoints": "Not enough talent points.",
+  "ResultNoChange": "Nothing to change.",
+  "ResultStaleRequest": "State changed; this request was not applied. Try again.",
+  "ResultCapacity": "Save capacity exceeded. No changes applied."
+}
+    TalentNames: {
+  "MaxLife": "Maximum life",
+  "MaxMana": "Maximum mana",
+  "Defense": "Defense",
+  "MoveSpeed": "Movement speed",
+  "Acceleration": "Acceleration",
+  "LifeRegen": "Fixed life regeneration",
+  "NaturalLifeRegen": "Natural life regeneration",
+  "ManaRegen": "Fixed mana regeneration",
+  "NaturalManaRegen": "Natural mana regeneration",
+  "Healing": "Healing items",
+  "ManaRestoration": "Mana restoration items",
+  "Damage": "Global damage",
+  "AttackSpeed": "Attack speed",
+  "CritDamage": "Critical damage",
+  "ArmorPenetration": "Armor penetration",
+  "Knockback": "Knockback",
+  "AmmoSaving": "Ammo conservation",
+  "ManaSaving": "Mana cost reduction",
+  "Minions": "Minion capacity",
+  "Sentries": "Sentry capacity",
+  "PickupRange": "Pickup range"
+}
+    TalentHints: {
+  "MaxLife": "+25 HP per level. Raising the maximum never heals; lowering it only clips current life.",
+  "MaxMana": "+20 MP per level. Raising the maximum never restores mana.",
+  "Defense": "+4 defense per level, additive with equipment.",
+  "MoveSpeed": "+5% running speed per level, multiplied after equipment. Mount movement follows native rules.",
+  "Acceleration": "+5% running acceleration per level, multiplied after equipment.",
+  "LifeRegen": "+1 HP/sec per level through native life regeneration and its status rules.",
+  "NaturalLifeRegen": "+10% natural life regeneration per level; multiplies the native natural component.",
+  "ManaRegen": "+2 MP/sec per level, independent of natural mana regeneration delay.",
+  "NaturalManaRegen": "+10% natural mana regeneration per level; supplements the native computed rate and preserves its delay.",
+  "Healing": "+5% healing item restoration per level. Heart pickup restoration is a separate future talent.",
+  "ManaRestoration": "+5% mana item restoration per level. Mana stars are a separate future talent.",
+  "Damage": "+5% generic damage per level, additive with equipment damage bonuses.",
+  "AttackSpeed": "+3% attack speed per level; respects weapon inheritance and tick timing.",
+  "CritDamage": "Adds 0.05 critical multiplier per level. Level 10 changes native ×2 crits to ×2.5.",
+  "ArmorPenetration": "+3 armor penetration per level through Generic DamageClass inheritance.",
+  "Knockback": "+10% knockback per level, additive with equipment; respects enemy immunity.",
+  "AmmoSaving": "Ammo consumption chance ×0.93 per level, multiplicative with native conservation.",
+  "ManaSaving": "Mana cost ×0.95 per level, multiplicative with native modifiers.",
+  "Minions": "+1 minion capacity per level, additive with equipment.",
+  "Sentries": "+1 sentry capacity per level, additive with equipment.",
+  "PickupRange": "+10% pickup range per level, multiplied with the original item range."
+}
     Messages: {
       Status: "Level {0} | XP {1} / {2} | Total XP {3} | Available talent points {4} | Spent {5}"
       Waiting: "Waiting for the server to confirm character progression."

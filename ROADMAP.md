@@ -3,7 +3,7 @@
 ## P0 — Progression Core
 Goal: stable character-bound infinite leveling foundation.
 
-Implementation status: P0 0.1.0 is delivered through PR #2 (bootstrap dependency #1); official compilation, 1,537 core assertions and 28 tModLoader runtime assertions passed. On 2026-09-13 the user confirmed singleplayer XP and persistence across death, restart and world changes, and authorized merging. Real multiplayer contribution and segmented/multi-stage Boss tests are explicitly deferred, not passed. See `docs/P0_VALIDATION.md`. P1–P3 remain unimplemented.
+Implementation status: P0 0.1.0 is delivered through PR #2 (bootstrap dependency #1); official compilation, 1,537 core assertions and 28 tModLoader runtime assertions passed. On 2026-09-13 the user confirmed singleplayer XP and persistence across death, restart and world changes, and authorized merging. Real multiplayer contribution and segmented/multi-stage Boss tests are explicitly deferred, not passed. See `docs/P0_VALIDATION.md`. P0 is merged; see P1 below. P2/P3 remain unimplemented.
 
 - tModLoader project skeleton
 - `ModPlayer` progression data
@@ -27,6 +27,8 @@ Implementation status: P0 0.1.0 is delivered through PR #2 (bootstrap dependency
 
 ## P1 — Numeric Talents
 Goal: implement stable numeric talents using the approved Lv.10 strong-state baseline.
+
+P1-A 0.2.0 implements 21 entries and the talent panel; validation / user acceptance pending. Implemented: maximum HP/MP, defense, run speed/acceleration, fixed/natural HP/MP recovery, item HP/MP restoration, generic damage/attack speed/crit damage/armor penetration/knockback, ammo conservation, mana cost, minion/sentry capacity, pickup range. The remaining catalog below is still planned, particularly crit chance / tiers and economy / resource drops. See `docs/P1_IMPLEMENTATION.md`.
 
 ### Base Stats
 - Max Life

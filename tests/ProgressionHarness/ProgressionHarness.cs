@@ -191,16 +191,99 @@ public sealed class RuntimeChecks : ModSystem
         Main.netMode = NetmodeID.SinglePlayer;
         Check(A.State.TotalExperienceEarned == 10000 * Experience.Scale, "received MP progression survives SP transition");
         Main.netMode = NetmodeID.Server; A.SessionReady = false;
-        using var invalid = new MemoryStream(new byte[] { 1, 1, 4, 0, 99, 0, 0, 0 });
+        using var invalid = new MemoryStream(new byte[] { ProgressionNetwork.ProtocolVersion, 1, 4, 0, 99, 0, 0, 0 });
         ModContent.GetInstance<TerrariaProgression.TerrariaProgression>().HandlePacket(new BinaryReader(invalid), 0);
         Check(!A.SessionReady && A.State.TotalExperienceEarned == 10000 * Experience.Scale, "malformed import rejected without erasing existing state");
+        RunTalents();
+    }
+    private void RunTalents()
+    {
+        Reset(); A.Award(10000000 * Experience.Scale);
+        foreach (var def in NumericTalents.All) Check(A.ApplyTalent(TalentOperation.Upgrade, def.Id, def.Category, 10) == TalentResult.Success, "purchase 10 levels: " + def.Id);
+        var p = A.Player;
+        var effects = p.GetModPlayer<NumericTalentPlayer>();
+        p.statLife = 60; p.statMana = 10;
+        p.ResetEffects();
+        Check(p.statLifeMax2 == 350 && p.statManaMax2 == 220, "native ResetEffects / ModifyMaxStats gives +250 HP +200 MP");
+        Check(p.statLife == 60 && p.statMana == 10, "max stat upgrades do not restore resources");
+        PlayerLoader.PostUpdateEquips(p);
+        Check((int)p.statDefense == 40 && Math.Abs(p.GetDamage(DamageClass.Generic).ApplyTo(100)-150) < .01, "native defense and global damage are applied");
+        Check(Math.Abs(p.GetAttackSpeed(DamageClass.Generic)-1.3f)<.001 && p.GetArmorPenetration(DamageClass.Generic)==30, "native generic attack speed and armor penetration");
+        Check(p.maxMinions == 11 && p.maxTurrets == 11, "minion / sentry capacity additive");
+        Check(Math.Abs(p.manaCost - Math.Pow(.95,10)) < .001, "native mana cost multiplication");
+        p.maxRunSpeed = 3; p.accRunSpeed = 6; p.runAcceleration = .08f;
+        effects.PostUpdateRunSpeeds();
+        Check(Math.Abs(p.maxRunSpeed-4.5f)<.001 && Math.Abs(p.accRunSpeed-9f)<.001 && Math.Abs(p.runAcceleration-.12f)<.001, "run speed and acceleration keep independent multipliers");
+        p.lifeRegen = 0; effects.UpdateLifeRegen(); float regen = 4; effects.NaturalLifeRegen(ref regen);
+        Check(p.lifeRegen == 20 && regen == 8, "10 HP/sec fixed and +100% natural life regen");
+        int healing = 100, manaHealing = 100;
+        effects.GetHealLife(new Item(), false, ref healing); effects.GetHealMana(new Item(),false,ref manaHealing);
+        Check(healing==150 && manaHealing==150,"healing item modifiers +50%");
+        var npc = Spawn(1000); npc.defense = 0; var modifiers = npc.GetIncomingStrikeModifiers(DamageClass.Generic,0);
+        effects.ModifyHitNPC(npc,ref modifiers);
+        var hit = modifiers.ToHitInfo(100,true,0,false);
+        Check(hit.Damage==250,"native critical damage grows x2 to x2.5 at level 10");
+        p.statMana=0; p.manaRegen=0;
+        for(int i=0;i<60;i++) effects.PostUpdate();
+        Check(p.statMana==20,"fixed mana recovers 20 per second at level 10 during regen delay");
+        A.ApplyTalent(TalentOperation.Disable,"ManaRegen",TalentCategory.Recovery,1);
+        p.statMana=0; p.manaRegen=24;
+        for(int i=0;i<60;i++) effects.PostUpdate();
+        Check(p.statMana==12,"natural mana adds 100% of vanilla 12 MP/sec at level 10");
+        var tag = new TagCompound(); A.SaveData(tag); B.LoadData(tag);
+        Check(B.State.Talents.Count==21 && !B.State.Talents["ManaRegen"].Enabled,"real SaveData / LoadData preserve all talents and toggle state");
+        A.ApplyTalent(TalentOperation.DisableEverything,"",TalentCategory.BaseStats,1);
+        p.statLife=300; p.statMana=200; p.ResetEffects(); effects.ClampResources();
+        Check(p.statLife==100 && p.statMana==20,"disabling maximum stats clips resources without damage or healing");
+        A.ApplyTalent(TalentOperation.EnableEverything,"",TalentCategory.BaseStats,1);
+        p.ResetEffects(); effects.ClampResources();
+        Check(p.statLife==100 && p.statMana==20 && p.statLifeMax2==350,"reenabling maximum stats does not refill resources");
+        A.ApplyTalent(TalentOperation.RefundEverything,"",TalentCategory.BaseStats,1);
+        p.ResetEffects(); PlayerLoader.PostUpdateEquips(p);
+        Check(A.State.TotalSpentTalentPoints==0 && p.statLifeMax2==100 && p.maxMinions==1,"refund all removes effects after native reset");
+
+        Reset(); A.Award(10000*Experience.Scale);
+        Main.netMode=NetmodeID.Server;
+        ulong revision = A.TalentRevision;
+        SendTalentAction(A.SessionId,revision,TalentOperation.Upgrade,"MaxLife",1);
+        Check(A.State.Talents["MaxLife"].TalentLevel==1 && A.TalentRevision==revision+1,"server applies bounded talent intent");
+        A.HasActionTick=false;
+        SendTalentAction(A.SessionId,revision,TalentOperation.Upgrade,"MaxLife",1);
+        Check(A.State.Talents["MaxLife"].TalentLevel==1,"duplicate revision cannot spend twice");
+        A.HasActionTick=false;
+        SendTalentAction(Guid.NewGuid(),A.TalentRevision,TalentOperation.RefundTalent,"MaxLife",1);
+        Check(A.State.Talents.ContainsKey("MaxLife"),"old session token cannot refund current character");
+        A.HasActionTick=false;
+        SendTalentAction(A.SessionId,A.TalentRevision,TalentOperation.Upgrade,"Unknown",1);
+        Check(A.State.Talents.Count==1,"server rejects unregistered talent request");
+        Main.netMode=NetmodeID.MultiplayerClient;
+        Check(A.ApplyTalent(TalentOperation.Upgrade,"MaxMana",TalentCategory.BaseStats,1)==TalentResult.NotReady,"client cannot apply a local authoritative mutation");
+        var retained=A.State;
+        Main.netMode=NetmodeID.Server; A.SessionReady=false;
+        Receive(1,retained);
+        Check(A.SessionReady && A.State.Talents["MaxLife"].TalentLevel==1,"registered talents import once on multiplayer join");
+    }
+    private void SendTalentAction(Guid token, ulong revision, TalentOperation operation, string id, int count)
+    {
+        using var stream=new MemoryStream();
+        using(var writer=new BinaryWriter(stream,System.Text.Encoding.UTF8,true)) {
+            writer.Write(ProgressionNetwork.ProtocolVersion); writer.Write((byte)ProgressionMessage.TalentAction);
+            writer.Write(token.ToByteArray()); writer.Write(revision); writer.Write((uint)1);
+            writer.Write((byte)operation); writer.Write(id); writer.Write((byte)TalentCategory.BaseStats); writer.Write((byte)count);
+        }
+        stream.Position=0; ProgressionNetwork.Receive(new BinaryReader(stream),0);
     }
     private void Receive(byte kind, ProgressionState state, bool padding = false)
     {
         using var stream = new MemoryStream();
         using (var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, leaveOpen: true)) {
             byte[] bytes = StateCodec.Encode(state);
-            writer.Write((byte)1); writer.Write(kind); writer.Write((ushort)bytes.Length); writer.Write(bytes);
+            writer.Write(ProgressionNetwork.ProtocolVersion); writer.Write(kind);
+            if (kind == 2) {
+                writer.Write((byte)0); writer.Write(A.SessionId.ToByteArray()); writer.Write(A.TalentRevision);
+                writer.Write((uint)0); writer.Write((byte)TalentResult.Success);
+            }
+            writer.Write((ushort)bytes.Length); writer.Write(bytes);
             if (padding) writer.Write(new byte[64]); // tML's underlying reader has bytes beyond the packet.
         }
         stream.Position = 0;
