@@ -71,3 +71,18 @@ Character talent levels are not capped for world-interaction abilities. Servers 
 
 ## D022 — Binary utility unlocks cost 2 talent points by default
 One-time functional unlock talents (`U` type), such as no fall damage, unlimited underwater breathing, water walking, lava immunity, accessory-like information functions, and status immunities, use a unified default unlock price of 2 talent points. This keeps utility abilities accessible and avoids unnecessary price tiers. Individual exceptions may only be introduced deliberately if a future ability is materially more powerful than the normal utility set.
+
+## D023 — Functional talents use an explicit registry rather than automatic accessory import
+All permanent utility/accessory-like powers are registered through `FunctionalTalentRegistry`. Each effect declares its implementation kind, stacking/conflict policy, network authority and compatibility status. Unknown accessories are never automatically exposed as purchasable talents.
+
+## D024 — Native APIs are preferred over accessory emulation
+Functional effects should use `NativeFlag` or `NativeSystem` whenever Terraria/tModLoader provides a stable state or subsystem. `AccessoryBridge` is reserved for explicitly whitelisted vanilla effects that cannot be represented cleanly otherwise. Complex cases use `Custom` implementations. Composite talents may combine already-registered child effects.
+
+## D025 — Accessory scanning is a developer discovery tool only
+`AccessoryTalentScanner` may enumerate registered accessories and report unmapped candidates, but it must not automatically generate behavior, spend talent points, run unknown third-party accessory logic, or infer final effects from tooltip text or reflection-based field differences.
+
+## D026 — Third-party accessory auto-import is experimental and off by default
+Any future third-party accessory bridge is opt-in/experimental (`ExperimentalImportedAccessories = false` by default). Formal support requires explicit mapping and test evidence. TerrariaProgression does not promise universal compatibility with arbitrary ModItem accessory logic.
+
+## D027 — Information and common status immunity are bundled utility unlocks
+To avoid menu bloat, vanilla-style information readouts are grouped under one 2-point `All Information` composite unlock with individually toggleable sub-effects. Common vanilla accessory-style debuff immunities are grouped under one 2-point status-immunity composite unlock, while knockback immunity remains a separate 2-point toggle because it materially changes combat feel.
