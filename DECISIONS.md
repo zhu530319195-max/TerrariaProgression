@@ -48,5 +48,23 @@ Area mining, vein mining, tree felling, terrain destruction, auto-replanting and
 ## D014 — Mod compatibility should be data/API driven
 Prefer standard tModLoader runtime properties and DamageClass/API behavior over hard-coded vanilla or third-party content lists, so modded NPCs/items work automatically when possible.
 
-## D015 — P1 values are not finalized
-The catalog is approved conceptually, but exact default effect-per-level, costs, and caps for P1 talents remain a design task. Implementation must not invent permanent balance values without approval.
+## D015 — P1 values were initially left open
+The initial bootstrap catalog approved the talent categories conceptually while leaving exact P1 values for later design approval.
+
+## D016 — Numeric talents are infinitely repeatable
+Supersedes the finite-cap assumption in the initial catalog. Any talent with meaningful continuous numeric scaling defaults to unlimited levels (`MaxLevel = 0`). Pure binary functionality remains an unlock-type ability.
+
+## D017 — Lv.10 is the default strong-state balance target
+Default talent values are tuned so Lv.1–3 is immediately noticeable, Lv.5 is clearly stronger than vanilla, and focused investment to Lv.10 is already very strong. Levels above 10 continue to scale but are not required to preserve conventional vanilla balance.
+
+## D018 — Numeric talent prices do not grow with level by default
+Normal numeric talents use a fixed talent-point cost per level, normally 1 point. XP progression already supplies the long-term cost curve, so the default design does not add an additional escalating talent-price curve.
+
+## D019 — Approved P1 strength examples
+Current default numeric baseline includes: +25 max HP/level, +20 max MP/level, +4 defense/level, +5% movement speed/level, +1 HP/s fixed life regen/level, +2 MP/s fixed mana regen/level, +5% global damage/level, +3% attack speed/level, +2.5 percentage points crit/level, +5% crit multiplier/level, +3 armor penetration/level, +10% monster coins and resource quantity/level. Exact formulas for multiplicative reductions and loot probability are specified in `docs/PROGRESSION_DESIGN_v0.1.md`.
+
+## D020 — Strength ceiling and current active strength are separate
+For abilities that can become inconvenient or dangerous at high levels (multi-jump, area mining, vein mining, terrain destruction, etc.), talent level determines the maximum unlocked power while the player can separately choose a lower current active intensity or disable the effect entirely.
+
+## D021 — World-editing growth remains unlimited but performance may be capped per action
+Character talent levels are not capped for world-interaction abilities. Servers may independently enforce a per-action world-edit limit such as `MaxBlocksPerAction` for performance and safety. This is a runtime protection limit, not a progression cap.
