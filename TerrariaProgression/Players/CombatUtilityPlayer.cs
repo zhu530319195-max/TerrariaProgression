@@ -68,14 +68,9 @@ public sealed class CombatUtilityPlayer : ModPlayer
     }
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        if (!IsOwner || Player.dead || damageDone<=0 || !target.active || target.life<=0 ||
-            target.friendly || target.townNPC || target.immortal || target.dontTakeDamage) return;
-        ApplyAttackDebuff(target,"AttackBurn",BuffID.OnFire);
-        ApplyAttackDebuff(target,"AttackPoison",BuffID.Poisoned);
-    }
-    private void ApplyAttackDebuff(NPC target, string talent, int buff)
-    {
-        int duration=TalentMath.AddInt(0,Level(talent)*120); // two seconds per active level
-        if (duration>0) target.AddBuff(buff,duration); // native immunity, max refresh and sync
+        // Multiplayer applications originate from the server's confirmed native
+        // strike observer. The owner callback is used only in single player.
+        if (Main.netMode == NetmodeID.SinglePlayer)
+            NPCs.AfflictionNpc.ApplyHit(target, Player, damageDone);
     }
 }

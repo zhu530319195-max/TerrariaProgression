@@ -1,3 +1,5 @@
+> 0.9.0已通过用户实机验收，共87项天赋；[PR #12](https://github.com/zhu530319195-max/TerrariaProgression/pull/12)已获合并授权。见[实现记录](docs/P2Afflictions_IMPLEMENTATION.md)与[任务清单](docs/TASK_CHECKLIST_zh-CN.md)。旧的未验收／未完成事项继续单列。
+
 # TerrariaProgression
 
 Terraria/tModLoader 独立角色成长系统。
@@ -39,12 +41,14 @@ Terraria/tModLoader 独立角色成长系统。
 
 - `AGENTS.md` — 工程与协作规则
 - `PROJECT_STATUS.md` — 当前状态、已确认规则和下一步
+- [最新任务清单（中文）](docs/TASK_CHECKLIST_zh-CN.md) — 已完成、下一批、候选、遗留验证与取消事项
 - `ROADMAP.md` — P0–P3 开发路线
 - `DECISIONS.md` — 已接受的产品/架构决策
 - `docs/PROGRESSION_DESIGN_v0.1.md` — 等级、经验、数值天赋与世界能力总设计
 - `docs/FUNCTIONAL_TALENTS_v0.1.md` — 功能天赋正式目录、Registry、Scanner 与兼容策略
+- [下一批P2已确认规则](docs/P2_AFFLICTIONS_DESIGN_zh-CN.md) — 异常伤害、四种新异常、渔力与扫描维护（待开发）
 
-当前阶段：**0.8.2 二级天赋菜单、钓鱼与饰品扫描**。PR #9的0.7.0已验收合并。本版新增加鱼饵节约与宝匣概率，共81项。
+当前阶段：**0.8.2 二级天赋菜单、钓鱼与饰品扫描**。PR #1～#10已验收合并。本批新增鱼饵节约与宝匣概率，共81项；此前单列的未验收／未完成项目仍按各自状态保留。
 
 - 六类二级目录、全局搜索、已购买/已启用筛选，菜单重开保留当前会话选择。
 - 分组/分类退款明确显示范围与实际投入；旧角色数据保留。
@@ -52,4 +56,4 @@ Terraria/tModLoader 独立角色成长系统。
 - 存档v3、协议10；所有端更新至0.8.2。
 - [中文安装与验收](docs/P2MenuFishing_TEST_GUIDE_zh-CN.md)
 - [实现、验证与限制](docs/P2MenuFishing_IMPLEMENTATION.md)
-- 本版需单独实机验收与合并授权，之前暂缓项目仍按各自状态保留。
+- 本版已获用户实机验收并合并PR #10；下一批六项新天赋和两项扫描维护的规则已确认，整批开发尚未开始。

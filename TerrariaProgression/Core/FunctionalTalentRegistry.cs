@@ -46,6 +46,10 @@ public static class FunctionalTalentRegistry
         Unlock("PanicSpeed", "Combat", category: TalentCategory.Combat),
         Growing("AttackBurn", 2, EffectUnit.Seconds, FunctionalImplementation.NativeSystem, FunctionalStackPolicy.Max),
         Growing("AttackPoison", 2, EffectUnit.Seconds, FunctionalImplementation.NativeSystem, FunctionalStackPolicy.Max),
+        Growing("AttackFrostburn", 2, EffectUnit.Seconds, FunctionalImplementation.NativeSystem, FunctionalStackPolicy.Max),
+        Growing("AttackCursedInferno", 2, EffectUnit.Seconds, FunctionalImplementation.NativeSystem, FunctionalStackPolicy.Max),
+        Growing("AttackVenom", 2, EffectUnit.Seconds, FunctionalImplementation.NativeSystem, FunctionalStackPolicy.Max),
+        Growing("AttackIchor", 2, EffectUnit.Seconds, FunctionalImplementation.NativeSystem, FunctionalStackPolicy.Max),
         Unlock("Dash", "Movement", FunctionalImplementation.NativeSystem),
         Unlock("WallClimb", "Movement", FunctionalImplementation.NativeSystem),
         Unlock("WallSlide", "Movement", FunctionalImplementation.NativeSystem),
@@ -71,3 +75,4 @@ public static class FunctionalTalentRegistry
         state.Talents.TryGetValue(id, out var t) && t.Enabled && !t.DisabledEffects.Contains(child);
     public static string GroupOf(string id) => TryGet(id, out var t) ? t.Group : "Tools";
 }
+

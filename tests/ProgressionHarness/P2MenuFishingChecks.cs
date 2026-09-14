@@ -109,7 +109,7 @@ public sealed partial class RuntimeChecks
             string report=AccessoryTalentScanner.WriteReport(temp);
             using var json=JsonDocument.Parse(File.ReadAllText(report+".json"));
             Check(json.RootElement.GetProperty("Items").GetArrayLength()==rows.Count && File.ReadAllText(report+".csv").Contains("UnmappedScannerAccessory"),"JSON and UTF8 CSV contain full candidate report");
-            Check(json.RootElement.GetProperty("Registry").GetArrayLength()==81,"compatibility report includes all 81 registered talents");
+            Check(json.RootElement.GetProperty("Registry").GetArrayLength()==87,"compatibility report includes all 87 registered talents");
         } finally {Directory.Delete(temp,true);}
 
         // New refund intents pass through the real server decoder; bad scope and

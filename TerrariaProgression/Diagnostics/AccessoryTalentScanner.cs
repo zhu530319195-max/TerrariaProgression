@@ -8,6 +8,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
+using Terraria.ModLoader;
 using TerrariaProgression.Core;
 
 namespace TerrariaProgression.Diagnostics;
@@ -25,6 +26,37 @@ internal static class AccessoryTalentScanner
     private static AccessoryMapping Full(params string[] ids) => new(true, ids, "Known functional effects mapped; mapping is not a compatibility test.");
     private static AccessoryMapping Partial(string note, params string[] ids) => new(false, ids, note);
     private static readonly IReadOnlyDictionary<int,AccessoryMapping> Mappings = new Dictionary<int,AccessoryMapping> {
+        [ItemID.CopperWatch] = Partial("Information child Time is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.SilverWatch] = Partial("Information child Time is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.GoldWatch] = Partial("Information child Time is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.DepthMeter] = Partial("Information child Depth is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.Compass] = Partial("Information child Compass is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.WeatherRadio] = Partial("Information child Weather is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.Sextant] = Partial("Information child Moon is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.FishermansGuide] = Partial("Information child Fishing is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.Radar] = Partial("Information child Radar is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.DPSMeter] = Partial("Information child Dps is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.LifeformAnalyzer] = Partial("Information child RareCreatures is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.MetalDetector] = Partial("Information child Ore is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.TallyCounter] = Partial("Information child KillCount is covered; information talent also exposes other readouts.","AllInformation"),
+        [ItemID.Bezoar] = Partial("Reviewed immunity children: Poisoned; broader immunity talent is not item equivalence.","StatusImmunity"),
+        [ItemID.AdhesiveBandage] = Partial("Reviewed immunity children: Bleeding; broader immunity talent is not item equivalence.","StatusImmunity"),
+        [ItemID.FastClock] = Partial("Reviewed immunity children: Slow; broader immunity talent is not item equivalence.","StatusImmunity"),
+        [ItemID.Vitamins] = Partial("Reviewed immunity children: Weak; broader immunity talent is not item equivalence.","StatusImmunity"),
+        [ItemID.ArmorPolish] = Partial("Reviewed immunity children: BrokenArmor; broader immunity talent is not item equivalence.","StatusImmunity"),
+        [ItemID.Megaphone] = Partial("Reviewed immunity children: Silenced; broader immunity talent is not item equivalence.","StatusImmunity"),
+        [ItemID.Nazar] = Partial("Reviewed immunity children: Cursed; broader immunity talent is not item equivalence.","StatusImmunity"),
+        [ItemID.TrifoldMap] = Partial("Reviewed immunity children: Confused; broader immunity talent is not item equivalence.","StatusImmunity"),
+        [ItemID.Blindfold] = Partial("Reviewed immunity children: Darkness; broader immunity talent is not item equivalence.","StatusImmunity"),
+        [ItemID.PocketMirror] = Partial("Reviewed immunity children: Stoned; broader immunity talent is not item equivalence.","StatusImmunity"),
+        [ItemID.HandWarmer] = Partial("Reviewed immunity children: Chilled/Frozen; broader immunity talent is not item equivalence.","StatusImmunity"),
+        [ItemID.AnglerEarring] = Partial("Flat fishing power is covered; talent value is scalable.","FishingPower"),
+        [ItemID.AnglerTackleBag] = Partial("Fishing power, line and bait conservation are covered with distinct scalable formulas.","FishingPower","FishingLine","BaitSaving"),
+        [ItemID.LavaFishingHook] = Full("LavaFishing"),
+        [ItemID.Toolbelt] = Partial("Reach talent applies by held-item mode, not the exact equipment formula.","BuildReach"),
+        [ItemID.ExtendoGrip] = Partial("Separate horizontal/vertical native reach is not an exact talent equivalent.","ToolReach","BuildReach"),
+        [ItemID.PortableCementMixer] = Partial("Scalable wall placement speed differs from the native equipment value.","WallPlacementSpeed"),
+        [ItemID.BrickLayer] = Partial("Scalable placement speed differs from the native equipment value.","PlacementSpeed"),
         [ItemID.LuckyHorseshoe] = Full("NoFallDamage"),
         [ItemID.ObsidianSkull] = Partial("Native defense bonus is not part of hot-tile immunity.","HotTileImmunity"),
         [ItemID.CobaltShield] = Partial("Native defense bonus remains an independent stat.","KnockbackImmunity"),
@@ -86,7 +118,7 @@ internal static class AccessoryTalentScanner
         Directory.CreateDirectory(directory);
         string stem=Path.Combine(directory,"accessories-"+DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-fff"));
         var rows=Scan();
-        var report=new { SchemaVersion=1, ModVersion="0.8.0", GeneratedUtc=DateTime.UtcNow, Culture=Language.ActiveCulture.Name,
+        var report=new { SchemaVersion=1, ModVersion=ModContent.GetInstance<TerrariaProgression>().Version.ToString(), GeneratedUtc=DateTime.UtcNow, Culture=Language.ActiveCulture.Name,
             Notice="Passive metadata report. Mapped is not in-game acceptance; unavailable language names are null. No effects were run.",
             Summary=new {Total=rows.Count,Mapped=rows.Count(r=>r.MappingStatus=="Mapped"),Partial=rows.Count(r=>r.MappingStatus=="Partial"),Unmapped=rows.Count(r=>r.MappingStatus=="Unmapped")},
             Whitelist=Mappings.Select(p=>new {ItemId=p.Key,p.Value.Complete,p.Value.Talents,p.Value.Note}).ToArray(),

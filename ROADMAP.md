@@ -1,9 +1,15 @@
 # ROADMAP.md
 
+## 当前审查入口（2026-09-14）
+
+0.9.0已实机验收，PR #12已获合并授权，当前87项天赋。逐项状态、待定规则、完成证据与取消事项统一查阅[中文任务清单](docs/TASK_CHECKLIST_zh-CN.md)。下面阶段描述保留版本演进；不能用历史“planned／待验收”覆盖新验收事实，也不能将单列遗留项目统称通过。
+
+第一步规则已确认，见[下一批P2设计](docs/P2_AFFLICTIONS_DESIGN_zh-CN.md)：NEXT-01异常伤害+20%/级，NEXT-02四种攻击异常2秒/级，NEXT-03渔力+5/级已纳入必做，合计六项新天赋；MAINT-01／02同步维护。第二步P2整批0.9.0已交付并实机验收，PR #12获准合并；第三步合并P3公共保护、范围挖矿、矿脉连锁、一键伐木；第四步收割补种。后两步P3均未开发，P3具体规则在各批次开工前确认。自动魔力药水、减伤、额外攻击等继续留在候选池。
+
 ## P0 — Progression Core
 Goal: stable character-bound infinite leveling foundation.
 
-Implementation status: P0 0.1.0 is delivered through PR #2 (bootstrap dependency #1); official compilation, 1,537 core assertions and 28 tModLoader runtime assertions passed. On 2026-09-13 the user confirmed singleplayer XP and persistence across death, restart and world changes, and authorized merging. Real multiplayer contribution and segmented/multi-stage Boss tests are explicitly deferred, not passed. See `docs/P0_VALIDATION.md`. P0 is merged; see P1 below. P2-A implementation now follows below; P3 remains unimplemented.
+Implementation status: P0 0.1.0 is delivered through PR #2 (bootstrap dependency #1); official compilation, 1,537 core assertions and 28 tModLoader runtime assertions passed. On 2026-09-13 the user confirmed singleplayer XP and persistence across death, restart and world changes, and authorized merging. Real multiplayer contribution and segmented/multi-stage Boss tests are explicitly deferred, not passed. See `docs/P0_VALIDATION.md`. P0 is merged; see P1 below. Delivered P2 batches through0.8.2 are described below; P3 remains unimplemented.
 
 - tModLoader project skeleton
 - `ModPlayer` progression data
@@ -28,11 +34,11 @@ Implementation status: P0 0.1.0 is delivered through PR #2 (bootstrap dependency
 ## P1 — Numeric Talents
 Goal: implement stable numeric talents using the approved Lv.10 strong-state baseline.
 
-P1-A 0.2.0 implements 21 entries and the talent panel; official compilation, 2,058 core checks and 73 runtime checks passed; the user has confirmed the core singleplayer talent interactions and persistence. PR #3 includes the 0.2.1 UI layout refinement for 200% scale, merged after explicit user authorization. Implemented: maximum HP/MP, defense, run speed/acceleration, fixed/natural HP/MP recovery, item HP/MP restoration, generic damage/attack speed/crit damage/armor penetration/knockback, ammo conservation, mana cost, minion/sentry capacity, pickup range. The remaining catalog below is still planned, particularly crit chance / tiers and economy / resource drops. See `docs/P1_IMPLEMENTATION.md`.
+P1-A 0.2.0 implements 21 entries and the talent panel; official compilation, 2,058 core checks and 73 runtime checks passed; the user has confirmed the core singleplayer talent interactions and persistence. PR #3 includes the 0.2.1 UI layout refinement for 200% scale, merged after explicit user authorization. Implemented: maximum HP/MP, defense, run speed/acceleration, fixed/natural HP/MP recovery, item HP/MP restoration, generic damage/attack speed/crit damage/armor penetration/knockback, ammo conservation, mana cost, minion/sentry capacity, pickup range. The catalog below is the historical P1 scope; later versions implemented most entries. Current exceptions, including tiered crit, are listed in the numbered checklist. See `docs/P1_IMPLEMENTATION.md`.
 
-0.3.0 adds 24 entries (45 total) and adjustable melee/tool/build strength. Remaining exceptions: exact physical jump-height scaling, non-CommonDrop probability adapters and per-recipient multiplayer private loot. See `docs/P1_COMPLETION_IMPLEMENTATION.md`; this is not a claim of full third-party compatibility.
+0.3.0 adds 24 entries (45 total) and adjustable melee/tool/build strength. Historical exceptions at0.3.0 included exact jump-height scaling, drop-rule adapters and per-recipient private loot. Independent jump height was subsequently cancelled; extra-roll adapters arrived in0.3.1; multiplayer private loot remains incomplete. See `docs/P1_COMPLETION_IMPLEMENTATION.md`; this is not a claim of full third-party compatibility.
 
-0.3.1 P1 refinement: independent extra loot rolls replace DropChance, BagQuantity is added, vanilla shortsword/spear reach is adapted, and native firing intervals are checked. Depends on stage-accepted PR #4. No world-chest enhancement or P2/P3 expansion. See `docs/P1_REFINEMENT_0.3.1.md`.
+0.3.1 P1 refinement: independent extra loot rolls replace DropChance, BagQuantity is added, vanilla shortsword/spear reach is adapted, and native firing intervals are checked. Delivered in PR #5 on the PR #4 base; both are now accepted and merged. No world-chest enhancement or P2/P3 expansion. See `docs/P1_REFINEMENT_0.3.1.md`.
 
 ### Base Stats
 - Max Life
@@ -40,7 +46,7 @@ P1-A 0.2.0 implements 21 entries and the talent panel; official compilation, 2,0
 - Defense
 - Movement Speed
 - Movement acceleration
-- Jump height/speed where reliable
+- Jump speed implemented; independent jump height removed from scope
 - Breath capacity
 - Knockback resistance
 
@@ -69,7 +75,7 @@ P1-A 0.2.0 implements 21 entries and the talent panel; official compilation, 2,0
 ### Economy & Resources
 - Coin drop multiplier
 - Loot quantity multiplier
-- Dynamic drop-chance strengthening
+- Additional native loot rolls (replaces the retired drop-chance scheme)
 - Mining yield
 - Wood yield
 - Herb / gem / fishing yield
@@ -119,7 +125,7 @@ Architecture first:
 ### P2 completion batch 1 — 0.7.0
 Accepted and merged in PR #9: wing duration (+1s/level), wing speed (+5%/level), swimming speed (+10%/level), tile/wall placement speed (+20%/level each), night vision, personal light and dangersense. Adjustable numeric entries cost 1/level; binary entries cost 2 once. Native dangersense covers recognized traps without a second paid trap toggle. See `docs/P2Completion_IMPLEMENTATION.md`.
 
-0.8.0 implements bait saving/crate eligibility and menu navigation; see docs/P2MenuFishing_IMPLEMENTATION.md. Independent jump height, liquid/honey utility, actuator/wire helpers were removed from future scope by the user. Hover and dodge remain deferred. This batch does not claim the entire P2 catalog is done. Tool destruction efficiency already shipped in P2-A and is not duplicate P3 work.
+0.8.2 is user-accepted and merged in PR #10, with bait saving/crate eligibility, two-level navigation, client loading correction and hierarchy polish; see docs/P2MenuFishing_IMPLEMENTATION.md. Independent jump height, liquid/honey utility, actuator/wire helpers were removed from future scope by the user. Hover and dodge remain deferred. This batch does not claim the entire P2 catalog is done. Tool destruction efficiency already shipped in P2-A and is not duplicate P3 work.
 
 ### P2-D — Developer discovery tooling (0.8.0 implementation)
 - `AccessoryTalentScanner`: passive loaded metadata, JSON/CSV and explicit mapped/partial/unmapped report
