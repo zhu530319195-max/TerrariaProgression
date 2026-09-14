@@ -53,6 +53,7 @@ public sealed class ProgressionConfig : ModConfig
     [DefaultValue(true)] public bool EnableTreeFelling = true;
     [DefaultValue(true)] public bool EnableAreaHarvest = true;
     [DefaultValue(true)] public bool EnableAutoReplant = true;
+    [DefaultValue(true)] public bool EnableBlastRadius = true;
     [DefaultValue(false)] public bool EnableModOreMining;
     [DefaultValue(1000), Range(0, int.MaxValue)] public int MaxBlocksPerAction = 1000;
     [DefaultValue(32), Range(1, 256)] public int GatheringWorkPerTick = 32;

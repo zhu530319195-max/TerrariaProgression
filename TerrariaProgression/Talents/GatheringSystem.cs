@@ -27,6 +27,7 @@ public sealed class GatheringSystem : ModSystem
     private static int killDepth;
     private static int pickDamage;
     private static int nextPlayer;
+    private static bool preferBlast;
     internal static int PendingCount => jobs.Count;
     public override void Load()
     {
@@ -46,7 +47,7 @@ public sealed class GatheringSystem : ModSystem
         ActionKey = ModeKey = null; Clear();
     }
     public override void OnWorldUnload() => Clear();
-    internal static void Clear() { jobs.Clear(); requests.Clear(); notices.Clear(); permitted = manualTarget = null; killDepth = nextPlayer = 0; }
+    internal static void Clear() { foreach (var job in jobs.Values) job.Dispose(); jobs.Clear(); BlastRadiusSystem.Clear(); requests.Clear(); notices.Clear(); permitted = manualTarget = null; killDepth = nextPlayer = 0; preferBlast = false; }
     private static int PickDamage(On_Player.orig_GetPickaxeDamage orig, Player player, int x, int y, int power, int buffer, Tile tile)
     {
         int damage = orig(player, x, y, power, buffer, tile);
@@ -217,7 +218,7 @@ public sealed class GatheringSystem : ModSystem
             else {
                 int buffer = p.hitTile.HitObject(pos.X, pos.Y, 1);
                 int damage = Main.tileNoFail[Main.tile[pos.X, pos.Y].TileType] ? 100 : 0;
-                damage += (int)(p.HeldItem.axe * 1.2f);
+                damage += (int)(ToolPowerSystem.AxePower(p, p.HeldItem) * 1.2f);
                 if (Main.getGoodWorld) damage = (int)(damage * 1.3);
                 pickDamage = damage;
                 bool done = p.hitTile.AddDamage(buffer, damage) >= 100;
@@ -229,7 +230,18 @@ public sealed class GatheringSystem : ModSystem
         }
         finally { permitted = oldPermit; EconomySystem.Actor = oldActor; }
     }
-    private static void Notice(Player p, string key)
+    internal static bool Explode(Player p, TilePoint pos)
+    {
+        var oldActor = EconomySystem.Actor; var oldPermit = permitted;
+        EconomySystem.Actor = p; permitted = pos;
+        try {
+            WorldGen.KillTile(pos.X, pos.Y);
+            if (Main.netMode == NetmodeID.Server) NetMessage.SendTileSquare(-1, pos.X, pos.Y, 3);
+            return !Main.tile[pos.X, pos.Y].HasTile;
+        }
+        finally { permitted = oldPermit; EconomySystem.Actor = oldActor; }
+    }
+    internal static void Notice(Player p, string key)
     {
         if (notices.TryGetValue(p.whoAmI, out var tick) && Main.GameUpdateCount - tick < 120) return;
         notices[p.whoAmI] = Main.GameUpdateCount;
@@ -242,7 +254,11 @@ public sealed class GatheringSystem : ModSystem
         if (Main.netMode == NetmodeID.MultiplayerClient) return;
         int budget = Math.Clamp(Config.GatheringWorkPerTick, 1, 256);
         // Round robin across owners: one player's unlimited job cannot starve others.
-        while (budget-- > 0 && jobs.Count > 0) {
+        while (budget-- > 0 && (jobs.Count > 0 || BlastRadiusSystem.PendingCount > 0)) {
+            if (BlastRadiusSystem.PendingCount > 0 && (preferBlast || jobs.Count == 0)) {
+                preferBlast = false; BlastRadiusSystem.ProcessOne(); continue;
+            }
+            preferBlast = true;
             int owner = jobs.Keys.Where(i => i >= nextPlayer).DefaultIfEmpty(jobs.Keys.Min()).Min();
             nextPlayer = owner + 1;
             var job = jobs[owner];

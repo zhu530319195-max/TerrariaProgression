@@ -41,7 +41,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TerrariaProgression-P3Agriculture
+          name: TerrariaProgression-P3ToolPowerBlast
           if-no-files-found: warn
           path: artifacts/
 

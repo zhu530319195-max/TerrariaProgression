@@ -9,6 +9,8 @@ Mods: {
   }
 }
     TalentsUI: {
+      PowerPoints: "+{0} percentage points"
+      BlastTiles: "+{0} tiles of extra radius"
       MiningArea: "{0}x{0} tiles"
       MiningCount: "Up to {0} tiles (including origin)"
 
@@ -158,6 +160,9 @@ Mods: {
   "ManaSaving": "Mana cost reduction",
   "Minions": "Minion capacity",
   "Sentries": "Sentry capacity",
+  "PickPower": "Pickaxe power",
+  "AxePower": "Axe power",
+  "BlastRadius": "Terrain blast radius",
   "AreaHarvest": "Area harvest",
   "AutoReplant": "Auto replant",
   "AreaMining": "Area mining",
@@ -252,6 +257,9 @@ Mods: {
   "ManaSaving": "Mana cost ×0.95 per level, multiplicative with native modifiers.",
   "Minions": "+1 minion capacity per level, additive with equipment.",
   "Sentries": "+1 sentry capacity per level, additive with equipment.",
+  "PickPower": "1 point per level, +10 percentage points of pickaxe power (Lv.10: +100). Can meet native mining thresholds. Unlimited levels and adjustable intensity; native unbreakable rules remain. Effective power saturates at 100000%; items are not permanently changed.",
+  "AxePower": "1 point per level, +10 percentage points of axe power (Lv.10: +100). Unlimited and adjustable; applies to manual chopping and tree felling. Separate from tool speed. Effective power saturates at 100000%; items are not permanently changed.",
+  "BlastRadius": "1 point per level, +1 tile of terrain radius (Lv.10: +10). Vanilla bombs/dynamite and their sticky/bouncy variants only. No extra damage or wall radius; independent of Alt. The extra annulus obeys gathering protections, native explosion rules and server budgets. Native core blast remains unchanged. Adjustable intensity.",
   "AreaHarvest": "1 point/level, radius +1 tile; Lv1 3x3, Lv10 21x21, unlimited and adjustable. Toggle batch gathering with Left Alt, then target a herb with a pickaxe. Harvests only seed-ready vanilla herbs, preserving seedlings, planters, pots and soil. Toggle off to cancel pending work.",
   "AutoReplant": "One-time 2 points. Replant the same vanilla herb after single-pick or area harvesting, consuming one matching seed only after successful placement. Prefer this harvest, then the main inventory. Without seeds, harvest normally. Independent of the Alt toggle. Excludes trees, mod plants and special tool side effects.",
   "AreaMining": "Radius +1 tile per level: Lv1 3x3, Lv10 21x21; adjustable. Press the gathering key (Left Alt by default) once to enable, then mine the first tile normally. G switches area/vein mode. Respects pick power and server protection. Changing tools or talents stops the job.",
@@ -326,6 +334,11 @@ Mods: {
   "CrateChance": "Original crate-gate failure probability ×0.95 per active level. A 10% gate becomes about 46.1% at Lv.10. Only changes crate eligibility; native rarity, biome, quests, enemies, pond and liquid rules remain. Honey is skipped; lava retains extra selection, so final crate yield can differ. Adjustable."
 }
     Messages: {
+      EffectivePickPower: "Pickaxe power (talents): {0}% → {1}%"
+      EffectiveAxePower: "Axe power (talents): {0}% → {1}%"
+      BlastQueueFull: "Terrain expansion queue is full; the native blast remains."
+      BlastLimitReached: "This terrain expansion reached the server block limit."
+
       GatheringMode: "Gathering mode: {0}. Press the gathering key to toggle. Axes select tree felling automatically."
       GatheringOn: "Batch gathering: ON. Use tools normally; press the gathering key again to stop. G switches area / vein mining."
       GatheringOff: "Batch gathering: OFF. Pending work cancelled. Single-herb auto replant follows its own talent toggle."
@@ -348,7 +361,8 @@ Mods: {
         EnableVeinMining: { Label: "EnableVeinMining", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
         EnableTreeFelling: { Label: "EnableTreeFelling", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
         EnableAreaHarvest: { Label: "Allow area harvesting", Tooltip: "Only seed-ready vanilla herbs; preserves pots, planters and soil." }
-        EnableAutoReplant: { Label: "Allow auto replant", Tooltip: "Consume matching seeds to replant vanilla herbs, including single-pick harvesting." }
+        EnableBlastRadius: { Label: "Allow terrain blast radius" Tooltip: "Controls only additional terrain destruction; also requires world gathering permission and obeys its protections and budgets. Native blast remains unchanged." }
+      EnableAutoReplant: { Label: "Allow auto replant", Tooltip: "Consume matching seeds to replant vanilla herbs, including single-pick harvesting." }
         EnableModOreMining: { Label: "EnableModOreMining", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
         MaxBlocksPerAction: { Label: "MaxBlocksPerAction", Tooltip: "Default 1000 including origin; 0 is unlimited total work. Not a talent level cap. Trees exceeding the limit are refused." }
         GatheringWorkPerTick: { Label: "GatheringWorkPerTick", Tooltip: "Default 32, range 1-256. Global work budget shared fairly by all players, including unlimited jobs." }

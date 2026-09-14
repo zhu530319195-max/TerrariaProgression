@@ -281,7 +281,7 @@ Console.WriteLine($"Final P2-Completion core checks passed: {checks}");
 
 // 0.8.0 navigation membership and atomic new-scope refunds, independent of old enums.
 var menuIds=TalentNavigation.Groups.SelectMany(g=>g.TalentIds).ToArray();
-Check(menuIds.Length==92 && menuIds.Distinct().Count()==92 && menuIds.Order().SequenceEqual(TalentCatalog.All.Select(t=>t.Id).Order()),"all 92 implemented talents appear once in the menu");
+Check(menuIds.Length==95 && menuIds.Distinct().Count()==95 && menuIds.Order().SequenceEqual(TalentCatalog.All.Select(t=>t.Id).Order()),"all 95 implemented talents appear once in the menu");
 Check(TalentNavigation.Categories.Count==6 && TalentNavigation.Groups.All(g=>g.TalentIds.Count>0&&TalentNavigation.Categories.Contains(g.CategoryId)),"six populated categories and no empty or orphan groups");
 Check(!menuIds.Contains("AutoJump")&&!menuIds.Contains("JumpHeight"),"cancelled jumps absent from navigation");
 state=new();state.Award(100000000*scale,50000);
@@ -292,12 +292,12 @@ foreach(var scope in TalentNavigation.Categories) {
     var amount=TalentNavigation.RefundAmount(state,scope,false);
     Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuCategory,scope,TalentCategory.BaseStats,1,out copy)==TalentResult.Success,"new category refund accepted: "+scope);
     Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.TotalSpentTalentPoints==state.TotalSpentTalentPoints-amount,"category refund uses historical costs: "+scope);
-    Check(copy.Talents.Keys.All(id=>!TalentNavigation.InScope(id,scope,false)) && copy.Talents.Count==92-menuIds.Count(id=>TalentNavigation.InScope(id,scope,false)),"category refund exact membership: "+scope);
+    Check(copy.Talents.Keys.All(id=>!TalentNavigation.InScope(id,scope,false)) && copy.Talents.Count==95-menuIds.Count(id=>TalentNavigation.InScope(id,scope,false)),"category refund exact membership: "+scope);
 }
 foreach(var g in TalentNavigation.Groups) {
     var amount=TalentNavigation.RefundAmount(state,g.Id,true);
     Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuGroup,g.Id,TalentCategory.Economy,1,out copy)==TalentResult.Success,"new subgroup refund accepted: "+g.Id);
-    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.Talents.Count==92-g.TalentIds.Count,"subgroup exact historical refund: "+g.Id);
+    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.Talents.Count==95-g.TalentIds.Count,"subgroup exact historical refund: "+g.Id);
     Check(copy.Talents.Keys.All(id=>!g.TalentIds.Contains(id)) && snapshot.SequenceEqual(StateCodec.Encode(state)),"refund leaves source and other groups intact: "+g.Id);
 }
 foreach(var invalid in new[]{"","NotAGroup","AutoJump","../../Survival"}) {
@@ -426,3 +426,31 @@ foreach (int invalid in new[] { 0, -1, 1001, 65535, int.MaxValue }) {
 }
 Check(TalentCatalog.Apply(state,TalentOperation.IncreaseIntensity,"AreaMining",TalentCategory.Utility,101,out _)==TalentResult.InvalidRequest,"other operations retain their existing request bound");
 Console.WriteLine($"Final P3-Agriculture core checks passed: {checks}");
+
+foreach (int original in new[] {0, 1, 35, 100, 225, 150000}) {
+    Check(ToolPowerRules.Pick(original,0)==original && ToolPowerRules.Pick(original,-1)==original,"zero/negative pick level preserves original: "+original);
+    Check(ToolPowerRules.Pick(original,10)==(original==0?0:Math.Max(original,Math.Min(100000,original+100))),"pick adds percentage points: "+original);
+    Check(ToolPowerRules.Pick(original,BigInteger.Pow(10,200))==(original==0?0:Math.Max(original,100000)),"huge pick level saturates without reducing original: "+original);
+}
+Check(ToolPowerRules.Axe(7,10)==27 && ToolPowerRules.Axe(7,10)*5==135,"displayed axe power adds 100 points at Lv10");
+Check(ToolPowerRules.Axe(0,1000)==0 && ToolPowerRules.Axe(20001,1000)==20001 && ToolPowerRules.Axe(7,BigInteger.Pow(10,200))==20000,"axe ceiling and non-tools safe");
+foreach (string id in new[]{"PickPower","AxePower","BlastRadius"}) {
+    state=new();state.Award(1000000000*scale,50000);var beforePoints=state.AvailableTalentPoints;
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,id,TalentCategory.Utility,1000,out state)==TalentResult.Success && state.Talents[id].TalentLevel==1000 && state.Talents[id].InvestedPoints==1000,"new numeric talent supports 1000-level purchase: "+id);
+    Check(TalentCatalog.Apply(state,TalentOperation.DecreaseIntensity,id,TalentCategory.Utility,10,out state)==TalentResult.Success && NumericTalents.ActiveLevel(state,id)==990,"new talent intensity independent of purchased level: "+id);
+    copy=StateCodec.Decode(StateCodec.Encode(state));Check(TalentCatalog.ValidateImported(copy)&&NumericTalents.ActiveLevel(copy,id)==990,"new talent save round trip: "+id);
+    TalentCatalog.Apply(copy,TalentOperation.Disable,id,TalentCategory.Utility,1,out copy);
+    Check(NumericTalents.ActiveLevel(copy,id)==0 && copy.AvailableTalentPoints==beforePoints-1000,"disable does not refund: "+id);
+    TalentCatalog.Apply(copy,TalentOperation.RefundTalent,id,TalentCategory.Utility,1,out copy);
+    Check(copy.AvailableTalentPoints==beforePoints,"refund returns actual bulk investment: "+id);
+}
+var migratedKeys=new HashSet<string>();var keyFixture=new Dictionary<string,List<string>> { ["Jump"]=new(){"Space"}, ["TerrariaProgression/ToggleTalents"]=new(){"O","F6"}, ["TerrariaProgression/GatheringAction"]=new() };
+Check(DefaultKeybindRules.Initialize("Custom/Keyboard",keyFixture,migratedKeys),"first profile migration executes");
+Check(keyFixture["TerrariaProgression/ToggleTalents"].SequenceEqual(new[]{"O","F6"}) && keyFixture["Jump"].Single()=="Space","custom bindings and vanilla keys untouched");
+Check(keyFixture["TerrariaProgression/GatheringAction"].Single()=="LeftAlt"&&keyFixture["TerrariaProgression/GatheringMode"].Single()=="G","empty and missing bindings get defaults");
+keyFixture["TerrariaProgression/GatheringAction"].Clear();
+var restoredMarkers=System.Text.Json.JsonSerializer.Deserialize<HashSet<string>>(System.Text.Json.JsonSerializer.Serialize(migratedKeys))!;
+Check(!DefaultKeybindRules.Initialize("Custom/Keyboard",keyFixture,restoredMarkers)&&keyFixture["TerrariaProgression/GatheringAction"].Count==0,"intentional clear survives persisted migration marker");
+var newKeys=new Dictionary<string,List<string>>();
+Check(DefaultKeybindRules.Initialize("Other/Keyboard",newKeys,restoredMarkers)&&newKeys["TerrariaProgression/ToggleTalents"].Single()=="P","new profile gets defaults independently");
+Console.WriteLine($"Final P3-ToolPowerBlast core checks passed: {checks}");

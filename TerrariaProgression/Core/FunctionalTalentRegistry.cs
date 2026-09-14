@@ -32,6 +32,9 @@ public static class FunctionalTalentRegistry
         new(new TalentDefinition(id, category, 0, EffectUnit.Flag, DefaultCost: 2, MaxLevel: 1),
             kind, group, FunctionalStackPolicy.SatisfyOnce, FunctionalAuthority.ConfirmedPlayerState, Array.Empty<string>());
     public static readonly IReadOnlyList<FunctionalTalent> All = Array.AsReadOnly(new[] {
+        UtilityGrowth("PickPower", 10, EffectUnit.Percent, "Tools", FunctionalStackPolicy.Add),
+        UtilityGrowth("AxePower", 10, EffectUnit.Percent, "Tools", FunctionalStackPolicy.Add),
+        UtilityGrowth("BlastRadius", 1, EffectUnit.Flat, "Gathering", FunctionalStackPolicy.Add, FunctionalImplementation.Custom) with { NetworkAuthority = FunctionalAuthority.ServerWorld, RequiresServerPermission = true },
         UtilityGrowth("AreaHarvest", 1, EffectUnit.Flat, "Gathering", FunctionalStackPolicy.Add, FunctionalImplementation.Custom) with { NetworkAuthority = FunctionalAuthority.ServerWorld, RequiresServerPermission = true },
         Unlock("AutoReplant", "Gathering", FunctionalImplementation.Custom) with { NetworkAuthority = FunctionalAuthority.ServerWorld, RequiresServerPermission = true },
         UtilityGrowth("AreaMining", 1, EffectUnit.Flat, "Gathering", FunctionalStackPolicy.Add, FunctionalImplementation.Custom) with { NetworkAuthority = FunctionalAuthority.ServerWorld, RequiresServerPermission = true },
