@@ -3,7 +3,10 @@
 ## Current phase
 PR #1–#9 merged. P2 completion 0.7.0 was explicitly accepted by the user; PR #9 merged at `1301fea8a9805347150d204c36d5e47191859d24`, tested head `11c207ad162e92610c4f3d54c6f96592f5d523e0`. Final CI 34775077627: 2956 core checks, 399 native checks; both mod builds zero warnings/errors. This supersedes older pending acceptance text in all previous stage documents.
 
-0.8.0 on `feat/p2-menu-fishing` implements the user-approved two-level menu, global search/owned/active filters, exact scope refunds, bait conservation, crate eligibility, and passive accessory discovery/reporting. 81 talents: 49 numeric-registry entries + 32 functional-registry entries. Six display categories and 20 populated subgroups. New version needs separate in-game acceptance and explicit merge authorization.
+0.8.1 on `feat/p2-menu-fishing` implements the user-approved two-level menu, global search/owned/active filters, exact scope refunds, bait conservation, crate eligibility, and passive accessory discovery/reporting. 81 talents: 49 numeric-registry entries + 32 functional-registry entries. Six display categories and 20 populated subgroups. New version needs separate in-game acceptance and explicit merge authorization.
+
+## 0.8.1 client loading correction
+User reported that 0.8.0 failed client loading: TalentUISystem.Load activated TalentUIState, whose OnInitialize/RefreshTalents accessed an uninitialized local ModPlayer array. The former dedicated-server CI excluded this client-only system and did not prove graphical-client loading. PR #10 remains open and unaccepted. 0.8.1 defers widget creation until first in-world open, checks native TryGetModPlayer readiness, and binds the character on UI update. Added native regression checks explicitly invoke client-system Load with an empty player component array. Final corrected CI counts and exact artifact hashes belong in PR/BUILD_INFO; graphical-client acceptance is still required.
 
 ## Repository state
 - Target remains tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.

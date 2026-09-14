@@ -89,7 +89,9 @@ internal sealed class TalentUIState : UIState
         Place(feedback,panel,0,-27,1,0,25,1);
         resync=Button("Resync",()=>ProgressionNetwork.RequestSnapshot(),()=>Main.netMode==NetmodeID.MultiplayerClient&&Player.RequestTimedOut);
         resync.Left.Set(-90,1); resync.Top.Set(-30,1); resync.Width.Set(90,0);
-        RefreshNavigation(); RefreshTalents();
+        // Initialization builds only the layout. The first in-world Update
+        // binds the current character, including after changing characters.
+        RefreshNavigation();
     }
     private static void AttachList(UIElement parent,UIList target)
     {
@@ -311,4 +313,3 @@ internal sealed class TalentScrollbar(UIList list) : UIScrollbar
         if (list.GetTotalHeight() > list.GetInnerDimensions().Height + 1) base.DrawSelf(spriteBatch);
     }
 }
-

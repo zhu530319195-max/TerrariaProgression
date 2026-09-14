@@ -318,6 +318,7 @@ public sealed partial class RuntimeChecks : ModSystem
         RunP2C();
         RunP2Completion();
         RunP2MenuFishing();
+        RunMenuLifecycle();
     }
     private void RunCopperMining()
     {
@@ -481,4 +482,3 @@ internal sealed class RecordingSocket : Terraria.Net.Sockets.ISocket
     public void StopListening() { }
     public Terraria.Net.RemoteAddress GetRemoteAddress() => new Terraria.Net.TcpAddress(System.Net.IPAddress.Loopback, 7789);
 }
-
