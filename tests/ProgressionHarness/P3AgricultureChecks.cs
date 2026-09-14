@@ -113,6 +113,9 @@ public sealed partial class RuntimeChecks
         Init();Buy("AutoReplant");Herb(0,0,0);A.Player.GetModPlayer<GatheringPlayer>().BatchEnabled=false;Config.EnableAutoReplant=false;
         tool.Invoke(A.Player,new object[]{A.Player.HeldItem,false,x,y});
         Check(!Has(0,0)&&Items(ItemID.Daybloom)==1,"server-disabled replant preserves ordinary manual harvesting");
+        Init();Buy("AreaMining");Herb(0,0,0);
+        tool.Invoke(A.Player,new object[]{A.Player.HeldItem,false,x,y});
+        Check(!Has(0,0),"batch mining without agriculture talents preserves ordinary single-herb input");
         // Nearby regrowth staff must not be mistaken for the harvesting player.
         Init();Buy("AutoReplant");Herb(0,0,0,TileID.MatureHerbs);Main.dayTime=false;
         B.Player.Center=new Vector2(x*16,y*16);A.Player.Center=B.Player.Center-new Vector2(40,0);B.Player.inventory[0]=new Item(ItemID.StaffofRegrowth);
