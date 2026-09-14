@@ -29,6 +29,7 @@ public static class TalentNavigation
         G("Movement", "Vision", "NightVision", "SelfLight", "DangerSense", "AllInformation"),
         G("Gathering", "Resources", "MiningYield", "WoodYield", "HerbYield", "GemYield"),
         G("Gathering", "Fishing", "FishingPower", "FishingYield", "BaitSaving", "CrateChance", "FishingLine", "LavaFishing"),
+        G("Gathering", "Mining", "AreaMining", "VeinMining", "TreeFelling"),
         G("Gathering", "Harvest", "PickupRange"),
         G("Building", "Tools", "ToolReach", "ToolSpeed"),
         G("Building", "Construction", "BuildReach", "PlacementSpeed", "WallPlacementSpeed", "AutoPaint", "BuildingRuler"),

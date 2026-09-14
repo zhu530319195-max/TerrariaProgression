@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using Newtonsoft.Json;
@@ -46,6 +47,15 @@ public sealed class ProgressionConfig : ModConfig
     [DefaultValue(true)] public bool BoostPets = true;
     [DefaultValue(true)] public bool BoostModItems = true;
 
+    [DefaultValue(true)] public bool EnableWorldGathering = true;
+    [DefaultValue(true)] public bool EnableAreaMining = true;
+    [DefaultValue(true)] public bool EnableVeinMining = true;
+    [DefaultValue(true)] public bool EnableTreeFelling = true;
+    [DefaultValue(false)] public bool EnableModOreMining;
+    [DefaultValue(1000), Range(0, int.MaxValue)] public int MaxBlocksPerAction = 1000;
+    [DefaultValue(32), Range(1, 256)] public int GatheringWorkPerTick = 32;
+    public List<ProtectedTileArea> ProtectedTileAreas = new();
+
     public override void OnChanged()
     {
         if (!BigInteger.TryParse(TalentPointsPerLevel, NumberStyles.None, CultureInfo.InvariantCulture, out var points) || points < 0)
@@ -54,6 +64,9 @@ public sealed class ProgressionConfig : ModConfig
         HpToXpMultiplier = float.IsFinite(HpToXpMultiplier) ? Math.Clamp(HpToXpMultiplier, 0.01f, 10f) : 1f;
         StatueExperienceMultiplier = float.IsFinite(StatueExperienceMultiplier) ? Math.Clamp(StatueExperienceMultiplier, 0f, 10f) : 0f;
         ExperienceRequirementCap = Math.Max(0, ExperienceRequirementCap);
+        MaxBlocksPerAction = Math.Max(0, MaxBlocksPerAction);
+        GatheringWorkPerTick = Math.Clamp(GatheringWorkPerTick, 1, 256);
+        ProtectedTileAreas ??= new();
         MaxExtraLootRollsPerEvent = Math.Clamp(MaxExtraLootRollsPerEvent, 1, 100000);
     }
     public override bool AcceptClientChanges(ModConfig pendingConfig, int whoAmI, ref NetworkText message)
@@ -64,4 +77,14 @@ public sealed class ProgressionConfig : ModConfig
         message = NetworkText.FromKey("Mods.TerrariaProgression.Messages.ServerConfigLocked");
         return false;
     }
+}
+
+
+public sealed class ProtectedTileArea
+{
+    [DefaultValue(0), Range(0, int.MaxValue)] public int X;
+    [DefaultValue(0), Range(0, int.MaxValue)] public int Y;
+    [DefaultValue(1), Range(1, int.MaxValue)] public int Width = 1;
+    [DefaultValue(1), Range(1, int.MaxValue)] public int Height = 1;
+    public bool Contains(int x, int y) => x >= X && y >= Y && (long)x < (long)X + Width && (long)y < (long)Y + Height;
 }

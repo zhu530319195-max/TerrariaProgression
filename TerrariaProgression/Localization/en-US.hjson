@@ -1,11 +1,17 @@
 Mods: {
   TerrariaProgression: {
     Keybinds: {
+      GatheringAction: { DisplayName: "Hold: batch gathering" }
+      GatheringMode: { DisplayName: "Switch area / vein mode" }
+
   "ToggleTalents": {
     "DisplayName": "Toggle talent panel"
   }
 }
     TalentsUI: {
+      MiningArea: "{0}x{0} tiles"
+      MiningCount: "Up to {0} tiles (including origin)"
+
   "Close": "Close",
   "Category0": "Base stats",
   "Category1": "Recovery",
@@ -107,6 +113,7 @@ Mods: {
   "MenuGroupVision": "Vision & information",
   "MenuGroupResources": "Resource yield",
   "MenuGroupFishing": "Fishing",
+  "MenuGroupMining": "Mining and forestry",
   "MenuGroupHarvest": "Pickup & harvest",
   "MenuGroupTools": "Tool efficiency",
   "MenuGroupConstruction": "Construction",
@@ -150,6 +157,9 @@ Mods: {
   "ManaSaving": "Mana cost reduction",
   "Minions": "Minion capacity",
   "Sentries": "Sentry capacity",
+  "AreaMining": "Area mining",
+  "VeinMining": "Vein mining",
+  "TreeFelling": "Tree felling",
   "PickupRange": "Pickup range",
   "JumpSpeed": "Jump Speed",
   "Breath": "Breath",
@@ -239,11 +249,14 @@ Mods: {
   "ManaSaving": "Mana cost ×0.95 per level, multiplicative with native modifiers.",
   "Minions": "+1 minion capacity per level, additive with equipment.",
   "Sentries": "+1 sentry capacity per level, additive with equipment.",
+  "AreaMining": "Radius +1 tile per level: Lv1 3x3, Lv10 21x21; adjustable. Hold the gathering key (Left Alt by default) and mine the first tile normally. G switches area/vein mode. Respects pick power and server protection. Changing tools or talents stops the job.",
+  "VeinMining": "Up to 25 same-type connected ore tiles per level, including the first tile; Lv10 250. Adjustable. Hold Left Alt and select vein mode with G. Diagonal connections count, gaps do not. Mod ores require server opt-in and an ore flag.",
+  "TreeFelling": "One-time 2 points. Hold Left Alt with an axe and chop a native tree trunk; finish the same tree including its remaining stump. No neighbouring trees or wooden buildings. Keeps wood/gem yield. Refuses protected or over-budget trees. Excludes mod trees, giant mushrooms, cactus and bamboo.",
   "PickupRange": "+10% pickup range per level, multiplied with the original item range.",
   "CritChance": "Adds 10 percentage points per level. Above 100%: tier 1 x2, tier 2 x3, tier 3 x4. Respects DisableCrit and standard crit classes.",
   "BagQuantity": "+10% contents per level when opening vanilla Boss bags or fishing crates. Equipment duplicates are separate items. Uses the opener, with probabilistic fractional quantities. Does not affect world chests.",
   "DropChance": "+10% extra rolls per level: level 10 adds one roll, level 20 adds two. Fractional rolls are probabilistic. Independent rolls can repeat rewards and stack with quantity. Native supported rules; per-event budget applies.",
-  "MeleeRange": "Adds 10% native swing, vanilla shortsword thrust and spear size/reach per level. Sword beams, whips, yoyos and unknown modded projectiles are not enlarged. Active level is adjustable.",
+  "MeleeRange": "+10% per level to swings, native shortswords/spears, whip length and flail spin/throw reach; adjustable. Matching visible/hit geometry. Extreme flail output saturates below the native 900 px cleanup boundary. Excludes sword beams, yoyos and unknown mod projectiles.",
   "ToolReach": "Adds 1 tile of pick/axe/hammer reach per level. Does not change power, speed or tile count. Adjustable.",
   "BuildReach": "Adds 1 tile of tile/wall placement reach per level, separately from tool reach. Adjustable.",
   "PotionDuration": "New Potion Sickness duration x0.93 per level; stacks with Debuff Duration. Existing timers are not rescaled.",
@@ -308,6 +321,10 @@ Mods: {
   "CrateChance": "Original crate-gate failure probability ×0.95 per active level. A 10% gate becomes about 46.1% at Lv.10. Only changes crate eligibility; native rarity, biome, quests, enemies, pond and liquid rules remain. Honey is skipped; lava retains extra selection, so final crate yield can differ. Adjustable."
 }
     Messages: {
+      GatheringMode: "Gathering mode: {0}. Hold the gathering key. Axes select tree felling automatically."
+      GatheringBlocked: "Gathering blocked: check server permission, protection, tool, reach or the whole-tree budget."
+      GatheringLimit: "Gathering reached the action limit; talent levels and paid points are unchanged."
+
       LootLimit: "Extra loot reached the roll budget or item capacity; some extra rewards were not generated. Adjust the roll budget in Mod Config. Levels and points are unchanged."
       Status: "Level {0} | XP {1} / {2} | Total XP {3} | Available talent points {4} | Spent {5}"
       Waiting: "Waiting for the server to confirm character progression."
@@ -318,6 +335,14 @@ Mods: {
     Configs: {
       ProgressionConfig: {
         DisplayName: Progression rules (server)
+        EnableWorldGathering: { Label: "EnableWorldGathering", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
+        EnableAreaMining: { Label: "EnableAreaMining", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
+        EnableVeinMining: { Label: "EnableVeinMining", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
+        EnableTreeFelling: { Label: "EnableTreeFelling", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
+        EnableModOreMining: { Label: "EnableModOreMining", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
+        MaxBlocksPerAction: { Label: "MaxBlocksPerAction", Tooltip: "Default 1000 including origin; 0 is unlimited total work. Not a talent level cap. Trees exceeding the limit are refused." }
+        GatheringWorkPerTick: { Label: "GatheringWorkPerTick", Tooltip: "Default 32, range 1-256. Global work budget shared fairly by all players, including unlimited jobs." }
+        ProtectedTileAreas: { Label: "ProtectedTileAreas", Tooltip: "Tile-coordinate rectangles. X/Y is top-left, Width/Height is size. Protects this mod batch operations only. Use /tpgather coords for cursor coordinates." }
         MaxExtraLootRollsPerEvent: { Label: "Extra rolls per event budget", Tooltip: "Default 1000; range 1-100000. Stops excess rolls with a notice, without changing levels or points. Larger budgets may cause stalls." }
         BoostMaterials: { Label: "Boost Materials", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }
         BoostConsumables: { Label: "Boost Consumables", Tooltip: "Allow NPC loot quantity/chance boosts for this category. Enabled by default." }

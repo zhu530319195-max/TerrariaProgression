@@ -1,4 +1,8 @@
-> 0.9.0已通过用户实机验收，共87项天赋；[PR #12](https://github.com/zhu530319195-max/TerrariaProgression/pull/12)已获合并授权。见[实现记录](docs/P2Afflictions_IMPLEMENTATION.md)与[任务清单](docs/TASK_CHECKLIST_zh-CN.md)。旧的未验收／未完成事项继续单列。
+## 0.10.0已实机验收：P3采集基础＋攻击范围补全
+
+新增范围挖矿、矿脉连锁、一键伐木，共90项天赋。按住左Alt使用工具，G切换范围／矿脉；热键可修改。复用已有攻击范围天赋补齐原版鞭子和链锤。自动检查3150项核心、651项原生通过，本批实机验收已通过，PR #13获准合并；不代表P3农业或此前单列遗留项目完成。
+
+[规则与限制](docs/P3_GATHERING_DESIGN_zh-CN.md) · [安装和中文测试步骤](docs/P3Gathering_TEST_GUIDE_zh-CN.md)。存档v3，协议12，目标tModLoader v2026.07.3.0。
 
 # TerrariaProgression
 

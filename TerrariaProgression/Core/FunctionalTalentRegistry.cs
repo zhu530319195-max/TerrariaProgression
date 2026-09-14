@@ -6,7 +6,7 @@ namespace TerrariaProgression.Core;
 
 public enum FunctionalImplementation { NativeFlag, NativeSystem, AccessoryBridge, Custom, Composite }
 public enum FunctionalStackPolicy { SatisfyOnce, Add, Multiply, Max }
-public enum FunctionalAuthority { ConfirmedPlayerState, LocalDisplay }
+public enum FunctionalAuthority { ConfirmedPlayerState, LocalDisplay, ServerWorld }
 public sealed record FunctionalTalent(TalentDefinition Definition, FunctionalImplementation ImplementationKind,
     string Group, FunctionalStackPolicy StackPolicy, FunctionalAuthority NetworkAuthority,
     IReadOnlyList<string> ChildEffects, string CompatibilityGrade = "A", bool DefaultEnabled = true,
@@ -32,6 +32,9 @@ public static class FunctionalTalentRegistry
         new(new TalentDefinition(id, category, 0, EffectUnit.Flag, DefaultCost: 2, MaxLevel: 1),
             kind, group, FunctionalStackPolicy.SatisfyOnce, FunctionalAuthority.ConfirmedPlayerState, Array.Empty<string>());
     public static readonly IReadOnlyList<FunctionalTalent> All = Array.AsReadOnly(new[] {
+        UtilityGrowth("AreaMining", 1, EffectUnit.Flat, "Gathering", FunctionalStackPolicy.Add, FunctionalImplementation.Custom) with { NetworkAuthority = FunctionalAuthority.ServerWorld, RequiresServerPermission = true },
+        UtilityGrowth("VeinMining", 25, EffectUnit.Flat, "Gathering", FunctionalStackPolicy.Add, FunctionalImplementation.Custom) with { NetworkAuthority = FunctionalAuthority.ServerWorld, RequiresServerPermission = true },
+        Unlock("TreeFelling", "Gathering", FunctionalImplementation.Custom) with { NetworkAuthority = FunctionalAuthority.ServerWorld, RequiresServerPermission = true },
         UtilityGrowth("FlightTime", 1, EffectUnit.Seconds, "Movement", FunctionalStackPolicy.Add),
         UtilityGrowth("FlightSpeed", 5, EffectUnit.Percent, "Movement", FunctionalStackPolicy.Multiply),
         UtilityGrowth("SwimSpeed", 10, EffectUnit.Percent, "Movement", FunctionalStackPolicy.Multiply, FunctionalImplementation.Custom),

@@ -1,6 +1,18 @@
 # PROJECT_STATUS.md
 
-## 当前阶段（2026-09-14）
+## 当前已验收：0.10.0 P3采集基础＋攻击范围补全
+
+PR #12已合并，main基线`308621510075c85188bdc546657c4d7a0433f354`。用户批准并授权开发本批：P3-01～04＋RANGE-01／02。独立分支`feat/p3-gathering`；实现90项天赋、存档v3、协议12。自动检查与本批实机验收均已通过，用户已授权合并PR #13。
+
+功能代码提交 `d475f70e8a6defe9bd845884dbdb3290abd4bc0e` 已通过[分支CI 34825975807](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34825975807)和[PR CI 34825980551](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34825980551)：3150项核心、651项原生检查通过，生产与测试MOD编译均为零警告、零错误。
+
+2026-09-14：用户确认0.10.0本批验收通过，并明确授权合并[PR #13](https://github.com/zhu530319195-max/TerrariaProgression/pull/13)。验收包提交 `95e55b29156bad921e77d4d3bef1f1c701d9f359`；本次只更新验收文档，功能代码与验收包一致。合并提交以PR记录为准。
+
+验收提交已通过[分支CI 34826265788](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34826265788)和[PR CI 34826269107](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34826269107)：3150项核心、651项原生检查通过，生产与测试MOD编译均为零警告、零错误。
+
+见[批准规则与实现边界](docs/P3_GATHERING_DESIGN_zh-CN.md)、[中文验收说明](docs/P3Gathering_TEST_GUIDE_zh-CN.md)。P3农业（范围收割、补种）尚未实现。以下0.9.0及旧记录属于历史基线；旧“P3全部未开发／规则待确认”由本节覆盖。所有单列遗留状态继续保留。
+
+## 历史阶段：0.9.0（2026-09-14）
 
 **0.9.0已通过用户实机验收，PR #12已获明确合并授权。** 当前87项天赋，6个一级分类、20个二级分组；存档v3、联机协议11。
 
@@ -27,7 +39,7 @@
 - 多人独立掉落增产／按玩家额外抽取：未完成，不是仅缺一轮测试。
 - 分层暴击：实机无效，按用户决定暂缓修复。
 - 自动跳跃、世界探索宝箱强化继续取消；旧自动跳跃投入自动退款。液体／蜂蜜移动辅助、电线／执行器、独立跳跃高度移出计划，已有游泳／起跳速度保留。
-- 悬停、闪避暂缓；未知第三方适配未验证。P3世界操作全部未开发。
+- 悬停、闪避暂缓；未知第三方适配未验证。P3采集基础已验收，农业操作尚未开发。
 
 ## Confirmed core rules
 - Initial level: 1.
