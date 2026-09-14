@@ -1,3 +1,5 @@
+> 0.12.1用户已批准的爆破／挖矿保护新规则，以[P3原版地形修订](P3_NATIVE_TERRAIN_REVISION_zh-CN.md)为准；下文冲突表述仅为历史设计。
+
 # TerrariaProgression — Progression Design v0.1
 
 > 状态：设计基线。用于指导后续实现；若规则发生变化，应同步更新 `DECISIONS.md` 与 `PROJECT_STATUS.md`。

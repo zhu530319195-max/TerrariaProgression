@@ -454,3 +454,11 @@ Check(!DefaultKeybindRules.Initialize("Custom/Keyboard",keyFixture,restoredMarke
 var newKeys=new Dictionary<string,List<string>>();
 Check(DefaultKeybindRules.Initialize("Other/Keyboard",newKeys,restoredMarkers)&&newKeys["TerrariaProgression/ToggleTalents"].Single()=="P","new profile gets defaults independently");
 Console.WriteLine($"Final P3-ToolPowerBlast core checks passed: {checks}");
+
+var oldKeys=new Dictionary<string,List<string>> { ["TerrariaProgression/ToggleTalents"]=new(),["TerrariaProgression/GatheringAction"]=new(),["TerrariaProgression/GatheringMode"]=new(){"F8"} };
+var oldMarkers=new HashSet<string>{"Legacy/Keyboard"};
+Check(DefaultKeybindRules.Initialize("Legacy/Keyboard",oldKeys,oldMarkers)&&oldKeys["TerrariaProgression/MiningProtection"].Single()=="K","0.12.0 migration adds only new K binding");
+Check(oldKeys["TerrariaProgression/ToggleTalents"].Count==0&&oldKeys["TerrariaProgression/GatheringAction"].Count==0&&oldKeys["TerrariaProgression/GatheringMode"].Single()=="F8","K migration preserves cleared old bindings and custom mode key");
+oldKeys["TerrariaProgression/MiningProtection"].Clear();
+Check(!DefaultKeybindRules.Initialize("Legacy/Keyboard",oldKeys,oldMarkers)&&oldKeys["TerrariaProgression/MiningProtection"].Count==0,"intentional K clear persists after its one-time migration");
+Console.WriteLine($"Final P3-NativeTerrain core checks passed: {checks}");

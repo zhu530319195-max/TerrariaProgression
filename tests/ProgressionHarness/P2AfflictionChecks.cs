@@ -171,7 +171,7 @@ public sealed partial class RuntimeChecks
                 Check(rows.Single(r=>r.ItemId==ItemID.BrickLayer).TalentIds.Contains("PlacementSpeed")&&rows.Single(r=>r.ItemId==ItemID.PortableCementMixer).TalentIds.Contains("WallPlacementSpeed"),"block and wall accessory mappings remain distinct");
                 Check(rows.Single(r=>r.ItemId==ItemID.Radar).MappingStatus=="Partial"&&rows.Single(r=>r.ItemId==ItemID.AnkhShield).MappingStatus=="Partial","reviewed children do not falsely claim composite equivalence");
             } finally {Directory.Delete(folder,true);}
-            Check(ProgressionNetwork.ProtocolVersion==15,"catalog and NPC sync use protocol fifteen boundary");
+            Check(ProgressionNetwork.ProtocolVersion==16,"catalog and NPC sync use protocol sixteen boundary");
         } finally {Main.combatText=oldText;Reset();}
     }
 }

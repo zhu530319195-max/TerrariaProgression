@@ -8,11 +8,11 @@ using TerrariaProgression.Players;
 
 namespace TerrariaProgression.Networking;
 
-internal enum ProgressionMessage : byte { JoinCharacter = 1, Snapshot = 2, TalentAction = 3, RequestSnapshot = 4, GatheringAction = 5, GatheringToggle = 6 }
+internal enum ProgressionMessage : byte { JoinCharacter = 1, Snapshot = 2, TalentAction = 3, RequestSnapshot = 4, GatheringAction = 5, GatheringToggle = 6, MiningProtection = 7 }
 
 internal static class ProgressionNetwork
 {
-    internal const byte ProtocolVersion = 15;
+    internal const byte ProtocolVersion = 16;
     private static ModPacket Packet(ProgressionMessage kind)
     {
         var packet = ModContent.GetInstance<TerrariaProgression>().GetPacket();
@@ -79,6 +79,17 @@ internal static class ProgressionNetwork
         var packet = Packet(ProgressionMessage.GatheringToggle);
         packet.Write(p.SessionId.ToByteArray()); packet.Write(sequence); packet.Write(enabled); packet.Send();
     }
+    internal static void SendProtectionToggle(ProgressionPlayer p, bool enabled, uint sequence)
+    {
+        var packet = Packet(ProgressionMessage.MiningProtection);
+        packet.Write(p.SessionId.ToByteArray()); packet.Write(sequence); packet.Write(enabled); packet.Send();
+    }
+    private static void SendProtectionState(ProgressionPlayer p, uint sequence)
+    {
+        var packet = Packet(ProgressionMessage.MiningProtection);
+        packet.Write(p.SessionId.ToByteArray()); packet.Write(sequence);
+        packet.Write(p.Player.GetModPlayer<GatheringPlayer>().ProtectionEnabled); packet.Send(p.Player.whoAmI);
+    }
     internal static void Receive(BinaryReader reader, int sender)
     {
         if (reader.ReadByte() != ProtocolVersion) throw new InvalidDataException("Unsupported protocol.");
@@ -87,7 +98,12 @@ internal static class ProgressionNetwork
             if (sender < 0 || sender >= Main.maxPlayers) return;
             var player = Main.player[sender].GetModPlayer<ProgressionPlayer>();
             if (!player.Player.active) return;
-            if (kind == ProgressionMessage.GatheringToggle && player.SessionReady) {
+            if (kind == ProgressionMessage.MiningProtection && player.SessionReady) {
+                var session = new Guid(reader.ReadBytes(16)); uint seq = reader.ReadUInt32(); bool enabled = reader.ReadBoolean();
+                Talents.GatheringSystem.SetProtection(player.Player, session, seq, enabled);
+                SendProtectionState(player, seq);
+            }
+            else if (kind == ProgressionMessage.GatheringToggle && player.SessionReady) {
                 var session = new Guid(reader.ReadBytes(16)); uint seq = reader.ReadUInt32(); bool enabled = reader.ReadBoolean();
                 Talents.GatheringSystem.SetBatch(player.Player, session, seq, enabled);
             }
@@ -105,6 +121,8 @@ internal static class ProgressionNetwork
                 player.SessionId = Guid.NewGuid();
                 player.TalentRevision = 0;
                 player.SessionReady = true;
+                var gathering = player.Player.GetModPlayer<GatheringPlayer>();
+                gathering.ProtectionEnabled = gathering.BatchEnabled = false; gathering.ProtectionSequence = 0;
                 SendSnapshot(player, -1);
                 // Sync existing characters after the importing client is ready.
                 foreach (var other in Main.ActivePlayers) {
@@ -134,6 +152,14 @@ internal static class ProgressionNetwork
                 player.HasSnapshotTick = true;
                 player.LastSnapshotTick = Main.GameUpdateCount;
                 SendSnapshot(player);
+            }
+        }
+        else if (Main.netMode == NetmodeID.MultiplayerClient && kind == ProgressionMessage.MiningProtection) {
+            var session = new Guid(reader.ReadBytes(16)); uint sequence = reader.ReadUInt32(); bool enabled = reader.ReadBoolean();
+            var state = Main.LocalPlayer.GetModPlayer<ProgressionPlayer>();
+            var gathering = Main.LocalPlayer.GetModPlayer<GatheringPlayer>();
+            if (state.SessionReady && session == state.SessionId && sequence >= gathering.ProtectionSequence) {
+                gathering.ProtectionSequence = sequence; gathering.ProtectionEnabled = enabled;
             }
         }
         else if (Main.netMode == NetmodeID.MultiplayerClient && kind == ProgressionMessage.Snapshot) {
