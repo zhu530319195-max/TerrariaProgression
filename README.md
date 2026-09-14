@@ -44,6 +44,7 @@ Terraria/tModLoader 独立角色成长系统。
 - `DECISIONS.md` — 已接受的产品/架构决策
 - `docs/PROGRESSION_DESIGN_v0.1.md` — 等级、经验、数值天赋与世界能力总设计
 - `docs/FUNCTIONAL_TALENTS_v0.1.md` — 功能天赋正式目录、Registry、Scanner 与兼容策略
+- [下一批P2已确认规则](docs/P2_AFFLICTIONS_DESIGN_zh-CN.md) — 异常伤害、四种新异常、渔力与扫描维护（待开发）
 
 当前阶段：**0.8.2 二级天赋菜单、钓鱼与饰品扫描**。PR #1～#10已验收合并。本批新增鱼饵节约与宝匣概率，共81项；此前单列的未验收／未完成项目仍按各自状态保留。
 
@@ -53,4 +54,4 @@ Terraria/tModLoader 独立角色成长系统。
 - 存档v3、协议10；所有端更新至0.8.2。
 - [中文安装与验收](docs/P2MenuFishing_TEST_GUIDE_zh-CN.md)
 - [实现、验证与限制](docs/P2MenuFishing_IMPLEMENTATION.md)
-- 本版已获用户实机验收并合并PR #10；下一批优先讨论异常伤害强化与更多异常，渔力提升为可选追加。
+- 本版已获用户实机验收并合并PR #10；下一批六项新天赋和两项扫描维护的规则已确认，整批开发尚未开始。

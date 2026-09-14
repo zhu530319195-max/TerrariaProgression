@@ -14,9 +14,9 @@
 
 见[中文任务清单](docs/TASK_CHECKLIST_zh-CN.md)：按固定任务编号列出已完成、下一批、候选、遗留验证、P3和取消事项。本次仅同步文档，不升级MOD、不实装新天赋。
 
-下一批主线：NEXT-01异常伤害强化、NEXT-02更多攻击异常；具体异常名单、伤害来源／多人归属和叠加规则仍需讨论。此前每级+20%是建议，不是已定数值。NEXT-03渔力提升为可选追加，尚未列入必做范围。
+第一步规则已确认：[下一批P2设计](docs/P2_AFFLICTIONS_DESIGN_zh-CN.md)。NEXT-01异常伤害每级+20%；NEXT-02新增霜冻、诅咒焰、毒液、灵液，每级2秒；NEXT-03渔力每级+5已纳入必做。六项均1点/级、无限、可调，完成后预计87项，当前仍为81项。只强化天赋来源持续伤害，同种多人取最高、保留原生免疫和刷新规则；灵液不提高减防。全部待开发，不再标为规则未定或渔力可选。
 
-扫描报告读取实际版本号（MAINT-01）的问题已确认，但尚未修复；补齐映射表（MAINT-02）为后续维护。报告450项（Terraria435、ModLoader15；映射11、部分16、未映射423），未映射不等于未实现。扫描不会执行未知第三方饰品逻辑。
+扫描报告读取实际版本号（MAINT-01）的问题已确认，但尚未修复；补齐映射表（MAINT-02）也已纳入本批维护，均未实现。报告450项（Terraria435、ModLoader15；映射11、部分16、未映射423），未映射不等于未实现。扫描不会执行未知第三方饰品逻辑。
 
 ## 必须单独保留的状态
 
@@ -89,7 +89,7 @@
 - Combat-trigger accessory effects remain in the Combat page rather than bloating the Utility page.
 
 ## Still not finalized
-- New abnormal-damage scope/attribution/stacking and the additional debuff list; the existing two-level UI and configurable P hotkey are accepted.
+- P3具体范围、费用和保护规则在对应批次开工前集中确认；本批P2规则已见D047和专项设计，当前UI与P热键已验收。
 - Detailed segmented/multi-entity boss settlement handling.
 - Additional-loot-roll compatibility beyond the implemented native families, and per-player private reward expansion; do not restore the retired drop-chance scheme.
 - Exact compatibility behavior for over-100% critical chance with third-party crit systems.
@@ -111,7 +111,7 @@ P0/P1 and the delivered P2 batches are stage-accepted through0.8.2, subject to t
 - PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
 
 ## Next implementation task
-Review NEXT-01/NEXT-02 rules in docs/TASK_CHECKLIST_zh-CN.md; NEXT-03 remains optional. This documentation batch does not implement those talents or authorize merging its new PR.
+第一步规则定稿已完成。下一步按 docs/P2_AFFLICTIONS_DESIGN_zh-CN.md 整批实现NEXT-01／02／03和MAINT-01／02，统一交付。当前文档PR #11尚未合并，本次规则确认不等于合并授权。
 
 ## P1 merge authorization supersedes earlier notes
 The earlier acceptance sections above record history at the time of feedback. PR #4 and #5 were subsequently explicitly authorized and merged. Their tested code is the P2-A base.
