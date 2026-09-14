@@ -12,7 +12,28 @@ namespace TerrariaProgression.Talents;
 public sealed class FlexibleRangeProjectile : GlobalProjectile
 {
     public override bool InstancePerEntity => true;
-    private float flailFactor = 1;
+    private float flailFactor = 1, appliedScale = 1;
+    public override bool PreAI(Projectile p)
+    {
+        p.scale /= appliedScale; appliedScale = 1;
+        return true;
+    }
+    public override void PostAI(Projectile p)
+    {
+        if (!Flail(p)) return;
+        p.scale *= flailFactor; appliedScale = flailFactor;
+    }
+    public override void ModifyDamageHitbox(Projectile p, ref Rectangle hitbox)
+    {
+        if (Flail(p)) hitbox = ThrustRangeProjectile.ScaledAround(hitbox, p.Center, flailFactor);
+    }
+    public override bool? Colliding(Projectile p, Rectangle projHitbox, Rectangle targetHitbox) =>
+        Flail(p) && p.ai[0] != 0 ? ThrustRangeProjectile.ScaledAround(p.Hitbox, p.Center, flailFactor).Intersects(targetHitbox) : null;
+    public override bool TileCollideStyle(Projectile p, ref int width, ref int height, ref bool fallThrough, ref Vector2 hitboxCenterFrac)
+    {
+        if (Flail(p)) { width = (int)Math.Ceiling(width * flailFactor); height = (int)Math.Ceiling(height * flailFactor); }
+        return true;
+    }
     internal static bool OwnerReady(Projectile p) => p.owner >= 0 && p.owner < Main.maxPlayers && Main.player[p.owner].active;
     internal static float Factor(Projectile p) => OwnerReady(p)
         ? (float)Math.Clamp(1 + .1 * TalentMath.Level(ExtendedTalentPlayer.Level(Main.player[p.owner], "MeleeRange")), 1, Math.Max(1, Math.Max(Main.maxTilesX, Main.maxTilesY))) : 1;

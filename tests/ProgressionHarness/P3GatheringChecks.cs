@@ -18,7 +18,7 @@ public sealed partial class RuntimeChecks
     {
         int x=Main.spawnTileX+35,y=Main.spawnTileY-10;
         uint seq=0;
-        void Advance(ulong ticks=100)=>typeof(Main).GetProperty(nameof(Main.GameUpdateCount))!.SetValue(null,Main.GameUpdateCount+ticks);
+        void Advance(ulong ticks=100)=>typeof(Main).GetField("_gameUpdateCount",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic)!.SetValue(null,unchecked(Main.GameUpdateCount+(uint)ticks));
         void Init() {
             Reset(); GatheringSystem.Clear(); seq=0; A.Award(100000000*Experience.Scale);
             Config.EnableWorldGathering=Config.EnableAreaMining=Config.EnableVeinMining=Config.EnableTreeFelling=true;
@@ -129,12 +129,17 @@ public sealed partial class RuntimeChecks
             float Run(bool enabled,bool launch) {
                 A.State.Talents["MeleeRange"].Enabled=enabled;p.channel=!launch;
                 int index=Projectile.NewProjectile(p.GetSource_ItemUse(p.HeldItem),p.MountedCenter,Vector2.Zero,p.HeldItem.shoot,20,0,p.whoAmI);
-                var q=Main.projectile[index];float furthest=0;
+                var q=Main.projectile[index];float initialScale=q.scale;float furthest=0;
                 for(int i=0;i<(launch?30:5);i++) {
                     ProjectileLoader.ProjectileAI(q);if(!q.active)break;
                     q.position+=q.velocity;furthest=Math.Max(furthest,Vector2.Distance(q.Center,p.MountedCenter));
                 }
                 if(!launch)Check(q.Colliding(q.Hitbox,new Rectangle((int)p.MountedCenter.X+80,(int)p.MountedCenter.Y,1,1))==enabled,"native flail spin collision respects enabled range: "+itemType);
+                if(!launch)Check(Math.Abs(q.scale/initialScale-(enabled?2:1))<.01,"flail head visual scale matches range without accumulation: "+itemType);
+                if(launch && q.active) {
+                    var box=q.Hitbox;ProjectileLoader.ModifyDamageHitbox(q,ref box);
+                    Check(box.Width==q.width*(enabled?2:1),"flail thrown hitbox matches head visual scale: "+itemType);
+                }
                 q.active=false;return furthest;
             }
             float n=Run(false,false),e=Run(true,false);Check(Math.Abs(e/n-2)<.01,"flail visible spin distance doubles without accumulation: "+itemType);
