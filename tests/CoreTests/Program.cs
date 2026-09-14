@@ -281,7 +281,7 @@ Console.WriteLine($"Final P2-Completion core checks passed: {checks}");
 
 // 0.8.0 navigation membership and atomic new-scope refunds, independent of old enums.
 var menuIds=TalentNavigation.Groups.SelectMany(g=>g.TalentIds).ToArray();
-Check(menuIds.Length==87 && menuIds.Distinct().Count()==87 && menuIds.Order().SequenceEqual(TalentCatalog.All.Select(t=>t.Id).Order()),"all 87 implemented talents appear once in the menu");
+Check(menuIds.Length==90 && menuIds.Distinct().Count()==90 && menuIds.Order().SequenceEqual(TalentCatalog.All.Select(t=>t.Id).Order()),"all 90 implemented talents appear once in the menu");
 Check(TalentNavigation.Categories.Count==6 && TalentNavigation.Groups.All(g=>g.TalentIds.Count>0&&TalentNavigation.Categories.Contains(g.CategoryId)),"six populated categories and no empty or orphan groups");
 Check(!menuIds.Contains("AutoJump")&&!menuIds.Contains("JumpHeight"),"cancelled jumps absent from navigation");
 state=new();state.Award(100000000*scale,50000);
@@ -292,12 +292,12 @@ foreach(var scope in TalentNavigation.Categories) {
     var amount=TalentNavigation.RefundAmount(state,scope,false);
     Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuCategory,scope,TalentCategory.BaseStats,1,out copy)==TalentResult.Success,"new category refund accepted: "+scope);
     Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.TotalSpentTalentPoints==state.TotalSpentTalentPoints-amount,"category refund uses historical costs: "+scope);
-    Check(copy.Talents.Keys.All(id=>!TalentNavigation.InScope(id,scope,false)) && copy.Talents.Count==87-menuIds.Count(id=>TalentNavigation.InScope(id,scope,false)),"category refund exact membership: "+scope);
+    Check(copy.Talents.Keys.All(id=>!TalentNavigation.InScope(id,scope,false)) && copy.Talents.Count==90-menuIds.Count(id=>TalentNavigation.InScope(id,scope,false)),"category refund exact membership: "+scope);
 }
 foreach(var g in TalentNavigation.Groups) {
     var amount=TalentNavigation.RefundAmount(state,g.Id,true);
     Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuGroup,g.Id,TalentCategory.Economy,1,out copy)==TalentResult.Success,"new subgroup refund accepted: "+g.Id);
-    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.Talents.Count==87-g.TalentIds.Count,"subgroup exact historical refund: "+g.Id);
+    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.Talents.Count==90-g.TalentIds.Count,"subgroup exact historical refund: "+g.Id);
     Check(copy.Talents.Keys.All(id=>!g.TalentIds.Contains(id)) && snapshot.SequenceEqual(StateCodec.Encode(state)),"refund leaves source and other groups intact: "+g.Id);
 }
 foreach(var invalid in new[]{"","NotAGroup","AutoJump","../../Survival"}) {
@@ -367,3 +367,34 @@ leases.Apply(0,0,sessionA,3000,120);leases.Clear();Check(leases.Highest(0,3001,t
 leases.Apply(0,0,sessionA,ulong.MaxValue-100,1200);Check(leases.Highest(0,ulong.MaxValue-1,true,Strength)==10,"expiry addition saturates without wrapping");
 Check(NumericTalents.TryGet("AfflictionDamage",out var boostDefinition)&&boostDefinition.PerLevel==20 && NumericTalents.TryGet("FishingPower",out var fishingDefinition)&&fishingDefinition.PerLevel==5,"approved twenty-percent damage and five fishing power values");
 Console.WriteLine($"Final P2-Afflictions core checks passed: {checks}");
+
+// P3 state, geometry and budget invariants.
+foreach (string id in new[] { "AreaMining", "VeinMining", "TreeFelling" }) {
+    state = new(); state.Award(100000000 * scale, 50000);
+    int cost = id == "TreeFelling" ? 2 : 1;
+    int levels = id == "TreeFelling" ? 1 : 10;
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,id,TalentCategory.Utility,levels,out state)==TalentResult.Success && state.TotalSpentTalentPoints==cost*levels,"P3 actual purchase: "+id);
+    if (levels == 10) {
+        TalentCatalog.Apply(state,TalentOperation.DecreaseIntensity,id,TalentCategory.Utility,7,out state);
+        Check(NumericTalents.ActiveLevel(state,id)==3 && state.Talents[id].TalentLevel==10,"P3 intensity does not spend/refund: "+id);
+    }
+    copy=StateCodec.Decode(StateCodec.Encode(state));
+    Check(TalentCatalog.ValidateImported(copy),"P3 save/import: "+id);
+    TalentCatalog.Apply(copy,TalentOperation.Disable,id,TalentCategory.Utility,1,out copy);
+    Check(NumericTalents.ActiveLevel(copy,id)==0 && copy.TotalSpentTalentPoints==cost*levels,"P3 disable keeps paid costs: "+id);
+    TalentCatalog.Apply(copy,TalentOperation.RefundTalent,id,TalentCategory.Utility,1,out copy);
+    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+cost*levels,"P3 exact refund: "+id);
+}
+foreach(int radius in new[]{0,1,2,10,50}) {
+    var square=GatheringRules.Square(new TilePoint(100,100),radius).ToArray();
+    Check(square.Length==(2*radius+1)*(2*radius+1) && square.Distinct().Count()==square.Length,"square covers each tile exactly once: "+radius);
+    Check(square.All(p=>Math.Abs(p.X-100)<=radius && Math.Abs(p.Y-100)<=radius),"square never leaves selected radius: "+radius);
+    Check(square.Take(Math.Min(9,square.Length)).All(p=>Math.Abs(p.X-100)<=1&&Math.Abs(p.Y-100)<=1),"budget processes closest ring first: "+radius);
+}
+Check(GatheringRules.Neighbours(new(0,0)).Distinct().Count()==8,"vein has eight neighbours including diagonals");
+Check(GatheringRules.Limit(GatheringMode.Vein,10,1000,10000)==250,"level ten vein allows 250 including origin");
+Check(GatheringRules.Limit(GatheringMode.Vein,100,1000,10000)==1000,"server action cap does not change level");
+Check(GatheringRules.Limit(GatheringMode.Vein,100,0,10000)==2500,"zero budget means no server action cap");
+Check(GatheringRules.Radius(BigInteger.Pow(10,200),8400)==8400 && GatheringRules.Limit(GatheringMode.Vein,BigInteger.Pow(10,200),0,10000)==10000,"huge levels saturate world geometry without integer overflow");
+Check(GatheringRules.Square(new(0,0),int.MaxValue).Take(9).Count()==9,"huge range enumerates lazily");
+Console.WriteLine($"Final P3-Gathering core checks passed: {checks}");

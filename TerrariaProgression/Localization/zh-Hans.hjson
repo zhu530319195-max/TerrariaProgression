@@ -1,11 +1,17 @@
 Mods: {
   TerrariaProgression: {
     Keybinds: {
+      GatheringAction: { DisplayName: "按住：批量采集" }
+      GatheringMode: { DisplayName: "切换范围挖矿／矿脉连锁" }
+
   "ToggleTalents": {
     "DisplayName": "打开／关闭天赋页面"
   }
 }
     TalentsUI: {
+      MiningArea: "{0}×{0} 格"
+      MiningCount: "最多 {0} 格（含首格）"
+
   "Close": "关闭",
   "Category0": "基础属性",
   "Category1": "恢复续航",
@@ -150,6 +156,9 @@ Mods: {
   "ManaSaving": "魔力消耗降低",
   "Minions": "召唤物上限",
   "Sentries": "哨兵上限",
+  "AreaMining": "范围挖矿",
+  "VeinMining": "矿脉连锁",
+  "TreeFelling": "一键伐木",
   "PickupRange": "物品拾取范围",
   "JumpSpeed": "跳跃速度",
   "Breath": "最大呼吸容量",
@@ -239,6 +248,9 @@ Mods: {
   "ManaSaving": "每级令魔力消耗 ×0.95，与原版耗魔修正相乘。",
   "Minions": "每级 +1 召唤物容量，与装备加算。",
   "Sentries": "每级 +1 哨兵容量，与装备加算。",
+  "AreaMining": "每级增加1格半径，1级3×3、10级21×21，可调强度。按住批量采集键（默认左Alt）正常挖掉第一格后处理周围方块；G切换范围／矿脉模式。尊重镐力和服务器保护，切换工具或修改天赋会停止作业。",
+  "VeinMining": "每级最多连锁25格同种矿石（包含第一格），10级250格，可调强度。按住左Alt采集，G选择矿脉模式；斜角连接有效，不跨空隙，不挖相邻泥土石块。原版矿石默认支持，MOD矿石须服务器允许且标记为矿石。",
+  "TreeFelling": "一次性2点。持斧按住左Alt砍掉同一棵原版树的任意树干后，清理其余树干、枝根；不连锁邻树、不拆木材建筑。沿用木材／宝石产量。受保护或整树超过单次上限时不启动，不含MOD树、巨型蘑菇、仙人掌和竹子。",
   "PickupRange": "每级 +10% 拾取范围，乘算物品原有范围。",
   "JumpSpeed": "每级 +3% 原生跳跃速度，与装备后的速度相乘；特殊坐骑和第三方移动逻辑可能覆盖。",
   "Breath": "每级 +10% 呼吸容量。提高上限不自动补充呼吸；关闭时仅截断到新上限。",
@@ -248,7 +260,7 @@ Mods: {
   "PotionDuration": "每级令新施加的药水病时间 ×0.93。与负面状态时间缩短相乘；不反复缩短已有计时。",
   "DebuffDuration": "每级令新施加的负面状态时间 ×0.95，最短 1 帧；持续环境可重新施加。开关不重算已有计时。",
   "CritChance": "每级 +10 个百分点，叠加武器暴击率。超过 100% 后：一重 ×2、二重 ×3、三重 ×4；暴击伤害天赋另加。遵循原生禁止暴击。",
-  "MeleeRange": "每级 +10% 普通挥砍及原版戳刺短剑／长矛的可见尺寸与命中范围；不扩大剑气、鞭子、悠悠球及未知 MOD 投射物。可调低当前强度。",
+  "MeleeRange": "每级 +10% 普通挥砍、原版戳刺短剑／长矛、鞭子长度和链锤旋转／甩出范围，可调强度。显示与命中同步；链锤极高强度受原版900像素回收保护限制。不扩大剑气、悠悠球及未知MOD投射物。",
   "ProjectileSpeed": "每级 +5% 武器发射瞬间的投射物速度；自定义 AI 可能重设速度，不强行干预。",
   "Invulnerability": "每级 +1 帧受击后无敌时间，加入本次实际使用的无敌计时，不生成额外免伤。",
   "Coins": "每级 +10% 怪物原生金币掉落。使用原生掉落归属角色的天赋；不放大普通拾取和玩家丢弃的金币。",
@@ -308,6 +320,10 @@ Mods: {
   "CrateChance": "每级使原宝匣判定失败概率乘0.95。若原判定率10%，Lv.10约46.1%。只增强宝匣资格，保持原生种类、稀有度、任务与敌人判定、池塘及液体条件；蜂蜜跳过，岩浆保留额外筛选，最终宝匣比例不一定等于资格概率。可调当前等级。"
 }
     Messages: {
+      GatheringMode: "采集模式：{0}。按住批量采集键使用；持斧砍树自动使用一键伐木。"
+      GatheringBlocked: "本次批量采集未启动：请检查服务器许可、保护区域、工具、距离或整树数量上限。"
+      GatheringLimit: "本次批量采集达到数量上限，已停止；天赋等级和投入不变。"
+
       LootLimit: "额外战利品达到单次抽取保护或物品容量，部分额外奖励未生成；可在 MOD 配置调整抽取保护。天赋等级与点数不变。"
       Status: "等级 {0}｜当前经验 {1} / {2}｜累计经验 {3}｜可用天赋点 {4}｜已投入 {5}"
       Waiting: "正在等待服务器确认角色成长数据。"
@@ -318,6 +334,14 @@ Mods: {
     Configs: {
       ProgressionConfig: {
         DisplayName: 成长规则（服务器）
+        EnableWorldGathering: { Label: "允许批量采集", Tooltip: "P3世界操作总开关。仍须购买天赋并按住批量采集键。" }
+        EnableAreaMining: { Label: "允许范围挖矿", Tooltip: "允许范围挖矿模式。" }
+        EnableVeinMining: { Label: "允许矿脉连锁", Tooltip: "仅连接同种矿石，包括斜角。" }
+        EnableTreeFelling: { Label: "允许一键伐木", Tooltip: "仅原版树；不砍相邻树和木材建筑。" }
+        EnableModOreMining: { Label: "允许MOD矿石连锁", Tooltip: "默认关闭；仅尝试带原生矿石标记的MOD方块，仍检查其正常镐力和破坏规则，不保证所有MOD兼容。" }
+        MaxBlocksPerAction: { Label: "单次采集方块上限", Tooltip: "默认1000，包含第一格；0为总量不限。不是天赋等级上限。整树超过上限时拒绝启动。" }
+        GatheringWorkPerTick: { Label: "每帧采集处理预算", Tooltip: "默认32，所有玩家共用，范围1～256。检查候选格或敲击一次消耗一个单位；0总量不限仍按此预算处理。" }
+        ProtectedTileAreas: { Label: "采集保护区域", Tooltip: "方块坐标矩形，X/Y为左上角，Width/Height为宽高；仅保护本MOD批量采集。可用 /tpgather coords 查看鼠标方块坐标。" }
         MaxExtraLootRollsPerEvent: { Label: "单次额外抽取保护", Tooltip: "默认 1000 次，范围 1～100000。达到上限时停止本次额外抽取并提示，不限制等级，不扣点数。较高设置会增加卡顿风险。" }
         BoostMaterials: { Label: "允许增益：普通材料", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }
         BoostConsumables: { Label: "允许增益：消耗品", Tooltip: "控制怪物掉落数量／掉率天赋是否作用于此分类；默认开启。" }

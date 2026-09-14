@@ -41,7 +41,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TerrariaProgression-P2Afflictions
+          name: TerrariaProgression-P3Gathering
           if-no-files-found: warn
           path: artifacts/
 
