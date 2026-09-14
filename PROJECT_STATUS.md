@@ -111,7 +111,7 @@ P0/P1 and the delivered P2 batches are stage-accepted through0.8.2, subject to t
 - PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
 
 ## Next implementation task
-第一步规则定稿已完成。下一步按 docs/P2_AFFLICTIONS_DESIGN_zh-CN.md 整批实现NEXT-01／02／03和MAINT-01／02，统一交付。当前文档PR #11尚未合并，本次规则确认不等于合并授权。
+第一步规则定稿已完成；第二步0.9.0整批实现已进入自动验证和统一交付准备。下一步等待玩家验收，P3尚未开工。文档PR #11与功能PR均不自动合并。
 
 ## P1 merge authorization supersedes earlier notes
 The earlier acceptance sections above record history at the time of feedback. PR #4 and #5 were subsequently explicitly authorized and merged. Their tested code is the P2-A base.

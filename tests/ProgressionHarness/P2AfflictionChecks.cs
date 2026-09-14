@@ -45,16 +45,17 @@ public sealed partial class RuntimeChecks
             foreach(var e in AfflictionNpc.Effects) {
                 Reset();A.Award(1000000*Experience.Scale);
                 SetTalent(A,e.Talent,10);SetTalent(A,"AfflictionDamage",10);
-                var native=Target();native.AddBuff(e.Buff,1200);int normal=DamageTicks(native);
+                var native=Target();native.AddBuff(e.Buff,1200);int normal=DamageTicks(native,600);
                 Check(Bonus(native)==0,"native-only status never acquires a talent damage source: "+e.Talent);
                 var enhanced=Target();AfflictionNpc.ApplyHit(enhanced,A.Player,10);
                 Check(enhanced.HasBuff(e.Buff)&&enhanced.buffTime[enhanced.FindBuffIndex(e.Buff)]==1200,"native level-ten status has twenty-second duration: "+e.Talent);
-                int increased=DamageTicks(enhanced);
-                Console.WriteLine($"AFFLICTION_EVIDENCE {e.Talent}: native/120ticks={normal}, boost10={increased}");
-                Check(normal==e.Regen && increased==normal*3,"actual native DoT health loss triples at level ten (Ichor stays zero): "+e.Talent);
+                int increased=DamageTicks(enhanced,600);
+                Console.WriteLine($"AFFLICTION_EVIDENCE {e.Talent}: native/600ticks={normal}, boost10={increased}");
+                Check(normal==e.Regen*5 && increased==normal*3,"actual native DoT health loss triples at level ten (Ichor stays zero): "+e.Talent);
                 if(e.Regen>0) {
                     SetTalent(A,"AfflictionDamage",1);enhanced.lifeRegenCount=0;
-                    Check(DamageTicks(enhanced,600)==e.Regen*6,"fractional level-one bonus preserves exactly twenty percent over ten seconds: "+e.Talent);
+                    int fractionalLoss=DamageTicks(enhanced,600);
+                    Check(fractionalLoss*120-enhanced.lifeRegenCount==e.Regen*6*120,"fractional level-one bonus preserves twenty percent including native popup carry: "+e.Talent);
                 } else {
                     var before=enhanced.GetIncomingStrikeModifiers(DamageClass.Generic,1).Defense.Flat;
                     SetTalent(A,"AfflictionDamage",100);Flags(enhanced);
@@ -112,7 +113,7 @@ public sealed partial class RuntimeChecks
             foreach(var e in AfflictionNpc.Effects)SetTalent(A,e.Talent,10);
             A.Player.ApplyDamageToNPC(target,10,0,1,false,DamageClass.Generic);
             Check(AfflictionNpc.Effects.All(e=>target.HasBuff(e.Buff)),"real player hit applies all six native statuses with native coexistence");
-            foreach(var q in Main.projectile)q.active=false;var minionTarget=Target();
+            foreach(var q in Main.projectile)q.active=false;foreach(var n in Main.npc)n.active=false;var minionTarget=Target();
             int shot=Projectile.NewProjectile(A.Player.GetSource_Misc("affliction minion test"),minionTarget.Center,Vector2.Zero,ProjectileID.BabySlime,10,0,0);
             Main.projectile[shot].Damage();
             Check(Main.projectile[shot].minion && AfflictionNpc.Effects.All(e=>minionTarget.HasBuff(e.Buff)),"real owned summon collision applies all attack afflictions");
@@ -124,7 +125,8 @@ public sealed partial class RuntimeChecks
             AfflictionNpc.ApplyHit(rejected,A.Player,0);Check(Bonus(rejected)==0&&!rejected.HasBuff(BuffID.OnFire),"friendly and zero-damage hits do not apply statuses");
             var mixed=Target();AfflictionNpc.ApplyHit(mixed,A.Player,10);mixed.AddBuff(BuffID.Oiled,1200);
             int withoutOil=AfflictionNpc.Effects.Sum(e=>e.Regen)*3;
-            Check(DamageTicks(mixed)==withoutOil+50,"oiled native synergy is not multiplied by talent damage");
+            int mixedLoss=DamageTicks(mixed);
+            Check(mixedLoss*120-mixed.lifeRegenCount==(withoutOil+50)*120,"oiled native synergy is not multiplied by talent damage");
             var huge=Target();AfflictionNpc.ApplyHit(huge,A.Player,10);
             A.State.Talents["AfflictionDamage"].AddCost(1,BigInteger.Pow(10,80));Flags(huge);huge.lifeRegen=0;int popup=0;
             NPCLoader.UpdateLifeRegen(huge,ref popup);
