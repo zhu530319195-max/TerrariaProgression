@@ -32,6 +32,12 @@ public sealed partial class RuntimeChecks
         NPC Target() {
             var n=Spawn(100000);foreach(var e in AfflictionNpc.Effects)n.buffImmune[e.Buff]=false;return n;
         }
+        void ItemHit(NPC n) {
+            var hit=Hit(10);int dealt=n.StrikeNPC(hit);
+            // Match native melee dispatch: generic ApplyDamageToNPC deliberately
+            // omits item-specific hooks, including the existing XP attribution hook.
+            CombinedHooks.OnPlayerHitNPCWithItem(A.Player,new Item(ItemID.WoodenSword),n,in hit,dealt);
+        }
         void Flags(NPC n) {flags.Invoke(n,null);n.UpdateNPC_BuffSetFlags(false);}
         int Bonus(NPC n,int ticks=5) {
             int sum=0;for(int i=0;i<ticks;i++){Flags(n);n.lifeRegen=0;int d=0;NPCLoader.UpdateLifeRegen(n,ref d);sum-=n.lifeRegen;}return sum;
@@ -111,7 +117,7 @@ public sealed partial class RuntimeChecks
 
             Main.netMode=NetmodeID.SinglePlayer;target=Target();
             foreach(var e in AfflictionNpc.Effects)SetTalent(A,e.Talent,10);
-            A.Player.ApplyDamageToNPC(target,10,0,1,false,DamageClass.Generic);
+            ItemHit(target);
             Check(AfflictionNpc.Effects.All(e=>target.HasBuff(e.Buff)),"real player hit applies all six native statuses with native coexistence");
             foreach(var q in Main.projectile)q.active=false;foreach(var n in Main.npc)n.active=false;var minionTarget=Target();
             int shot=Projectile.NewProjectile(A.Player.GetSource_Misc("affliction minion test"),minionTarget.Center,Vector2.Zero,ProjectileID.BabySlime,10,0,0);
@@ -137,7 +143,7 @@ public sealed partial class RuntimeChecks
             Reset();A.Award(100000000*Experience.Scale);SetTalent(A,"AttackVenom",10);SetTalent(A,"AfflictionDamage",10);
             var doomed=Target();doomed.life=doomed.lifeMax=60;EncounterSystem.Spawn(doomed,null);
             var xpBefore=A.State.TotalExperienceEarned;
-            A.Player.ApplyDamageToNPC(doomed,10,0,1,false,DamageClass.Generic);DamageTicks(doomed);
+            ItemHit(doomed);DamageTicks(doomed);
             Check(!doomed.active,"native talent-enhanced DoT can finish an enemy");
             Settle(doomed);var xpAfter=A.State.TotalExperienceEarned;Settle(doomed);
             Check(xpAfter-xpBefore==60*Experience.Scale&&A.State.TotalExperienceEarned==xpAfter,"DoT kill follows existing maximum-life XP settlement exactly once");
