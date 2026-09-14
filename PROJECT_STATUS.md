@@ -1,26 +1,32 @@
 # PROJECT_STATUS.md
 
-## Current phase
-PR #1–#9 merged. P2 completion 0.7.0 was explicitly accepted by the user; PR #9 merged at `1301fea8a9805347150d204c36d5e47191859d24`, tested head `11c207ad162e92610c4f3d54c6f96592f5d523e0`. Final CI 34775077627: 2956 core checks, 399 native checks; both mod builds zero warnings/errors. This supersedes older pending acceptance text in all previous stage documents.
+## 当前阶段（2026-09-14）
 
-0.8.2 on `feat/p2-menu-fishing` implements the user-approved two-level menu, global search/owned/active filters, exact scope refunds, bait conservation, crate eligibility, and passive accessory discovery/reporting. 81 talents: 49 numeric-registry entries + 32 functional-registry entries. Six display categories and 20 populated subgroups. New version needs separate in-game acceptance and explicit merge authorization.
+**0.8.2已通过用户实机验收并合并PR #10，PR #1～#10均已合并。** 当前81项天赋，6个一级分类、20个二级分组。0.8.1客户端加载修复和0.8.2目录缩进／高亮优化均已验收；此事实覆盖旧阶段文档中的“PR #10未合并／待验收”。
 
-## 0.8.1 client loading correction
-User reported that 0.8.0 failed client loading: TalentUISystem.Load activated TalentUIState, whose OnInitialize/RefreshTalents accessed an uninitialized local ModPlayer array. The former dedicated-server CI excluded this client-only system and did not prove graphical-client loading. User confirmed 0.8.1 testing passed, then requested the navigation-only polish in 0.8.2. PR #10 remains open; no merge was authorized. 0.8.1 defers widget creation until first in-world open, checks native TryGetModPlayer readiness, and binds the character on UI update. Added native regression checks explicitly invoke client-system Load with an empty player component array. Final corrected CI counts and exact artifact hashes belong in PR/BUILD_INFO; The 0.8.1 client fix is user-accepted; the 0.8.2 presentation change needs a visual check.
+- main合并提交：`afe41c470faeb81e14eabbff2f35cf9183487ef1`。
+- 验收分支提交：`0bf00456c72ddedaa119d1f8a0864de37f0f3649`。
+- [分支CI 34805851271](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34805851271)、[PR CI 34805853679](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34805853679)：3060项核心、440项原生检查；生产与测试MOD编译零警告、零错误。
+- 环境：tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8；存档v3、协议10。现有ID、等级、实际成本、开关与强度保留。
+- PR #9八项补全能力已验收合并，0.8.2继续保留，不重复开发。
 
-## 0.8.2 navigation polish
-Approved: inset entire child buttons by20 UI pixels, rename All to 本类全部, draw right/down triangles, use subdued parent highlight and gold selected-child border, add8 UI pixels after expanded children. Preserve three columns, text size and existing navigation behavior. Reuse 3060 core/440 native regression checks; exact final evidence is in PR/BUILD_INFO.
+## 最新任务审查入口
 
-## Repository state
-- Target remains tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
-- Save v3 retained, old IDs and paid-cost ledger unchanged. Protocol10 requires all peers on0.8.0.
-- New display taxonomy does not renumber legacy saved/network category values. Server validates new category/group refund scopes.
-- CI 34779551529 on `b4d6de949720c2681aa970203e0cc29972658aa4` passed 3060 core checks and 431 native checks; production and harness builds each report zero warnings/errors. Local native execution was blocked by runtime process-map access and is not counted as a pass.
-- Final delivered commit, CI count and package hashes are recorded in PR/BUILD_INFO.
-- Real multiplayer, potion sickness/fishing yield, special/segmented/multi-stage Bosses and per-player private loot retain their individual unaccepted/incomplete states. Tiered crit remains user-deferred.
-- Liquid/honey movement assistance, wires, actuators and independent jump height removed from the future development scope by user. Existing swim/jump speed remains. Hover/dodge deferred. Abnormal damage strengthening and further attack debuffs are a separate future batch, not this release. P3 world operations remain unimplemented.
-- AutoJump/world-chest enhancement remain cancelled; historical AutoJump purchases still refund once.
-- See `docs/P2MenuFishing_IMPLEMENTATION.md` and `docs/P2MenuFishing_TEST_GUIDE_zh-CN.md`.
+见[中文任务清单](docs/TASK_CHECKLIST_zh-CN.md)：按固定任务编号列出已完成、下一批、候选、遗留验证、P3和取消事项。本次仅同步文档，不升级MOD、不实装新天赋。
+
+下一批主线：NEXT-01异常伤害强化、NEXT-02更多攻击异常；具体异常名单、伤害来源／多人归属和叠加规则仍需讨论。此前每级+20%是建议，不是已定数值。NEXT-03渔力提升为可选追加，尚未列入必做范围。
+
+扫描报告读取实际版本号（MAINT-01）的问题已确认，但尚未修复；补齐映射表（MAINT-02）为后续维护。报告450项（Terraria435、ModLoader15；映射11、部分16、未映射423），未映射不等于未实现。扫描不会执行未知第三方饰品逻辑。
+
+## 必须单独保留的状态
+
+- 药水病缩短、原有钓鱼产量：已有相关实现，仍未实机验收。
+- 真实多人：已有同步／结算基础与自动检查，真实多人实机验证暂缓。
+- 特殊／多节／多阶段Boss：已有去重基础及部分自动检查，特殊适配与实机覆盖未完成，不能统称通过。
+- 多人独立掉落增产／按玩家额外抽取：未完成，不是仅缺一轮测试。
+- 分层暴击：实机无效，按用户决定暂缓修复。
+- 自动跳跃、世界探索宝箱强化继续取消；旧自动跳跃投入自动退款。液体／蜂蜜移动辅助、电线／执行器、独立跳跃高度移出计划，已有游泳／起跳速度保留。
+- 悬停、闪避暂缓；未知第三方适配未验证。P3世界操作全部未开发。
 
 ## Confirmed core rules
 - Initial level: 1.
@@ -38,7 +44,7 @@ Approved: inset entire child buttons by20 UI pixels, rename All to 本类全部,
 - Refunds return the points actually paid.
 
 ## Talent model approved
-- Six categories: Base Stats; Recovery & Sustain; Combat; Economy & Resources; Utility/Accessory-like Abilities; Transcendent/World Interaction.
+- Current display categories: 生存与恢复、战斗与召唤、移动与探索、采集与钓鱼、建筑与工具、掉落与交易. Legacy saved enum values remain unchanged.
 - Numeric talents default to unlimited levels (`MaxLevel = 0`).
 - Pure binary functionality uses one-time unlocks.
 - One-time utility/function unlocks use a unified default price of 2 talent points.
@@ -83,14 +89,14 @@ Approved: inset entire child buttons by20 UI pixels, rename All to 本类全部,
 - Combat-trigger accessory effects remain in the Combat page rather than bloating the Utility page.
 
 ## Still not finalized
-- Final UI layout and hotkeys.
+- New abnormal-damage scope/attribution/stacking and the additional debuff list; the existing two-level UI and configurable P hotkey are accepted.
 - Detailed segmented/multi-entity boss settlement handling.
-- Exact runtime implementation for dynamic loot probability/quantity modification across vanilla and third-party drop rules.
+- Additional-loot-roll compatibility beyond the implemented native families, and per-player private reward expansion; do not restore the retired drop-chance scheme.
 - Exact compatibility behavior for over-100% critical chance with third-party crit systems.
 - Exact implementation mappings (`NativeFlag` vs `NativeSystem` vs `AccessoryBridge` vs `Custom`) for every P2 functional entry; these are technical tasks, not unresolved product rules.
 
 ## Design status
-The core progression rules, P1 default balance direction, utility unlock pricing, and functional talent architecture are sufficiently defined to begin implementation. Remaining design questions can be handled as targeted follow-ups without blocking P0.
+P0/P1 and the delivered P2 batches are stage-accepted through0.8.2, subject to the explicit exceptions above. New development follows the numbered task checklist; proposed mechanics need specific decisions before implementation.
 
 ## User acceptance update (2026-09-13)
 - Confirmed in 0.3.0: critical chance, ordinary wooden-sword swing size, tool reach, mining/wood yield, purchase and selling prices. Potion sickness and fishing lack user test conditions. The user subsequently accepted 0.3.0 as a stage. The latest message corrects the earlier report of copper yield failure.
@@ -105,7 +111,7 @@ The core progression rules, P1 default balance direction, utility unlock pricing
 - PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
 
 ## Next implementation task
-Deliver 0.8.0 menu/fishing/scanner from passing CI for separate in-game acceptance. Do not merge until explicitly authorized.
+Review NEXT-01/NEXT-02 rules in docs/TASK_CHECKLIST_zh-CN.md; NEXT-03 remains optional. This documentation batch does not implement those talents or authorize merging its new PR.
 
 ## P1 merge authorization supersedes earlier notes
 The earlier acceptance sections above record history at the time of feedback. PR #4 and #5 were subsequently explicitly authorized and merged. Their tested code is the P2-A base.
