@@ -115,7 +115,9 @@ public sealed partial class RuntimeChecks
             Check(AfflictionNpc.Effects.All(e=>target.HasBuff(e.Buff)),"real player hit applies all six native statuses with native coexistence");
             foreach(var q in Main.projectile)q.active=false;foreach(var n in Main.npc)n.active=false;var minionTarget=Target();
             int shot=Projectile.NewProjectile(A.Player.GetSource_Misc("affliction minion test"),minionTarget.Center,Vector2.Zero,ProjectileID.BabySlime,10,0,0);
-            Main.projectile[shot].Damage();
+            // Native slime AI enables contact damage only after choosing a target.
+            // Start this collision fixture in that attacking state.
+            Main.projectile[shot].friendly=true;Main.projectile[shot].Damage();
             Check(Main.projectile[shot].minion && AfflictionNpc.Effects.All(e=>minionTarget.HasBuff(e.Buff)),"real owned summon collision applies all attack afflictions");
             var clientOnly=Target();Main.netMode=NetmodeID.MultiplayerClient;
             A.Player.GetModPlayer<CombatUtilityPlayer>().OnHitNPC(clientOnly,Hit(10),10);AfflictionNpc.ApplyHit(clientOnly,A.Player,10);
