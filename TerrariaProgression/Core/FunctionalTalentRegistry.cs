@@ -32,6 +32,10 @@ public static class FunctionalTalentRegistry
         new(new TalentDefinition(id, category, 0, EffectUnit.Flag, DefaultCost: 2, MaxLevel: 1),
             kind, group, FunctionalStackPolicy.SatisfyOnce, FunctionalAuthority.ConfirmedPlayerState, Array.Empty<string>());
     public static readonly IReadOnlyList<FunctionalTalent> All = Array.AsReadOnly(new[] {
+        UtilityGrowth("HammerPower", 10, EffectUnit.Percent, "Tools", FunctionalStackPolicy.Add),
+        UtilityGrowth("HerbGrowth", 20, EffectUnit.Percent, "Gathering", FunctionalStackPolicy.Max, FunctionalImplementation.Custom) with { NetworkAuthority = FunctionalAuthority.ServerWorld, RequiresServerPermission = true },
+        UtilityGrowth("AreaWallRemoval", 1, EffectUnit.Flat, "Tools", FunctionalStackPolicy.Add, FunctionalImplementation.Custom) with { NetworkAuthority = FunctionalAuthority.ServerWorld, RequiresServerPermission = true },
+        Unlock("AutoReplantTree", "Gathering", FunctionalImplementation.Custom) with { NetworkAuthority = FunctionalAuthority.ServerWorld, RequiresServerPermission = true },
         UtilityGrowth("PickPower", 10, EffectUnit.Percent, "Tools", FunctionalStackPolicy.Add),
         UtilityGrowth("AxePower", 10, EffectUnit.Percent, "Tools", FunctionalStackPolicy.Add),
         UtilityGrowth("BlastRadius", 1, EffectUnit.Flat, "Gathering", FunctionalStackPolicy.Add, FunctionalImplementation.Custom) with { NetworkAuthority = FunctionalAuthority.ServerWorld, RequiresServerPermission = true },
@@ -80,7 +84,7 @@ public static class FunctionalTalentRegistry
     public static bool TryGet(string id, out FunctionalTalent talent) => byId.TryGetValue(id, out talent!);
     public static bool HasChild(string id, string child) => TryGet(id, out var t) && t.ChildEffects.Contains(child);
     public static bool ChildEnabled(ProgressionState state, string id, string child) => HasChild(id, child) &&
-        state.Talents.TryGetValue(id, out var t) && t.Enabled && !t.DisabledEffects.Contains(child);
+        state.Talents.TryGetValue(id, out var t) && NumericTalents.ActiveLevel(state, id) > 0 && !t.DisabledEffects.Contains(child);
     public static string GroupOf(string id) => TryGet(id, out var t) ? t.Group : "Tools";
 }
 

@@ -53,6 +53,7 @@ public static class NumericTalents
         new TalentDefinition("LootQuantity", TalentCategory.Economy, 10, EffectUnit.Percent),
         new TalentDefinition("BagQuantity", TalentCategory.Economy, 10, EffectUnit.Percent),
         new TalentDefinition("DropChance", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new TalentDefinition("BasicBlockYield", TalentCategory.Economy, 10, EffectUnit.Percent, true),
         new TalentDefinition("MiningYield", TalentCategory.Economy, 10, EffectUnit.Percent),
         new TalentDefinition("WoodYield", TalentCategory.Economy, 10, EffectUnit.Percent),
         new TalentDefinition("HerbYield", TalentCategory.Economy, 10, EffectUnit.Percent),
@@ -71,7 +72,7 @@ public static class NumericTalents
     private static readonly Dictionary<string, TalentDefinition> byId = All.ToDictionary(t => t.Id, StringComparer.Ordinal);
     public static bool TryGet(string id, out TalentDefinition talent) => byId.TryGetValue(id, out talent!);
     public static BigInteger ActiveLevel(ProgressionState state, string id) =>
-        state.Talents.TryGetValue(id, out var t) && t.Enabled ? EffectiveLevel(t) : BigInteger.Zero;
+        state.Talents.TryGetValue(id, out var t) && t.Enabled ? TalentLimits.Clamp(id, EffectiveLevel(t)) : BigInteger.Zero;
     public static BigInteger EffectiveLevel(TalentState t) => t.CurrentIntensity is decimal n ? BigInteger.Min(t.TalentLevel, new BigInteger(n)) : t.TalentLevel;
 
 

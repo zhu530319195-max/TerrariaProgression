@@ -10,6 +10,10 @@ Mods: {
   }
 }
     TalentsUI: {
+      RestoreTalentLimits: "Restore default talent level limits"
+      ServerLevels: "Server cap: {0} | Effective level: {1}"
+      UnlimitedLimit: "Unlimited"
+
       ProtectionOn: "Mining protection: ON (click to disable)"
       ProtectionOff: "Mining protection: OFF (click to enable)"
       PowerPoints: "+{0} percentage points"
@@ -143,6 +147,12 @@ Mods: {
   "NoSelection": "No selection"
 }
     TalentNames: {
+      BasicBlockYield: "Basic block yield"
+      HerbGrowth: "Herb growth speed"
+      HammerPower: "Hammer power"
+      AreaWallRemoval: "Area wall removal"
+      AutoReplantTree: "Replant tree saplings"
+
   "MaxLife": "Maximum life",
   "MaxMana": "Maximum mana",
   "Defense": "Defense",
@@ -240,6 +250,12 @@ Mods: {
   "CrateChance": "Crate chance"
 }
     TalentHints: {
+      BasicBlockYield: "Adds 10% yield per level to 30 basic block items, including silt, slush and desert fossils. Natural and player-placed blocks both qualify; one resource multiplier per drop."
+      HerbGrowth: "Adds 20% native herb update speed per level within a fixed 50-tile circular radius through walls. Highest living player bonus wins. Keeps native bloom conditions. Global budget: 4096 extra native herb updates per tick."
+      HammerPower: "Adds 10 percentage points of hammer power per level, only to tools that already have hammer power. Tool destruction efficiency controls speed separately."
+      AreaWallRemoval: "Toggle Alt, then hammer a background wall. Radius +1 per level; Lv1=3x3, Lv10=21x21. Each wall uses native hammer damage and edge conditions. Does not batch slopes or altars. Server work budget applies."
+      AutoReplantTree: "One-time 2 points. Replants a cleared native tree after its job ends, even with Alt off. One acorn for normal/palm trees; matching gemcorn for gem trees. Fresh harvest first, then main inventory. No material or failed planting costs nothing; existing saplings are not replaced."
+
   "MaxLife": "+25 HP per level. Raising the maximum never heals; lowering it only clips current life.",
   "MaxMana": "+20 MP per level. Raising the maximum never restores mana.",
   "Defense": "+4 defense per level, additive with equipment.",
@@ -337,6 +353,8 @@ Mods: {
   "CrateChance": "Original crate-gate failure probability ×0.95 per active level. A 10% gate becomes about 46.1% at Lv.10. Only changes crate eligibility; native rarity, biome, quests, enemies, pond and liquid rules remain. Honey is skipped; lava retains extra selection, so final crate yield can differ. Adjustable."
 }
     Messages: {
+      EffectiveHammerPower: "Hammer power: {0}% -> {1}% with talent"
+
       MiningProtectionOn: "Extra mining protection ON: skips falling blocks, wiring and furniture supports. Current mining job stopped."
       MiningProtectionOff: "Extra mining protection OFF: each tile uses native pick rules. Current mining job stopped."
       EffectivePickPower: "Pickaxe power (talents): {0}% → {1}%"
@@ -357,7 +375,18 @@ Mods: {
       ServerConfigLocked: "Set progression rules before hosting, or edit the dedicated server config and restart."
     }
     Configs: {
+      TalentLevelOverride: {
+        TalentId: { Label: "Talent ID" }
+        Limit: { Label: "Level limit (-1 unlimited, 0 disabled)" }
+      }
       ProgressionConfig: {
+        GlobalTalentLevelLimit: { Label: "Global talent level limit", Tooltip: "-1 unlimited; 0 prevents purchase and effects; positive integer caps levels. Preserves purchased levels and paid costs. Per-talent overrides win." }
+        TalentLevelOverrides: { Label: "Per-talent level overrides", Tooltip: "Add a stable talent ID and limit. -1 unlimited, 0 disabled, positive integer cap. Unlisted talents inherit global; last duplicate wins." }
+        RestoreDefaultTalentLimits: { Label: "Restore default talent limits", Tooltip: "Click then save settings. Only resets global to -1 and clears per-talent overrides." }
+        EnableHerbGrowth: { Label: "Allow herb growth acceleration", Tooltip: "Seven native herbs within 50 tiles of a living player." }
+        EnableAutoReplantTree: { Label: "Allow tree replanting", Tooltip: "Native trees, palms and gem trees; consumes matching seeds." }
+        EnableAreaWallRemoval: { Label: "Allow area wall removal", Tooltip: "Uses native wall conditions and shared work budget." }
+
         DisplayName: Progression rules (server)
         EnableWorldGathering: { Label: "EnableWorldGathering", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
         EnableAreaMining: { Label: "EnableAreaMining", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }

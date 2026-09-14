@@ -2,6 +2,8 @@ using System;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using TerrariaProgression.Core;
 using System.Numerics;
 using Newtonsoft.Json;
 using Terraria;
@@ -31,6 +33,15 @@ public sealed class ProgressionConfig : ModConfig
     public string TalentPointsPerLevel = "1";
     [JsonIgnore] public BigInteger PointsPerLevel => BigInteger.TryParse(TalentPointsPerLevel, NumberStyles.None, CultureInfo.InvariantCulture, out var n) && n >= 0 ? n : BigInteger.One;
 
+    [DefaultValue("-1"), CustomModConfigItem(typeof(TalentLimitInputElement))] public string GlobalTalentLevelLimit = "-1";
+    [CustomModConfigItem(typeof(TalentOverridesElement))]
+    public List<TalentLevelOverride> TalentLevelOverrides = new();
+    [DefaultValue(false), CustomModConfigItem(typeof(RestoreTalentLimitsElement))]
+    public bool RestoreDefaultTalentLimits {
+        get => false;
+        set { if (value) { GlobalTalentLevelLimit = "-1"; TalentLevelOverrides = new(); } }
+    }
+
     [DefaultValue(1000), Range(1, 100000)]
     public int MaxExtraLootRollsPerEvent = 1000;
 
@@ -47,6 +58,9 @@ public sealed class ProgressionConfig : ModConfig
     [DefaultValue(true)] public bool BoostPets = true;
     [DefaultValue(true)] public bool BoostModItems = true;
 
+    [DefaultValue(true)] public bool EnableHerbGrowth = true;
+    [DefaultValue(true)] public bool EnableAutoReplantTree = true;
+    [DefaultValue(true)] public bool EnableAreaWallRemoval = true;
     [DefaultValue(true)] public bool EnableWorldGathering = true;
     [DefaultValue(true)] public bool EnableAreaMining = true;
     [DefaultValue(true)] public bool EnableVeinMining = true;
@@ -62,6 +76,15 @@ public sealed class ProgressionConfig : ModConfig
 
     public override void OnChanged()
     {
+        if (!TalentLimits.TryParse(GlobalTalentLevelLimit, out var limit)) limit = -1;
+        GlobalTalentLevelLimit = limit.ToString(CultureInfo.InvariantCulture);
+        TalentLevelOverrides ??= new();
+        foreach (var entry in TalentLevelOverrides.Where(e => e != null)) {
+            entry.TalentId = (entry.TalentId ?? "").Trim();
+            if (!TalentLimits.TryParse(entry.Limit, out limit)) limit = -1;
+            entry.Limit = limit.ToString(CultureInfo.InvariantCulture);
+        }
+        TalentLimits.Configure(GlobalTalentLevelLimit, TalentLevelOverrides.Where(e => e != null).Select(e => new KeyValuePair<string,string>(e.TalentId,e.Limit)));
         if (!BigInteger.TryParse(TalentPointsPerLevel, NumberStyles.None, CultureInfo.InvariantCulture, out var points) || points < 0)
             TalentPointsPerLevel = "1";
         else TalentPointsPerLevel = points.ToString(CultureInfo.InvariantCulture);
@@ -92,4 +115,11 @@ public sealed class ProtectedTileArea
     [DefaultValue(1), Range(1, int.MaxValue)] public int Width = 1;
     [DefaultValue(1), Range(1, int.MaxValue)] public int Height = 1;
     public bool Contains(int x, int y) => x >= X && y >= Y && (long)x < (long)X + Width && (long)y < (long)Y + Height;
+}
+
+public sealed class TalentLevelOverride
+{
+    [DefaultValue("MaxLife")] public string TalentId = "MaxLife";
+    [DefaultValue("-1")] public string Limit = "-1";
+    public override string ToString() => TalentId + ": " + Limit;
 }

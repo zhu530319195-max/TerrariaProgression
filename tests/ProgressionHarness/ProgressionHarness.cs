@@ -326,6 +326,7 @@ public sealed partial class RuntimeChecks : ModSystem
         try { RunBulkUpgrades(); } catch (Exception e) { p3Errors.Add(e); }
         try { RunFlexibleRange(); } catch (Exception e) { p3Errors.Add(e); }
         try { RunToolPowerBlast(); } catch (Exception e) { p3Errors.Add(e); }
+        try { RunResourcesLimits(); } catch (Exception e) { p3Errors.Add(e); }
         if (p3Errors.Count > 0) throw new AggregateException("P3 verification failed", p3Errors);
     }
     private void RunCopperMining()

@@ -33,6 +33,7 @@ internal sealed class TalentUIState : UIState
     private bool ownedOnly, enabledOnly;
     private ProgressionState? filteredState;
     private string filteredLanguage = "";
+    private int filteredLimits = -1;
     private float lastWidth, lastHeight;
     private TalentButton? resync, search, ownedFilter, enabledFilter, clearSearch;
     internal bool SearchFocused { get; private set; }
@@ -68,12 +69,12 @@ internal sealed class TalentUIState : UIState
         Place(hint,detailCard,0,140,1,0,0); hint.IsWrapped=true;
         actions.Width.Set(0,1); rightArea.Append(actions); AttachList(actions,actionList);
         actionCard.Width.Set(0,1); actionList.Add(actionCard);
-        AddAction(()=>TalentCatalog.TryGet(selected,out var d)?Text(d.MaxLevel==1?"UnlockCost":"UpgradeCost",d.DefaultCost):Text("Upgrade"),
-            ()=>Request(TalentOperation.Upgrade),()=>CanAct && TalentCatalog.TryGet(selected,out var d) && Player.State.AvailableTalentPoints>=d.DefaultCost && (d.MaxLevel==0 || (Player.State.Talents.GetValueOrDefault(selected)?.TalentLevel??0)<d.MaxLevel));
-        foreach (int count in new[] { 10, 100, 300, 1000 })
-            AddAction(() => Text("UpgradeManyCost", count, TalentCatalog.TryGet(selected, out var d) ? Compact((BigInteger)d.DefaultCost * count) : "0"),
-                () => Player.RequestTalent(TalentOperation.Upgrade, selected, category, count),
-                () => CanAct && TalentCatalog.TryGet(selected, out var d) && d.MaxLevel == 0 && Player.State.AvailableTalentPoints >= (BigInteger)d.DefaultCost * count);
+        foreach (int count in new[] { 1, 10, 100, 300, 1000 })
+            AddAction(() => {
+                int actual = TalentLimits.PurchaseCount(Player.State, selected, count);
+                return Text("UpgradeManyCost", actual, TalentCatalog.TryGet(selected, out var d) ? Compact((BigInteger)d.DefaultCost * actual) : "0");
+            }, () => Player.RequestTalent(TalentOperation.Upgrade, selected, category, count),
+                () => CanAct && TalentCatalog.TryGet(selected, out var d) && TalentLimits.PurchaseCount(Player.State, selected, count) is var actual && actual > 0 && Player.State.AvailableTalentPoints >= (BigInteger)d.DefaultCost * actual);
         AddAction(()=>Text(Main.LocalPlayer.GetModPlayer<GatheringPlayer>().ProtectionEnabled?"ProtectionOn":"ProtectionOff"),
             ()=>Main.LocalPlayer.GetModPlayer<GatheringPlayer>().ToggleProtection(),()=>CanAct && selected is "AreaMining" or "VeinMining");
         AddAction(()=>Text("RefundOneAmount",Compact(HasSelected?Player.State.Talents[selected].CostRuns[^1].Cost:0)),()=>Request(TalentOperation.RefundOne),()=>CanAct&&HasSelected);
@@ -165,7 +166,7 @@ internal sealed class TalentUIState : UIState
                 location.Width.Set(0,1);location.Height.Set(20,0);location.MinWidth.Set(0,0);list.Add(location);
             }
         }
-        list.ViewPosition=scroll; filteredState=Player.State; filteredLanguage=Language.ActiveCulture.Name;
+        list.ViewPosition=scroll; filteredState=Player.State; filteredLanguage=Language.ActiveCulture.Name; filteredLimits=TalentLimits.Revision;
     }
     private void AddAction(Func<string> text,Action action,Func<bool> enabled)
     {var b=new TalentButton(text,action,enabled);actionButtons.Add(b);actionCard.Append(b);}
@@ -176,9 +177,9 @@ internal sealed class TalentUIState : UIState
     private static string Xp(BigInteger units) {string value=Experience.Format(units);return value.Length<=12?value:Compact(units/Experience.Scale);}
     private static string Effect(TalentDefinition definition,BigInteger level)
     {
-        if(definition.Id is "PickPower" or "AxePower")return Text("PowerPoints",Compact(level*10));
+        if(definition.Id is "PickPower" or "AxePower" or "HammerPower")return Text("PowerPoints",Compact(level*10));
         if(definition.Id=="BlastRadius")return Text("BlastTiles",Compact(level));
-        if(definition.Id is "AreaMining" or "AreaHarvest")return Text("MiningArea",Compact(level*2+1));
+        if(definition.Id is "AreaMining" or "AreaHarvest" or "AreaWallRemoval")return Text("MiningArea",Compact(level*2+1));
         if(definition.Id=="VeinMining")return Text("MiningCount",Compact(level*25));
         if(definition.Unit==EffectUnit.Flag)return Text(level>0?"On":"Off");
         if(definition.Unit==EffectUnit.RemainingMultiplier)return Text(definition.Id=="CrateChance"?"CrateRemaining":definition.Id=="BaitSaving"?"BaitRemaining":"Remaining",(100*TalentMath.Remaining((double)definition.PerLevel,level)).ToString("0.##",CultureInfo.InvariantCulture));
@@ -257,7 +258,7 @@ internal sealed class TalentUIState : UIState
                 if(Main.keyState.IsKeyDown(Keys.Enter)||Main.keyState.IsKeyDown(Keys.Escape)){EndSearch();base.Update(gameTime);return;}
             }
         }
-        if (!ReferenceEquals(filteredState,Player.State) || filteredLanguage!=Language.ActiveCulture.Name) RefreshTalents();
+        if (!ReferenceEquals(filteredState,Player.State) || filteredLanguage!=Language.ActiveCulture.Name || filteredLimits!=TalentLimits.Revision) RefreshTalents();
         var location=TalentNavigation.Find(selected);
         pathLabel.SetText(query.Trim().Length>0?Text("GlobalResults",query):Text("Menu"+menuCategory)+" / "+(menuGroup.Length>0?Text("MenuGroup"+menuGroup):Text("AllInCategory")));
         if (Main.keyState.IsKeyDown(Keys.Escape) && !Main.oldKeyState.IsKeyDown(Keys.Escape)) {
@@ -285,8 +286,8 @@ internal sealed class TalentUIState : UIState
             if (definition.MaxLevel == 1) detail.SetText(Text("UnlockDetail", Text(level > 0 ? "Unlocked" : "Locked"),
                 Text(owned?.Enabled == true ? "On" : "Off"), definition.DefaultCost, Compact(owned?.InvestedPoints ?? 0)));
             else detail.SetText(Text("Detail", Compact(level), owned?.Enabled == false ? Text("Off") : level > 0 ? Text("On") : Text("Unlearned"),
-                Effect(definition, NumericTalents.ActiveLevel(s, selected)), Effect(definition, level + 1), definition.DefaultCost, Compact(owned?.InvestedPoints ?? 0)));
-            hint.SetText(Language.GetTextValue("Mods.TerrariaProgression.TalentHints." + selected) +
+                Effect(definition, NumericTalents.ActiveLevel(s, selected)), Effect(definition, TalentLimits.Clamp(selected, level + 1)), definition.DefaultCost, Compact(owned?.InvestedPoints ?? 0)));
+            hint.SetText("ID: " + selected + "\n" + Text("ServerLevels", TalentLimits.Cap(selected) < 0 ? Text("UnlimitedLimit") : Compact(TalentLimits.Cap(selected)), Compact(NumericTalents.ActiveLevel(s, selected))) + "\n" + Language.GetTextValue("Mods.TerrariaProgression.TalentHints." + selected) +
                 (definition.Adjustable ? "\n" + Text("Intensity", Compact(owned == null ? 0 : NumericTalents.EffectiveLevel(owned))) : ""));
         }
         else { title.SetText(Text("NoResults")); detail.SetText(Text("NoResultsHint")); hint.SetText(""); }
