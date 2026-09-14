@@ -91,11 +91,11 @@ public sealed partial class RuntimeChecks
         Check(Items(ItemID.StoneBlock)==2,"server alone creates each real drop");Put(0,0,TileID.Stone);Advance();
         Packet(A.SessionId,4,x,0);Check(Has(0,0),"replayed accepted request cannot break a replacement tile");
         // Native tree frames: hit the middle and finish the lower stump too.
-        Init();Buy("TreeFelling");Buy("WoodYield",10);A.Player.inventory[0]=new Item(ItemID.PickaxeAxe);
+        Init();Buy("TreeFelling");Buy("WoodYield",10);A.Player.inventory[0]=new Item(ItemID.PickaxeAxe);A.Player.HeldItem.axe=100; // Native bonusWood is then deterministic (two wood per tile).
         for(int dx=0;dx<=3;dx+=3){Put(dx,5,TileID.Grass);for(int dy=-4;dy<=4;dy++)Put(dx,dy,TileID.Trees);}
         for(int n=0;n<10&&Has(0,0);n++)Request(GatheringMode.Tree);Drain();
         Check(Enumerable.Range(-4,9).All(dy=>!Has(0,dy))&&Enumerable.Range(-4,9).All(dy=>Has(3,dy)),"one tree including lower stump cleared, adjacent same-type tree preserved");
-        Check(Items(ItemID.Wood)==18,"nine tree tiles use existing doubled wood yield once");
+        Check(Items(ItemID.Wood)==36,"nine native two-wood drops receive talent x2 once; actual="+Items(ItemID.Wood));
         Init();Buy("TreeFelling");Put(0,5,TileID.Grass);for(int dy=-4;dy<=4;dy++)Put(0,dy,TileID.Trees);
         Config.MaxBlocksPerAction=3;Check(!Request(GatheringMode.Tree)&&Has(0,0),"over-budget whole tree is refused intact");
         Config.MaxBlocksPerAction=1000;Config.ProtectedTileAreas.Add(new ProtectedTileArea{X=x,Y=y-4,Width=1,Height=1});
