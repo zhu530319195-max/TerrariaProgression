@@ -119,13 +119,19 @@ public sealed class GatheringSystem : ModSystem
         // Do not read Player.tileRangeX/Y: they are static, reset per local player.
         // Use the native base plus this server-confirmed character's reach contribution.
         int bonus = (int)BigInteger.Min(ExtendedTalentPlayer.Level(p, "ToolReach"), Math.Max(Main.maxTilesX, Main.maxTilesY));
-        int reach = p.HeldItem.tileBoost + p.blockRange + bonus;
-        return pos.X >= (int)(p.position.X / 16) - 5 - reach && pos.X <= (int)((p.position.X + p.width) / 16) + 5 + reach
-            && pos.Y >= (int)(p.position.Y / 16) - 4 - reach && pos.Y <= (int)((p.position.Y + p.height) / 16) + 4 + reach;
+        int rx = 5 + bonus, ry = 4 + bonus;
+        if (p.equippedAnyTileRangeAcc) { rx += 3; ry += 2; }
+        if (Main.netMode == NetmodeID.SinglePlayer && p.whoAmI == Main.myPlayer) {
+            rx = Player.tileRangeX; ry = Player.tileRangeY;
+        }
+        return p.position.X / 16f - rx - p.HeldItem.tileBoost <= pos.X
+            && (p.position.X + p.width) / 16f + rx + p.HeldItem.tileBoost - 1 >= pos.X
+            && p.position.Y / 16f - ry - p.HeldItem.tileBoost <= pos.Y
+            && (p.position.Y + p.height) / 16f + ry + p.HeldItem.tileBoost - 2 >= pos.Y;
     }
     internal static bool Request(Player p, GatheringMode mode, int x, int y, Guid session, ulong revision, uint seq, int slot, int itemType)
     {
-        if (Main.netMode == NetmodeID.MultiplayerClient || !Enum.IsDefined(mode) || !p.active || p.dead || p.CCed || p.noItems) return false;
+        if (Main.netMode == NetmodeID.MultiplayerClient || !Enum.IsDefined(mode) || !p.active || p.dead || p.CCed || p.noItems || p.noBuilding) return false;
         var state = p.GetModPlayer<ProgressionPlayer>();
         if (!state.SessionReady || session != state.SessionId || revision != state.TalentRevision || seq == 0
             || slot != p.selectedItem || itemType != p.HeldItem.type) return false;
@@ -247,7 +253,7 @@ public sealed class GatheringSystem : ModSystem
         public bool Step()
         {
             Player p = Main.player[owner]; var state = p.GetModPlayer<ProgressionPlayer>();
-            if (!p.active || p.dead || p.CCed || p.noItems || !state.SessionReady || state.SessionId != session || state.TalentRevision != revision
+            if (!p.active || p.dead || p.CCed || p.noItems || p.noBuilding || !state.SessionReady || state.SessionId != session || state.TalentRevision != revision
                 || p.selectedItem != slot || p.HeldItem.type != itemType || !Enabled(mode) || !InReach(p, origin)) return false;
             Limit = Math.Min(Limit, GatheringRules.Limit(mode, level, Config.MaxBlocksPerAction, (long)Main.maxTilesX * Main.maxTilesY));
             if (Removed >= Limit) { Notice(p, "GatheringLimit"); return false; }

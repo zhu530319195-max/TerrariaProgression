@@ -22,7 +22,7 @@ public sealed class FlexibleRangeProjectile : GlobalProjectile
         ref float maxForcedRetractSpeed, ref int ricochetTimeLimit, ref float spinVisualDistance)
     {
         if (!Flail(p)) return;
-        float speed = Math.Max(.01f, Main.player[p.owner].GetAttackSpeed(DamageClass.Melee));
+        float speed = Math.Max(.01f, Main.player[p.owner].GetTotalAttackSpeed(DamageClass.Melee));
         // Native AI kills a flail more than 900 px from its owner. Saturate only
         // the engine output, leaving levels and paid costs intact.
         float f = flailFactor = Math.Max(1, Math.Min(Factor(p), 800 / Math.Max(spinVisualDistance, launchSpeed * (launchTimeLimit + 2) * speed)));
