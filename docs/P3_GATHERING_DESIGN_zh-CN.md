@@ -50,7 +50,9 @@
 
 功能代码提交 `d475f70e8a6defe9bd845884dbdb3290abd4bc0e` 已通过[分支CI 34825975807](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34825975807)和[PR CI 34825980551](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34825980551)：3150项核心、651项原生检查通过，生产与测试MOD编译均为零警告、零错误。
 
-[PR #13](https://github.com/zhu530319195-max/TerrariaProgression/pull/13)等待玩家实机验收，未合并。本次后续提交只补充文档，功能代码与上述检查一致。最终交付包绑定提交和校验值以包内BUILD_INFO及PR记录为准。
+2026-09-14：用户确认0.10.0本批验收通过，并明确授权合并[PR #13](https://github.com/zhu530319195-max/TerrariaProgression/pull/13)。验收包提交 `95e55b29156bad921e77d4d3bef1f1c701d9f359`；本次只更新验收文档，功能代码与验收包一致。合并提交以PR记录为准。
+
+验收提交已通过[分支CI 34826265788](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34826265788)和[PR CI 34826269107](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34826269107)：3150项核心、651项原生检查通过，生产与测试MOD编译均为零警告、零错误。
 
 验证覆盖：首格原生镐力累计、3×3及同种8方向连矿、草皮转泥土后的继续挖掘、单次与分帧预算、箱子／支撑／电线／保护矩形、关闭／退款／换工具取消、服务器会话与槽位／距离／重放检查、同树与邻树区分、实际生成树冠／树枝和棕榈沙地、正常木材和棕榈木产量只增强一次、三种原版鞭子的可见控制点和命中、四种链锤的旋转／甩出／回收与锤头尺寸，以及已有天赋回归。
 

@@ -179,10 +179,20 @@ Include MAINT-01 actual report version and MAINT-02 known mappings in the same i
 
 用户确认五项P3天赋分两批，确认鞭子、链锤沿用现有MeleeRange补全，随后明确开始开发P3采集基础＋攻击范围补全。规则见`docs/P3_GATHERING_DESIGN_zh-CN.md`，取代旧P3待定记录。第一批P3-01～04及RANGE-01／02合一交付；第二批收割／补种未实现。不自动合并新PR。
 
-## D051 — 0.10.0自动验证与交付边界
+## D051 — 0.10.0自动验证与交付边界（历史；验收结果见D052）
 
 功能代码提交 `d475f70e8a6defe9bd845884dbdb3290abd4bc0e` 已通过[分支CI 34825975807](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34825975807)和[PR CI 34825980551](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34825980551)：3150项核心、651项原生检查通过，生产与测试MOD编译均为零警告、零错误。
 
 [PR #13](https://github.com/zhu530319195-max/TerrariaProgression/pull/13)等待玩家实机验收，未合并。本次后续提交只补充文档，功能代码与上述检查一致。最终交付包绑定提交和校验值以包内BUILD_INFO及PR记录为准。
 
 公共保护、三项P3采集与鞭子／链锤修复的自动检查通过，不自动视为玩家实机验收；不合并PR #13。旧未验收／未完成／暂缓事项保持独立状态。
+
+## D052 — 0.10.0验收与PR #13合并授权
+
+2026-09-14：用户确认0.10.0本批验收通过，并明确授权合并[PR #13](https://github.com/zhu530319195-max/TerrariaProgression/pull/13)。验收包提交 `95e55b29156bad921e77d4d3bef1f1c701d9f359`；本次只更新验收文档，功能代码与验收包一致。合并提交以PR记录为准。
+
+验收提交已通过[分支CI 34826265788](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34826265788)和[PR CI 34826269107](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34826269107)：3150项核心、651项原生检查通过，生产与测试MOD编译均为零警告、零错误。
+
+本次验收覆盖P3-01～04公共保护与控制、范围挖矿、矿脉连锁、一键伐木，以及RANGE-01／02原版鞭子和链锤攻击范围补全。90项天赋，存档v3、协议12。此前PR #13待验收／不得合并的记录由本次明确授权覆盖。
+
+范围收割和自动补种留待下一批，尚未开发。药水病缩短、原有钓鱼产量、真实多人、特殊／多阶段Boss、多人独立掉落增产和分层暴击继续保留各自未验收、未完成或暂缓状态，不随本批验收自动通过。本授权不包含下一批开发或其他新PR合并。
