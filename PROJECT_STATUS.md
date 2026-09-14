@@ -1,3 +1,15 @@
+## 0.12.1 实机验收通过，PR #15 获准合并
+
+2026-09-14：用户确认“测试通过，可以合并”，本批实机验收通过并明确授权合并 [PR #15](https://github.com/zhu530319195-max/TerrariaProgression/pull/15)。实际合并结果和 main 提交以 GitHub PR 记录为准。本记录覆盖下文历史“待复验／未获合并授权”措辞。
+
+验收包提交 `5b2da240778ce47e68cd7bc64a34e11dabaed7a2`；功能提交 `03e66a42a5f4512e7ff2a5ef9f0c9c7fbaac08bc`。[最终分支 CI 34861970946](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34861970946) 和 [PR CI 34861975091](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34861975091) 均成功：3240 项核心、1103 项原生检查，正式及测试 MOD 编译零警告、零错误。本次仅追加 Markdown 验收记录，功能代码与验收包一致，复用以上有效证据。
+
+本批包括镐力／斧力增强、即时原版整圆地形爆破（背景墙沿用原版条件）、默认快捷键修复，以及默认关闭、可用 K／面板切换的额外挖矿保护。版本 0.12.1，共 95 项天赋，存档 v3、联机协议 16。MOD SHA256：`4b6fa3adf99ac7783bd550961adc7865520a53462f4c5ace4146841247f0a822`。
+
+药水病缩短、原有钓鱼产量仍未实机验收；真实多人暂缓实测；特殊／多阶段 Boss 适配与实机覆盖、多人独立掉落增产／按玩家额外抽取尚未完成；分层暴击暂缓；特殊斧头自动种树等附带行为仍未适配。取消事项和第三方兼容边界保持原决定。
+
+下一步仅讨论资源获取天赋的现有覆盖与缺口；本次不授权开发新天赋。
+
 ## 0.12.1 修订：即时原版爆破与可选挖矿保护
 
 功能提交`03e66a42a5f4512e7ff2a5ef9f0c9c7fbaac08bc`已通过[分支CI 34861643567](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34861643567)及[PR CI 34861649597](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34861649597)：3240项核心、1103项原生检查，正式及测试MOD编译零警告、零错误。此后的验证文档提交不改变功能代码；玩家实机待复验。
