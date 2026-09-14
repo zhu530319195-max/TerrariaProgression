@@ -101,6 +101,16 @@ public sealed partial class RuntimeChecks
         Config.MaxBlocksPerAction=1000;Config.ProtectedTileAreas.Add(new ProtectedTileArea{X=x,Y=y-4,Width=1,Height=1});
         Check(!Request(GatheringMode.Tree)&&Has(0,0),"protected crown refuses whole tree before starting");
         Init();Buy("TreeFelling");Put(0,0,TileID.WoodBlock);Check(!Request(GatheringMode.Tree)&&Has(0,0),"tree mode cannot fell wooden construction");
+        foreach(bool palm in new[]{false,true}) {
+            Init();Buy("TreeFelling");
+            for(int dx=-3;dx<=3;dx++)Put(dx,5,palm?TileID.Sand:TileID.Grass);
+            bool grew=palm?WorldGen.GrowPalmTree(x,y+5):WorldGen.GrowTree(x,y+5);
+            Check(grew,"actual native tree generation succeeds: palm="+palm);
+            int TreeTiles()=>Enumerable.Range(-3,7).Sum(dx=>Enumerable.Range(-20,25).Count(dy=>Has(dx,dy)&&GatheringSystem.NativeTree(Main.tile[x+dx,y+dy].TileType)));
+            Check(TreeTiles()>=5,"generated tree has native trunk and crown frames");
+            for(int n=0;n<10&&Has(0,2);n++)Request(GatheringMode.Tree,0,2);Drain();
+            Check(TreeTiles()==0&&Has(0,5),"generated whole tree including branches is cleared, ground preserved: palm="+palm);
+        }
         GatheringSystem.Clear();Config.ProtectedTileAreas.Clear();Config.MaxBlocksPerAction=1000;Config.GatheringWorkPerTick=32;
         Main.netMode=NetmodeID.SinglePlayer;
     }
@@ -113,12 +123,12 @@ public sealed partial class RuntimeChecks
         foreach(int itemType in new[]{ItemID.BlandWhip,ItemID.FireWhip,ItemID.RainbowWhip}) {
             p.inventory[0]=new Item(itemType);p.selectedItem=0;p.itemAnimationMax=p.itemAnimation=p.HeldItem.useAnimation;
             int index=Projectile.NewProjectile(p.GetSource_ItemUse(p.HeldItem),p.Center,new Vector2(4,0),p.HeldItem.shoot,20,0,p.whoAmI);
-            var q=Main.projectile[index];q.ai[0]=p.itemAnimationMax*.5f;q.spriteDirection=1;
+            var q=Main.projectile[index];q.ai[0]=p.itemAnimationMax*q.MaxUpdates*.6f;q.spriteDirection=1;
             var native=new List<Vector2>();var enlarged=new List<Vector2>();
             A.State.Talents["MeleeRange"].Enabled=false;Projectile.FillWhipControlPoints(q,native);
             A.State.Talents["MeleeRange"].Enabled=true;Projectile.FillWhipControlPoints(q,enlarged);
             Vector2 origin=native[0];
-            Check(native.Max(v=>Vector2.Distance(v,origin))>50,"native whip fixture has a real nonzero reach: "+itemType);
+            Check(native.Max(v=>Vector2.Distance(v,origin))>50,"native whip fixture has extended reach: "+itemType+", radius="+native.Max(v=>Vector2.Distance(v,origin)));
             Check(native.Count==enlarged.Count&&native.Zip(enlarged).All(pair=>Vector2.Distance(origin+(pair.First-origin)*2,pair.Second)<.1f),"native whip visible and collision control points double: "+itemType);
             var far=enlarged.MaxBy(v=>Vector2.DistanceSquared(v,origin));var target=new Rectangle((int)far.X-2,(int)far.Y-2,4,4);
             Check(q.Colliding(q.Hitbox,target),"enlarged whip reaches actual native collision target: "+itemType);

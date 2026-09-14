@@ -90,7 +90,7 @@ public sealed class GatheringSystem : ModSystem
             if (dx == 0 && dy == 0) continue;
             var n = Main.tile[x + dx, y + dy];
             if (!n.HasTile) continue;
-            if (TileID.Sets.Falling[n.TileType]) return false;
+            if (dy < 0 && TileID.Sets.Falling[n.TileType]) return false;
             if (Main.tileFrameImportant[n.TileType] && !(mode == GatheringMode.Tree && NativeTree(n.TileType))) return false;
         }
         return WorldGen.CanKillTile(x, y);
