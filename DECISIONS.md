@@ -153,3 +153,13 @@ User explicitly approved the complete proposal after step-one discussion. NEXT-0
 Valid weapon and owned-projectile hits including summons always attempt application, respecting native enemy immunity and coexistence/replacement. Same-status hits refresh rather than accumulate duration or damage instances. Track each valid talent source and its duration; same-status multiplayer extra damage uses the strongest valid source rather than summing/multiplying, weak effects cannot overwrite strong ones, and current enabled intensity controls ongoing extra damage. Disabling/refunding removes that source's extra bonus without clearing the native status. No amplification of weapon-native/environment/unknown-mod statuses, no crit or recursive hit-effect triggers from DoT, and existing kill XP/loot settlement is retained. See docs/P2_AFFLICTIONS_DESIGN_zh-CN.md for the full accepted specification.
 
 Include MAINT-01 actual report version and MAINT-02 known mappings in the same implementation batch. Automatic mana potions, damage reduction and other attack effects remain outside this batch. Consolidated plan: step1 rules (complete), step2 one P2 implementation PR/package, step3 shared world protections plus area mining/vein chaining/tree felling, step4 harvesting/replanting. P3 details require later per-batch decisions. This turn finalizes documentation only; no new gameplay has shipped and PR #11 has not been authorized for merge. D047 supersedes earlier tentative D042/D046 defaults and optional-fishing status, without changing historical acceptance exceptions.
+
+
+## D048 — 0.9.0原生适配与开发记录（2026-09-14）
+
+- 按用户开发授权落实D047，六项天赋整批交付；功能分支基于PR #11已批准规则文档，不执行任何PR合并。
+- 固定原生NPC基础DoT：燃烧4、中毒6、霜冻8、诅咒焰24、毒液30 HP/s；灵液0 DoT。额外伤害按各自原生量的20%×当前强度相加到lifeRegen，不乘整条lifeRegen；涂油等其他效果不倍增。
+- 单人使用有效命中回调；多人复用已存在的服务器原生StrikeNPC确认链，来源由服务器记录，不新增客户端自报异常来源消息。NPC额外AI同步只传服务器选出的伤害率，协议升11，存档v3不变。
+- GetFishingLevel在固定版本实际收到的是环境倍率；渔力改加Player.fishingSkill，保留原版后续倍率。
+- 极端等级只对引擎输出饱和：基础渔力贡献结果最高1,000,000；额外lifeRegen扣减最高120,000,000，并提高原生批量飘字单位以限制内部循环。等级／实际投入仍无限且完整保存，不把饱和上限当等级上限。
+- 自动运行及玩家实机验收分开记录；不得自动通过此前药水病、原有钓鱼产量、真实多人和特殊Boss事项。

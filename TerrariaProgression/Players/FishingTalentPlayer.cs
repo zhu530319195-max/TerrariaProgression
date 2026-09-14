@@ -8,6 +8,15 @@ namespace TerrariaProgression.Players;
 
 public sealed class FishingTalentPlayer : ModPlayer
 {
+    public override void UpdateEquips()
+    {
+        var level = ExtendedTalentPlayer.Level(Player, "FishingPower");
+        if (level <= 0) return;
+        // GetFishingLevel receives an environment MULTIPLIER in the pinned native
+        // build. Add to equipment power here instead; native weather/time still apply.
+        Player.fishingSkill = (int)System.Numerics.BigInteger.Min(1_000_000,
+            (System.Numerics.BigInteger)Player.fishingSkill + 5 * level);
+    }
     internal bool? ConserveBait()
     {
         if (Main.netMode == NetmodeID.Server || Player.whoAmI != Main.myPlayer) return null;

@@ -319,6 +319,7 @@ public sealed partial class RuntimeChecks : ModSystem
         RunP2Completion();
         RunP2MenuFishing();
         RunMenuLifecycle();
+        RunP2Afflictions();
     }
     private void RunCopperMining()
     {

@@ -166,5 +166,7 @@ public sealed class EncounterSystem : ModSystem
         lifetimes.Clear();
         groups.Clear();
         StrikeObserver.Clear();
+        AfflictionNpc.ResetWorld();
     }
 }
+

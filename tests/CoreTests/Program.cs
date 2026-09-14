@@ -92,7 +92,7 @@ Check(state.Invest("MaxLife", 1, BigInteger.Pow(10, 30)), "unlimited compressed 
 Check(state.Talents["MaxLife"].CostRuns.Count == 1 && StateCodec.Encode(state).Length < 512, "huge same-price levels fit a compact snapshot");
 copy = StateCodec.Decode(StateCodec.Encode(state));
 Check(copy.RefundOne("MaxLife") == 1 && copy.RefundAll("MaxLife") == BigInteger.Pow(10, 30) - 1, "constant-time huge refunds preserve exact costs");
-Check(NumericTalents.All.Count == 49 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "49 implemented unlimited numeric talents registered");
+Check(NumericTalents.All.Count == 51 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "51 implemented unlimited numeric talents registered");
 state = new(); state.Award(1000 * scale, 50000);
 var result = TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 1, out copy);
 Check(result == TalentResult.Success && copy.AvailableTalentPoints == 2 && state.AvailableTalentPoints == 3, "transaction copy commits without mutating original");
@@ -281,7 +281,7 @@ Console.WriteLine($"Final P2-Completion core checks passed: {checks}");
 
 // 0.8.0 navigation membership and atomic new-scope refunds, independent of old enums.
 var menuIds=TalentNavigation.Groups.SelectMany(g=>g.TalentIds).ToArray();
-Check(menuIds.Length==81 && menuIds.Distinct().Count()==81 && menuIds.Order().SequenceEqual(TalentCatalog.All.Select(t=>t.Id).Order()),"all 81 implemented talents appear once in the menu");
+Check(menuIds.Length==87 && menuIds.Distinct().Count()==87 && menuIds.Order().SequenceEqual(TalentCatalog.All.Select(t=>t.Id).Order()),"all 87 implemented talents appear once in the menu");
 Check(TalentNavigation.Categories.Count==6 && TalentNavigation.Groups.All(g=>g.TalentIds.Count>0&&TalentNavigation.Categories.Contains(g.CategoryId)),"six populated categories and no empty or orphan groups");
 Check(!menuIds.Contains("AutoJump")&&!menuIds.Contains("JumpHeight"),"cancelled jumps absent from navigation");
 state=new();state.Award(100000000*scale,50000);
@@ -292,12 +292,12 @@ foreach(var scope in TalentNavigation.Categories) {
     var amount=TalentNavigation.RefundAmount(state,scope,false);
     Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuCategory,scope,TalentCategory.BaseStats,1,out copy)==TalentResult.Success,"new category refund accepted: "+scope);
     Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.TotalSpentTalentPoints==state.TotalSpentTalentPoints-amount,"category refund uses historical costs: "+scope);
-    Check(copy.Talents.Keys.All(id=>!TalentNavigation.InScope(id,scope,false)) && copy.Talents.Count==81-menuIds.Count(id=>TalentNavigation.InScope(id,scope,false)),"category refund exact membership: "+scope);
+    Check(copy.Talents.Keys.All(id=>!TalentNavigation.InScope(id,scope,false)) && copy.Talents.Count==87-menuIds.Count(id=>TalentNavigation.InScope(id,scope,false)),"category refund exact membership: "+scope);
 }
 foreach(var g in TalentNavigation.Groups) {
     var amount=TalentNavigation.RefundAmount(state,g.Id,true);
     Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuGroup,g.Id,TalentCategory.Economy,1,out copy)==TalentResult.Success,"new subgroup refund accepted: "+g.Id);
-    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.Talents.Count==81-g.TalentIds.Count,"subgroup exact historical refund: "+g.Id);
+    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.Talents.Count==87-g.TalentIds.Count,"subgroup exact historical refund: "+g.Id);
     Check(copy.Talents.Keys.All(id=>!g.TalentIds.Contains(id)) && snapshot.SequenceEqual(StateCodec.Encode(state)),"refund leaves source and other groups intact: "+g.Id);
 }
 foreach(var invalid in new[]{"","NotAGroup","AutoJump","../../Survival"}) {
@@ -331,3 +331,39 @@ foreach(string id in new[]{"BaitSaving","CrateChance"}) {
 Check(Math.Abs(1-.9*TalentMath.Remaining(.95,10)-.4611367547)<1e-9,"10 percent native crate gate becomes 46.11367547 percent");
 Check(TalentMath.Remaining(.93,BigInteger.Pow(10,80))==0&&TalentMath.Remaining(.95,0)==1,"extreme and zero fishing levels are bounded without loops");
 Console.WriteLine($"Final P2-MenuFishing core checks passed: {checks}");
+
+// Approved P2 afflictions: new state entries use the existing paid-cost ledger.
+foreach (string id in new[]{"AfflictionDamage","AttackFrostburn","AttackCursedInferno","AttackVenom","AttackIchor","FishingPower"}) {
+    Check(TalentCatalog.TryGet(id,out var def) && def.Adjustable && def.MaxLevel==0 && def.DefaultCost==1,"new unlimited adjustable entry: "+id);
+    state=new();state.Award(1000000*scale,50000);
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,id,TalentCategory.Combat,10,out copy)==TalentResult.Success,"new purchase ten: "+id);
+    Check(copy.TotalSpentTalentPoints==10 && NumericTalents.ActiveLevel(copy,id)==10,"new exact cost and active level: "+id);
+    TalentCatalog.Apply(copy,TalentOperation.DecreaseIntensity,id,TalentCategory.Combat,7,out state);
+    var restored=StateCodec.Decode(StateCodec.Encode(state));
+    Check(NumericTalents.ActiveLevel(restored,id)==3 && restored.TotalSpentTalentPoints==10,"new intensity survives codec: "+id);
+    TalentCatalog.Apply(restored,TalentOperation.Disable,id,TalentCategory.Combat,1,out state);
+    Check(NumericTalents.ActiveLevel(state,id)==0 && state.TotalSpentTalentPoints==10,"new disable retains paid points: "+id);
+    Check(state.RefundAll(id)==10,"new refund returns actual paid cost: "+id);
+}
+var leases=new AfflictionSources();var sessionA=Guid.NewGuid();var sessionB=Guid.NewGuid();
+BigInteger strengthA=10,strengthB=3;bool connectedA=true;
+BigInteger? Strength(int p,Guid session)=>p==0&&session==sessionA&&connectedA?strengthA:p==1&&session==sessionB?strengthB:null;
+leases.Apply(0,0,sessionA,100,120);leases.Apply(0,1,sessionB,100,1200);
+Check(leases.Highest(0,100,true,Strength)==10,"same-status leases select highest instead of adding");
+Check(leases.Highest(1,100,true,Strength)==0,"different status cannot borrow another lease");
+strengthA=1;Check(leases.Highest(0,101,true,Strength)==3,"live intensity reduction selects another source");
+strengthA=10;Check(leases.Highest(0,102,true,Strength)==10,"live restored intensity remains within lease");
+strengthA=0;Check(leases.Highest(0,103,true,Strength)==3,"disabled boost leaves other source active");
+strengthA=10;Check(leases.Highest(0,219,true,Strength)==10 && leases.Highest(0,220,true,Strength)==3,"strong lease expires at its own tick and falls back");
+Check(leases.Highest(0,1300,true,Strength)==0,"longer unrelated native debuff cannot prolong expired sources");
+leases.Apply(0,0,sessionA,1400,1200);leases.Apply(0,0,sessionA,1401,120);
+Check(leases.Highest(0,2599,true,Strength)==10 && leases.Highest(0,2600,true,Strength)==0,"same-source refresh max never adds or shortens");
+leases.Apply(0,0,sessionA,2700,1200);Check(leases.Highest(0,2701,false,Strength)==0,"native removal discards lease");
+Check(leases.Highest(0,2702,true,Strength)==0,"new weapon status cannot reactivate removed talent lease");
+leases.Apply(0,0,sessionA,2800,1200);connectedA=false;Check(leases.Highest(0,2801,true,Strength)==0,"disconnection discards source");
+connectedA=true;Check(leases.Highest(0,2802,true,Strength)==0,"reconnect cannot reactivate old source");
+leases.Apply(0,0,sessionA,2900,1200);sessionA=Guid.NewGuid();Check(leases.Highest(0,2901,true,Strength)==0,"recycled player slot cannot inherit old session source");
+leases.Apply(0,0,sessionA,3000,120);leases.Clear();Check(leases.Highest(0,3001,true,Strength)==0,"world or NPC lifecycle reset clears transient leases");
+leases.Apply(0,0,sessionA,ulong.MaxValue-100,1200);Check(leases.Highest(0,ulong.MaxValue-1,true,Strength)==10,"expiry addition saturates without wrapping");
+Check(NumericTalents.TryGet("AfflictionDamage",out var boostDefinition)&&boostDefinition.PerLevel==20 && NumericTalents.TryGet("FishingPower",out var fishingDefinition)&&fishingDefinition.PerLevel==5,"approved twenty-percent damage and five fishing power values");
+Console.WriteLine($"Final P2-Afflictions core checks passed: {checks}");

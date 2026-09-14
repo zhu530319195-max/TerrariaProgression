@@ -49,6 +49,8 @@ public sealed class StrikeObserver : ModSystem
         int lost = Math.Max(0, captured.BeforeLife - Math.Max(0, captured.HealthOwner.life));
         int effective = Math.Min(lost, captured.InstantKill ? captured.BeforeLife : captured.Damage);
         EncounterSystem.ReportAttributedDamage(npc, Main.player[captured.Sender], effective);
+        AfflictionNpc.ApplyHit(npc, Main.player[captured.Sender], effective);
     }
     public override void PostUpdateEverything() => Clear();
 }
+
