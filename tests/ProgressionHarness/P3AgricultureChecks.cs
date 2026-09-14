@@ -37,7 +37,7 @@ public sealed partial class RuntimeChecks
         void Buy(string id,int n=1)=>Check(A.ApplyTalent(TalentOperation.Upgrade,id,TalentCategory.Utility,n)==TalentResult.Success,"agriculture purchase: "+id);
         void Put(int dx,int dy,ushort type) {var t=Main.tile[x+dx,y+dy];t.ClearEverything();t.HasTile=true;t.TileType=type;}
         void Herb(int dx,int dy,int style,ushort stage=TileID.BloomingHerbs,ushort soil=TileID.PlanterBox) {
-            Put(dx,dy+1,soil);Put(dx,dy,stage);var t=Main.tile[x+dx,y+dy];t.TileFrameX=(short)(18*style);
+            Put(dx,dy+2,TileID.Stone);Put(dx,dy+1,soil);Put(dx,dy,stage);var t=Main.tile[x+dx,y+dy];t.TileFrameX=(short)(18*style);
         }
         bool Has(int dx,int dy)=>Main.tile[x+dx,y+dy].HasTile;
         bool Seedling(int dx,int dy,int style)=>Has(dx,dy)&&Main.tile[x+dx,y+dy].TileType==TileID.ImmatureHerbs&&Main.tile[x+dx,y+dy].TileFrameX==style*18;
@@ -74,7 +74,7 @@ public sealed partial class RuntimeChecks
             } else Herb(0,0,style,TileID.BloomingHerbs,container==0?soils[style]:TileID.PlanterBox);
             int seed=AgricultureSystem.Seed(style);A.Player.inventory[1]=new Item(seed,5);
             Check(Request(),"native supported harvest: species/container "+style+"/"+container);Drain();
-            Check(Seedling(0,0,style)&&Has(0,1),"same species replanted preserving support: "+style+"/"+container);
+            Check(Seedling(0,0,style)&&Has(0,1),"same species replanted preserving support: "+style+"/"+container+", tile="+Main.tile[x,y].TileType+", active="+Has(0,0)+", support="+Has(0,1));
             Check(A.Player.inventory[1].stack==5,"newly harvested seed is preferred to inventory");
             int remaining=Items(seed);Check(remaining>=1&&remaining<=5&&remaining%2==1,"native 1-3 seeds doubled once, then exactly one consumed");
             int herb=style==6?ItemID.Shiverthorn:ItemID.Daybloom+style;
