@@ -104,7 +104,7 @@ Check(state.Talents["MaxLife"].TalentLevel == 2 && !state.Talents["MaxLife"].Ena
 Check(TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxMana", TalentCategory.BaseStats, 2, out copy) == TalentResult.NotEnoughPoints && ReferenceEquals(state,copy), "insufficient batch purchase atomic");
 Check(TalentCatalog.Apply(state, TalentOperation.Upgrade, "Unknown", TalentCategory.BaseStats, 1, out _) == TalentResult.UnknownTalent, "unknown talent rejected");
 Check(TalentCatalog.Apply(state, (TalentOperation)99, "MaxLife", TalentCategory.BaseStats, 1, out _) == TalentResult.InvalidRequest, "invalid operation rejected");
-Check(TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 101, out _) == TalentResult.InvalidRequest, "unbounded request rejected");
+Check(TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 1001, out _) == TalentResult.InvalidRequest, "unbounded request rejected");
 Check(!TalentCatalog.ValidateImported(new ProgressionState { Talents = { ["Unknown"] = new TalentState() } }), "unregistered imported talent rejected");
 state = new(); state.Award(1000000 * scale, 50000);
 for (int i = 0; i < 500; i++) {
@@ -281,7 +281,7 @@ Console.WriteLine($"Final P2-Completion core checks passed: {checks}");
 
 // 0.8.0 navigation membership and atomic new-scope refunds, independent of old enums.
 var menuIds=TalentNavigation.Groups.SelectMany(g=>g.TalentIds).ToArray();
-Check(menuIds.Length==90 && menuIds.Distinct().Count()==90 && menuIds.Order().SequenceEqual(TalentCatalog.All.Select(t=>t.Id).Order()),"all 90 implemented talents appear once in the menu");
+Check(menuIds.Length==92 && menuIds.Distinct().Count()==92 && menuIds.Order().SequenceEqual(TalentCatalog.All.Select(t=>t.Id).Order()),"all 92 implemented talents appear once in the menu");
 Check(TalentNavigation.Categories.Count==6 && TalentNavigation.Groups.All(g=>g.TalentIds.Count>0&&TalentNavigation.Categories.Contains(g.CategoryId)),"six populated categories and no empty or orphan groups");
 Check(!menuIds.Contains("AutoJump")&&!menuIds.Contains("JumpHeight"),"cancelled jumps absent from navigation");
 state=new();state.Award(100000000*scale,50000);
@@ -292,12 +292,12 @@ foreach(var scope in TalentNavigation.Categories) {
     var amount=TalentNavigation.RefundAmount(state,scope,false);
     Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuCategory,scope,TalentCategory.BaseStats,1,out copy)==TalentResult.Success,"new category refund accepted: "+scope);
     Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.TotalSpentTalentPoints==state.TotalSpentTalentPoints-amount,"category refund uses historical costs: "+scope);
-    Check(copy.Talents.Keys.All(id=>!TalentNavigation.InScope(id,scope,false)) && copy.Talents.Count==90-menuIds.Count(id=>TalentNavigation.InScope(id,scope,false)),"category refund exact membership: "+scope);
+    Check(copy.Talents.Keys.All(id=>!TalentNavigation.InScope(id,scope,false)) && copy.Talents.Count==92-menuIds.Count(id=>TalentNavigation.InScope(id,scope,false)),"category refund exact membership: "+scope);
 }
 foreach(var g in TalentNavigation.Groups) {
     var amount=TalentNavigation.RefundAmount(state,g.Id,true);
     Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuGroup,g.Id,TalentCategory.Economy,1,out copy)==TalentResult.Success,"new subgroup refund accepted: "+g.Id);
-    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.Talents.Count==90-g.TalentIds.Count,"subgroup exact historical refund: "+g.Id);
+    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.Talents.Count==92-g.TalentIds.Count,"subgroup exact historical refund: "+g.Id);
     Check(copy.Talents.Keys.All(id=>!g.TalentIds.Contains(id)) && snapshot.SequenceEqual(StateCodec.Encode(state)),"refund leaves source and other groups intact: "+g.Id);
 }
 foreach(var invalid in new[]{"","NotAGroup","AutoJump","../../Survival"}) {
@@ -369,10 +369,10 @@ Check(NumericTalents.TryGet("AfflictionDamage",out var boostDefinition)&&boostDe
 Console.WriteLine($"Final P2-Afflictions core checks passed: {checks}");
 
 // P3 state, geometry and budget invariants.
-foreach (string id in new[] { "AreaMining", "VeinMining", "TreeFelling" }) {
+foreach (string id in new[] { "AreaMining", "VeinMining", "TreeFelling", "AreaHarvest", "AutoReplant" }) {
     state = new(); state.Award(100000000 * scale, 50000);
-    int cost = id == "TreeFelling" ? 2 : 1;
-    int levels = id == "TreeFelling" ? 1 : 10;
+    int cost = id is "TreeFelling" or "AutoReplant" ? 2 : 1;
+    int levels = id is "TreeFelling" or "AutoReplant" ? 1 : 10;
     Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,id,TalentCategory.Utility,levels,out state)==TalentResult.Success && state.TotalSpentTalentPoints==cost*levels,"P3 actual purchase: "+id);
     if (levels == 10) {
         TalentCatalog.Apply(state,TalentOperation.DecreaseIntensity,id,TalentCategory.Utility,7,out state);
@@ -397,4 +397,32 @@ Check(GatheringRules.Limit(GatheringMode.Vein,100,1000,10000)==1000,"server acti
 Check(GatheringRules.Limit(GatheringMode.Vein,100,0,10000)==2500,"zero budget means no server action cap");
 Check(GatheringRules.Radius(BigInteger.Pow(10,200),8400)==8400 && GatheringRules.Limit(GatheringMode.Vein,BigInteger.Pow(10,200),0,10000)==10000,"huge levels saturate world geometry without integer overflow");
 Check(GatheringRules.Square(new(0,0),int.MaxValue).Take(9).Count()==9,"huge range enumerates lazily");
-Console.WriteLine($"Final P3-Gathering core checks passed: {checks}");
+// Bulk purchases stay atomic and keep compressed actual-cost refund history.
+foreach (int amount in new[] { 10, 100, 300, 1000 }) {
+    state = new(); state.Award(1000000000 * scale, 50000);
+    var points = state.AvailableTalentPoints;
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,"AreaMining",TalentCategory.Utility,amount,out copy)==TalentResult.Success
+        && copy.Talents["AreaMining"].TalentLevel==amount && copy.AvailableTalentPoints==points-amount,"bulk purchase exact levels and cost: "+amount);
+    Check(copy.Talents["AreaMining"].CostRuns.Count==1 && copy.TotalSpentTalentPoints==amount,"bulk cost history compressed: "+amount);
+    copy.Talents["AreaMining"].Enabled=false; copy.Talents["AreaMining"].CurrentIntensity=3;
+    TalentCatalog.Apply(copy,TalentOperation.Upgrade,"AreaMining",TalentCategory.Utility,amount,out copy);
+    Check(!copy.Talents["AreaMining"].Enabled && copy.Talents["AreaMining"].CurrentIntensity==3,"bulk upgrade preserves switch and selected intensity: "+amount);
+    copy=StateCodec.Decode(StateCodec.Encode(copy));
+    Check(copy.Talents["AreaMining"].TalentLevel==amount*2 && TalentCatalog.ValidateImported(copy),"bulk save round-trip: "+amount);
+    TalentCatalog.Apply(copy,TalentOperation.RefundOne,"AreaMining",TalentCategory.Utility,1,out copy);
+    Check(copy.AvailableTalentPoints==points-amount*2+1,"bulk purchase single-level refund exact: "+amount);
+    TalentCatalog.Apply(copy,TalentOperation.RefundTalent,"AreaMining",TalentCategory.Utility,1,out copy);
+    Check(copy.AvailableTalentPoints==points && copy.TotalSpentTalentPoints==0,"bulk full refund exact: "+amount);
+    state=new();
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,"MaxLife",TalentCategory.BaseStats,amount,out copy)==TalentResult.NotEnoughPoints
+        && ReferenceEquals(copy,state) && state.Talents.Count==0,"insufficient bulk purchase has no partial mutation: "+amount);
+    state.Award(1000000000*scale,50000);
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,"AutoReplant",TalentCategory.Utility,amount,out copy)==TalentResult.NoChange
+        && ReferenceEquals(copy,state),"binary unlock cannot bulk purchase: "+amount);
+}
+foreach (int invalid in new[] { 0, -1, 1001, 65535, int.MaxValue }) {
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,"MaxLife",TalentCategory.BaseStats,invalid,out copy)==TalentResult.InvalidRequest
+        && ReferenceEquals(copy,state),"invalid bulk request is atomic: "+invalid);
+}
+Check(TalentCatalog.Apply(state,TalentOperation.IncreaseIntensity,"AreaMining",TalentCategory.Utility,101,out _)==TalentResult.InvalidRequest,"other operations retain their existing request bound");
+Console.WriteLine($"Final P3-Agriculture core checks passed: {checks}");

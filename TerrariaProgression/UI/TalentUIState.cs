@@ -70,6 +70,10 @@ internal sealed class TalentUIState : UIState
         actionCard.Width.Set(0,1); actionList.Add(actionCard);
         AddAction(()=>TalentCatalog.TryGet(selected,out var d)?Text(d.MaxLevel==1?"UnlockCost":"UpgradeCost",d.DefaultCost):Text("Upgrade"),
             ()=>Request(TalentOperation.Upgrade),()=>CanAct && TalentCatalog.TryGet(selected,out var d) && Player.State.AvailableTalentPoints>=d.DefaultCost && (d.MaxLevel==0 || (Player.State.Talents.GetValueOrDefault(selected)?.TalentLevel??0)<d.MaxLevel));
+        foreach (int count in new[] { 10, 100, 300, 1000 })
+            AddAction(() => Text("UpgradeManyCost", count, TalentCatalog.TryGet(selected, out var d) ? Compact((BigInteger)d.DefaultCost * count) : "0"),
+                () => Player.RequestTalent(TalentOperation.Upgrade, selected, category, count),
+                () => CanAct && TalentCatalog.TryGet(selected, out var d) && d.MaxLevel == 0 && Player.State.AvailableTalentPoints >= (BigInteger)d.DefaultCost * count);
         AddAction(()=>Text("RefundOneAmount",Compact(HasSelected?Player.State.Talents[selected].CostRuns[^1].Cost:0)),()=>Request(TalentOperation.RefundOne),()=>CanAct&&HasSelected);
         AddAction(()=>Text("RefundTalentAmount",Compact(HasSelected?Player.State.Talents[selected].InvestedPoints:0)),()=>Request(TalentOperation.RefundTalent),()=>CanAct&&HasSelected);
         AddAction(()=>Text("Enable"),()=>Request(TalentOperation.Enable),()=>CanAct&&HasSelected&&!Player.State.Talents[selected].Enabled);
@@ -170,7 +174,7 @@ internal sealed class TalentUIState : UIState
     private static string Xp(BigInteger units) {string value=Experience.Format(units);return value.Length<=12?value:Compact(units/Experience.Scale);}
     private static string Effect(TalentDefinition definition,BigInteger level)
     {
-        if(definition.Id=="AreaMining")return Text("MiningArea",Compact(level*2+1));
+        if(definition.Id is "AreaMining" or "AreaHarvest")return Text("MiningArea",Compact(level*2+1));
         if(definition.Id=="VeinMining")return Text("MiningCount",Compact(level*25));
         if(definition.Unit==EffectUnit.Flag)return Text(level>0?"On":"Off");
         if(definition.Unit==EffectUnit.RemainingMultiplier)return Text(definition.Id=="CrateChance"?"CrateRemaining":definition.Id=="BaitSaving"?"BaitRemaining":"Remaining",(100*TalentMath.Remaining((double)definition.PerLevel,level)).ToString("0.##",CultureInfo.InvariantCulture));
@@ -197,12 +201,12 @@ internal sealed class TalentUIState : UIState
         actions.Height.Set(actionHeight,0);actions.Top.Set(-actionHeight,1);
         // Two columns; long scoped refunds occupy an entire row. Scroll when height is limited.
         for(int i=0;i<actionButtons.Count;i++) {
-            bool wide=i>=8;
+            bool wide=i>=12;
             actionButtons[i].Left.Set(0,wide?0:i%2/2f);
-            actionButtons[i].Top.Set((wide?4+i-8:i/2)*36,0);
+            actionButtons[i].Top.Set((wide?6+i-12:i/2)*36,0);
             actionButtons[i].Width.Set(wide?0:-5,wide?1:.5f);
         }
-        actionCard.Height.Set(6*36,0);Recalculate();Recalculate();
+        actionCard.Height.Set(8*36,0);Recalculate();Recalculate();
     }
     public override void Draw(SpriteBatch spriteBatch)
     {

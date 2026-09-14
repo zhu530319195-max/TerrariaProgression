@@ -30,7 +30,7 @@ public static class TalentNavigation
         G("Gathering", "Resources", "MiningYield", "WoodYield", "HerbYield", "GemYield"),
         G("Gathering", "Fishing", "FishingPower", "FishingYield", "BaitSaving", "CrateChance", "FishingLine", "LavaFishing"),
         G("Gathering", "Mining", "AreaMining", "VeinMining", "TreeFelling"),
-        G("Gathering", "Harvest", "PickupRange"),
+        G("Gathering", "Harvest", "AreaHarvest", "AutoReplant", "PickupRange"),
         G("Building", "Tools", "ToolReach", "ToolSpeed"),
         G("Building", "Construction", "BuildReach", "PlacementSpeed", "WallPlacementSpeed", "AutoPaint", "BuildingRuler"),
         G("Trading", "Loot", "Coins", "LootQuantity", "DropChance", "BagQuantity"),

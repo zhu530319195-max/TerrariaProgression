@@ -120,7 +120,7 @@ public sealed partial class RuntimeChecks
         SendTalentAction(A.SessionId,A.TalentRevision,TalentOperation.Disable,"SwimSpeed",1);
         Check(!A.State.Talents["SwimSpeed"].Enabled,"server confirms completion talent toggle");
         var imported=StateCodec.Decode(StateCodec.Encode(A.State));A.SessionReady=false;Receive(1,imported);
-        Check(A.SessionReady && A.State.Talents.ContainsKey("FlightTime") && TerrariaProgression.Networking.ProgressionNetwork.ProtocolVersion==12,"current protocol imports completion catalog");
+        Check(A.SessionReady && A.State.Talents.ContainsKey("FlightTime") && TerrariaProgression.Networking.ProgressionNetwork.ProtocolVersion==14,"current protocol imports completion catalog");
         Reset();
     }
 }

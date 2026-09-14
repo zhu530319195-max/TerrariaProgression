@@ -322,6 +322,8 @@ public sealed partial class RuntimeChecks : ModSystem
         RunP2Afflictions();
         var p3Errors = new System.Collections.Generic.List<Exception>();
         try { RunP3Gathering(); } catch (Exception e) { p3Errors.Add(e); }
+        try { RunP3Agriculture(); } catch (Exception e) { p3Errors.Add(e); }
+        try { RunBulkUpgrades(); } catch (Exception e) { p3Errors.Add(e); }
         try { RunFlexibleRange(); } catch (Exception e) { p3Errors.Add(e); }
         if (p3Errors.Count > 0) throw new AggregateException("P3 verification failed", p3Errors);
     }
@@ -426,7 +428,7 @@ public sealed partial class RuntimeChecks : ModSystem
         using(var writer=new BinaryWriter(stream,System.Text.Encoding.UTF8,true)) {
             writer.Write(ProgressionNetwork.ProtocolVersion); writer.Write((byte)ProgressionMessage.TalentAction);
             writer.Write(token.ToByteArray()); writer.Write(revision); writer.Write((uint)1);
-            writer.Write((byte)operation); writer.Write(id); writer.Write((byte)TalentCategory.BaseStats); writer.Write((byte)count);
+            writer.Write((byte)operation); writer.Write(id); writer.Write((byte)TalentCategory.BaseStats); writer.Write((ushort)count);
         }
         stream.Position=0; ProgressionNetwork.Receive(new BinaryReader(stream),0);
     }
