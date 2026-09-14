@@ -2,7 +2,11 @@
 
 ## 当前开发：0.10.0 P3采集基础＋攻击范围补全
 
-PR #12已合并，main基线`308621510075c85188bdc546657c4d7a0433f354`。用户批准并授权开发本批：P3-01～04＋RANGE-01／02。独立分支`feat/p3-gathering`；实现90项天赋、存档v3、协议12。当前待自动验证和玩家实机验收，未获新PR合并授权。
+PR #12已合并，main基线`308621510075c85188bdc546657c4d7a0433f354`。用户批准并授权开发本批：P3-01～04＋RANGE-01／02。独立分支`feat/p3-gathering`；实现90项天赋、存档v3、协议12。自动检查已通过，待玩家实机验收，未获新PR合并授权。
+
+功能代码提交 `d475f70e8a6defe9bd845884dbdb3290abd4bc0e` 已通过[分支CI 34825975807](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34825975807)和[PR CI 34825980551](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34825980551)：3150项核心、651项原生检查通过，生产与测试MOD编译均为零警告、零错误。
+
+[PR #13](https://github.com/zhu530319195-max/TerrariaProgression/pull/13)等待玩家实机验收，未合并。本次后续提交只补充文档，功能代码与上述检查一致。最终交付包绑定提交和校验值以包内BUILD_INFO及PR记录为准。
 
 见[批准规则与实现边界](docs/P3_GATHERING_DESIGN_zh-CN.md)、[中文验收说明](docs/P3Gathering_TEST_GUIDE_zh-CN.md)。P3农业（范围收割、补种）尚未实现。以下0.9.0及旧记录属于历史基线；旧“P3全部未开发／规则待确认”由本节覆盖。所有单列遗留状态继续保留。
 

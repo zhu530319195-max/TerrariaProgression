@@ -178,3 +178,11 @@ Include MAINT-01 actual report version and MAINT-02 known mappings in the same i
 ## D050 — P3批次及攻击范围补全获准开发
 
 用户确认五项P3天赋分两批，确认鞭子、链锤沿用现有MeleeRange补全，随后明确开始开发P3采集基础＋攻击范围补全。规则见`docs/P3_GATHERING_DESIGN_zh-CN.md`，取代旧P3待定记录。第一批P3-01～04及RANGE-01／02合一交付；第二批收割／补种未实现。不自动合并新PR。
+
+## D051 — 0.10.0自动验证与交付边界
+
+功能代码提交 `d475f70e8a6defe9bd845884dbdb3290abd4bc0e` 已通过[分支CI 34825975807](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34825975807)和[PR CI 34825980551](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34825980551)：3150项核心、651项原生检查通过，生产与测试MOD编译均为零警告、零错误。
+
+[PR #13](https://github.com/zhu530319195-max/TerrariaProgression/pull/13)等待玩家实机验收，未合并。本次后续提交只补充文档，功能代码与上述检查一致。最终交付包绑定提交和校验值以包内BUILD_INFO及PR记录为准。
+
+公共保护、三项P3采集与鞭子／链锤修复的自动检查通过，不自动视为玩家实机验收；不合并PR #13。旧未验收／未完成／暂缓事项保持独立状态。
