@@ -1,5 +1,7 @@
 # P2-Afflictions 0.9.0 implementation
 
+> 2026-09-14：用户确认0.9.0本批测试均已通过，并明确授权合并[PR #12](https://github.com/zhu530319195-max/TerrariaProgression/pull/12)。验收包提交 `4f4a2135b0d48a367bbbbdfb307bf8aa9849df4f`；本次仅补充验收文档，功能代码与测试包一致。 本记录覆盖下文交付时的“待验收／不自动合并”历史表述。历史单列未验收项不随本批自动通过。
+
 Branch: `feat/p2-afflictions`. Accepted main baseline: `afe41c470faeb81e14eabbff2f35cf9183487ef1` (0.8.2, PR #10). The branch carries the approved PR #11 documentation from `d5bda49fa46675243b686e7cab20782a301d2527`; neither PR #11 nor this feature PR is automatically merged.
 
 ## Scope

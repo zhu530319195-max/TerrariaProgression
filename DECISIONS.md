@@ -163,3 +163,14 @@ Include MAINT-01 actual report version and MAINT-02 known mappings in the same i
 - GetFishingLevel在固定版本实际收到的是环境倍率；渔力改加Player.fishingSkill，保留原版后续倍率。
 - 极端等级只对引擎输出饱和：基础渔力贡献结果最高1,000,000；额外lifeRegen扣减最高120,000,000，并提高原生批量飘字单位以限制内部循环。等级／实际投入仍无限且完整保存，不把饱和上限当等级上限。
 - 自动运行及玩家实机验收分开记录；不得自动通过此前药水病、原有钓鱼产量、真实多人和特殊Boss事项。
+
+
+## D049 — 0.9.0验收与PR #12合并授权
+
+2026-09-14：用户确认0.9.0本批测试均已通过，并明确授权合并[PR #12](https://github.com/zhu530319195-max/TerrariaProgression/pull/12)。验收包提交 `4f4a2135b0d48a367bbbbdfb307bf8aa9849df4f`；本次仅补充验收文档，功能代码与测试包一致。
+
+[分支CI 34813696181](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34813696181)、[PR CI 34813726394](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34813726394)：3112项核心、523项原生检查通过，生产与测试MOD编译零警告、零错误。
+
+本次验收覆盖NEXT-01／02／03与MAINT-01／02，即六项新天赋及两项扫描维护。药水病缩短、原有钓鱼产量、真实多人、特殊／多阶段Boss、多人独立掉落增产和分层暴击保留各自未验收、未完成或暂缓状态；可选补验没有单独反馈，不自动改为通过。
+
+本授权覆盖PR #12及必要验收记录更新；PR #11规则文档已包含在该分支中，不另行执行其合并。下一步P3仅进入规则讨论，不因本次合并授权自动开发。

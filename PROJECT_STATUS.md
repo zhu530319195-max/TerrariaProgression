@@ -2,23 +2,22 @@
 
 ## 当前阶段（2026-09-14）
 
-**0.8.2已通过用户实机验收并合并PR #10，PR #1～#10均已合并。** 当前81项天赋，6个一级分类、20个二级分组。0.8.1客户端加载修复和0.8.2目录缩进／高亮优化均已验收；此事实覆盖旧阶段文档中的“PR #10未合并／待验收”。
+**0.9.0已通过用户实机验收，PR #12已获明确合并授权。** 当前87项天赋，6个一级分类、20个二级分组；存档v3、联机协议11。
 
-- main合并提交：`afe41c470faeb81e14eabbff2f35cf9183487ef1`。
-- 验收分支提交：`0bf00456c72ddedaa119d1f8a0864de37f0f3649`。
-- [分支CI 34805851271](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34805851271)、[PR CI 34805853679](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34805853679)：3060项核心、440项原生检查；生产与测试MOD编译零警告、零错误。
-- 环境：tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8；存档v3、协议10。现有ID、等级、实际成本、开关与强度保留。
-- PR #9八项补全能力已验收合并，0.8.2继续保留，不重复开发。
+2026-09-14：用户确认0.9.0本批测试均已通过，并明确授权合并[PR #12](https://github.com/zhu530319195-max/TerrariaProgression/pull/12)。验收包提交 `4f4a2135b0d48a367bbbbdfb307bf8aa9849df4f`；本次仅补充验收文档，功能代码与测试包一致。
+
+- [分支CI 34813696181](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34813696181)、[PR CI 34813726394](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34813726394)：3112项核心、523项原生检查通过，生产与测试MOD编译零警告、零错误。
+- 环境：tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8。
+- 上一正式基线为PR #10合并提交 `afe41c470faeb81e14eabbff2f35cf9183487ef1`，0.8.2、81项；历史已验收能力继续保留，不重复开发。
+- PR #12包含PR #11的规则文档，合并结果以GitHub PR记录为准。
 
 ## 最新任务审查入口
 
-本分支实现0.9.0 P2异常／渔力批次，共87项天赋（51项数值注册、36项功能注册），存档v3、协议11；自动检查通过，尚未实机验收或合并。正式已验收main仍是上面的0.8.2。
+见[中文任务清单](docs/TASK_CHECKLIST_zh-CN.md)、[批准设计](docs/P2_AFFLICTIONS_DESIGN_zh-CN.md)、[实现记录](docs/P2Afflictions_IMPLEMENTATION.md)和[中文验收说明](docs/P2Afflictions_TEST_GUIDE_zh-CN.md)。六项新天赋及两项扫描维护已验收；87项注册由51项数值、36项功能组成。
 
-见[中文任务清单](docs/TASK_CHECKLIST_zh-CN.md)、[批准设计](docs/P2_AFFLICTIONS_DESIGN_zh-CN.md)、[实现记录](docs/P2Afflictions_IMPLEMENTATION.md)和[中文验收说明](docs/P2Afflictions_TEST_GUIDE_zh-CN.md)。本批NEXT-01／02／03已实装：异常伤害+20%/级，霜冻／诅咒焰／毒液／灵液2秒/级，渔力+5/级；均1点/级、无限、可调。保留已有燃烧／中毒ID、存档及投入。
+本次验收覆盖NEXT-01／02／03与MAINT-01／02，即六项新天赋及两项扫描维护。药水病缩短、原有钓鱼产量、真实多人、特殊／多阶段Boss、多人独立掉落增产和分层暴击保留各自未验收、未完成或暂缓状态；可选补验没有单独反馈，不自动改为通过。
 
-MAINT-01读取实际加载版本；MAINT-02补充31项明确映射（信息读数、免疫子项、钓鱼和建筑工具）。原报告450项、映射11／部分16／未映射423仅作为0.8.2历史样本，不冒充新报告结果；扫描仍不执行未知第三方饰品逻辑。
-
-验证代码 `e77444fd35d7038e16082f5d044f176ca22227c4`：[CI 34813485999](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34813485999) 通过3112项核心、523项原生检查，生产与测试MOD编译零警告、零错误。最终包的精确提交及校验值见BUILD_INFO。玩家实机验收仍待进行。
+下一步进入P3采集基础的规则讨论：公共保护、范围挖矿、矿脉连锁、一键伐木。P3尚未开发；具体范围、数值和世界操作保护待确认。
 
 ## 必须单独保留的状态
 
@@ -113,7 +112,7 @@ P0/P1 and the delivered P2 batches are stage-accepted through0.8.2, subject to t
 - PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
 
 ## Next implementation task
-第一步规则定稿已完成；第二步0.9.0整批实现与自动检查已完成，准备统一交付。下一步等待玩家验收，P3尚未开工。文档PR #11与功能PR均不自动合并。
+第一、二步已完成，0.9.0已获实机验收及PR #12合并授权。下一步集中讨论P3采集基础规则，尚不开发P3。
 
 ## P1 merge authorization supersedes earlier notes
 The earlier acceptance sections above record history at the time of feedback. PR #4 and #5 were subsequently explicitly authorized and merged. Their tested code is the P2-A base.

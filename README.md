@@ -1,4 +1,4 @@
-> 开发分支0.9.0：87项天赋，P2异常伤害／四种攻击异常／渔力及扫描维护已实现，自动检查通过、待实机验收。正式已验收main仍为0.8.2。见[本批说明](docs/P2Afflictions_IMPLEMENTATION.md)和[玩家验收步骤](docs/P2Afflictions_TEST_GUIDE_zh-CN.md)。
+> 0.9.0已通过用户实机验收，共87项天赋；[PR #12](https://github.com/zhu530319195-max/TerrariaProgression/pull/12)已获合并授权。见[实现记录](docs/P2Afflictions_IMPLEMENTATION.md)与[任务清单](docs/TASK_CHECKLIST_zh-CN.md)。旧的未验收／未完成事项继续单列。
 
 # TerrariaProgression
 
