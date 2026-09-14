@@ -271,7 +271,13 @@ public sealed class GatheringSystem : ModSystem
                 Removed++; current = null;
                 if (mode == GatheringMode.Vein) AddNeighbours(pos);
             }
-            else if (pickDamage <= 0 || ++attempts >= 100) current = null;
+            else {
+                // Native grass/moss hits can transform the tile into dirt/stone
+                // before removal. Continue our own transformation, but still
+                // reject external replacements at the start of the next step.
+                if (mode == GatheringMode.Area) currentType = Main.tile[pos.X, pos.Y].TileType;
+                if (pickDamage <= 0 || ++attempts >= 100) current = null;
+            }
             return true;
         }
         public void Dispose() => scan?.Dispose();
