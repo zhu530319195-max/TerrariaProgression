@@ -322,6 +322,7 @@ public sealed partial class RuntimeChecks : ModSystem
         RunP2Afflictions();
         var p3Errors = new System.Collections.Generic.List<Exception>();
         try { RunP3Gathering(); } catch (Exception e) { p3Errors.Add(e); }
+        try { RunP3Agriculture(); } catch (Exception e) { p3Errors.Add(e); }
         try { RunFlexibleRange(); } catch (Exception e) { p3Errors.Add(e); }
         if (p3Errors.Count > 0) throw new AggregateException("P3 verification failed", p3Errors);
     }

@@ -60,7 +60,11 @@ public sealed class EconomySystem : ModSystem
         // explicit per-recipient adapter is present, do not turn them into public
         // bonus items or use another player's talent for everyone's private bag.
         if (Main.netMode == NetmodeID.Server && noBroadcast) SpawningBonus = true;
-        try { return orig(source, x, y, width, height, clone, type, stack, noBroadcast, prefix, noDelay, reverse); }
+        try {
+            int index = orig(source, x, y, width, height, clone, type, stack, noBroadcast, prefix, noDelay, reverse);
+            AgricultureSystem.RecordDrop(source, index);
+            return index;
+        }
         finally { SpawningBonus = old; }
     }
     private static void ItemCheck(On_Player.orig_ItemCheck orig, Player player)

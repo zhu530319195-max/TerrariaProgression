@@ -170,7 +170,7 @@ internal sealed class TalentUIState : UIState
     private static string Xp(BigInteger units) {string value=Experience.Format(units);return value.Length<=12?value:Compact(units/Experience.Scale);}
     private static string Effect(TalentDefinition definition,BigInteger level)
     {
-        if(definition.Id=="AreaMining")return Text("MiningArea",Compact(level*2+1));
+        if(definition.Id is "AreaMining" or "AreaHarvest")return Text("MiningArea",Compact(level*2+1));
         if(definition.Id=="VeinMining")return Text("MiningCount",Compact(level*25));
         if(definition.Unit==EffectUnit.Flag)return Text(level>0?"On":"Off");
         if(definition.Unit==EffectUnit.RemainingMultiplier)return Text(definition.Id=="CrateChance"?"CrateRemaining":definition.Id=="BaitSaving"?"BaitRemaining":"Remaining",(100*TalentMath.Remaining((double)definition.PerLevel,level)).ToString("0.##",CultureInfo.InvariantCulture));

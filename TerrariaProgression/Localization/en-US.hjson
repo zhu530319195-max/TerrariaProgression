@@ -1,7 +1,7 @@
 Mods: {
   TerrariaProgression: {
     Keybinds: {
-      GatheringAction: { DisplayName: "Hold: batch gathering" }
+      GatheringAction: { DisplayName: "Toggle batch gathering" }
       GatheringMode: { DisplayName: "Switch area / vein mode" }
 
   "ToggleTalents": {
@@ -157,6 +157,8 @@ Mods: {
   "ManaSaving": "Mana cost reduction",
   "Minions": "Minion capacity",
   "Sentries": "Sentry capacity",
+  "AreaHarvest": "Area harvest",
+  "AutoReplant": "Auto replant",
   "AreaMining": "Area mining",
   "VeinMining": "Vein mining",
   "TreeFelling": "Tree felling",
@@ -249,9 +251,11 @@ Mods: {
   "ManaSaving": "Mana cost ×0.95 per level, multiplicative with native modifiers.",
   "Minions": "+1 minion capacity per level, additive with equipment.",
   "Sentries": "+1 sentry capacity per level, additive with equipment.",
-  "AreaMining": "Radius +1 tile per level: Lv1 3x3, Lv10 21x21; adjustable. Hold the gathering key (Left Alt by default) and mine the first tile normally. G switches area/vein mode. Respects pick power and server protection. Changing tools or talents stops the job.",
-  "VeinMining": "Up to 25 same-type connected ore tiles per level, including the first tile; Lv10 250. Adjustable. Hold Left Alt and select vein mode with G. Diagonal connections count, gaps do not. Mod ores require server opt-in and an ore flag.",
-  "TreeFelling": "One-time 2 points. Hold Left Alt with an axe and chop a native tree trunk; finish the same tree including its remaining stump. No neighbouring trees or wooden buildings. Keeps wood/gem yield. Refuses protected or over-budget trees. Excludes mod trees, giant mushrooms, cactus and bamboo.",
+  "AreaHarvest": "1 point/level, radius +1 tile; Lv1 3x3, Lv10 21x21, unlimited and adjustable. Toggle batch gathering with Left Alt, then target a herb with a pickaxe. Harvests only seed-ready vanilla herbs, preserving seedlings, planters, pots and soil. Toggle off to cancel pending work.",
+  "AutoReplant": "One-time 2 points. Replant the same vanilla herb after single-pick or area harvesting, consuming one matching seed only after successful placement. Prefer this harvest, then the main inventory. Without seeds, harvest normally. Independent of the Alt toggle. Excludes trees, mod plants and special tool side effects.",
+  "AreaMining": "Radius +1 tile per level: Lv1 3x3, Lv10 21x21; adjustable. Press the gathering key (Left Alt by default) once to enable, then mine the first tile normally. G switches area/vein mode. Respects pick power and server protection. Changing tools or talents stops the job.",
+  "VeinMining": "Up to 25 same-type connected ore tiles per level, including the first tile; Lv10 250. Adjustable. Press Left Alt once to enable and select vein mode with G. Diagonal connections count, gaps do not. Mod ores require server opt-in and an ore flag.",
+  "TreeFelling": "One-time 2 points. Press Left Alt once to enable, then use an axe to chop a native tree trunk; finish the same tree including its remaining stump. No neighbouring trees or wooden buildings. Keeps wood/gem yield. Refuses protected or over-budget trees. Excludes mod trees, giant mushrooms, cactus and bamboo.",
   "PickupRange": "+10% pickup range per level, multiplied with the original item range.",
   "CritChance": "Adds 10 percentage points per level. Above 100%: tier 1 x2, tier 2 x3, tier 3 x4. Respects DisableCrit and standard crit classes.",
   "BagQuantity": "+10% contents per level when opening vanilla Boss bags or fishing crates. Equipment duplicates are separate items. Uses the opener, with probabilistic fractional quantities. Does not affect world chests.",
@@ -321,7 +325,9 @@ Mods: {
   "CrateChance": "Original crate-gate failure probability ×0.95 per active level. A 10% gate becomes about 46.1% at Lv.10. Only changes crate eligibility; native rarity, biome, quests, enemies, pond and liquid rules remain. Honey is skipped; lava retains extra selection, so final crate yield can differ. Adjustable."
 }
     Messages: {
-      GatheringMode: "Gathering mode: {0}. Hold the gathering key. Axes select tree felling automatically."
+      GatheringMode: "Gathering mode: {0}. Press the gathering key to toggle. Axes select tree felling automatically."
+      GatheringOn: "Batch gathering: ON. Use tools normally; press the gathering key again to stop. G switches area / vein mining."
+      GatheringOff: "Batch gathering: OFF. Pending work cancelled. Single-herb auto replant follows its own talent toggle."
       GatheringBlocked: "Gathering blocked: check server permission, protection, tool, reach or the whole-tree budget."
       GatheringLimit: "Gathering reached the action limit; talent levels and paid points are unchanged."
 
@@ -339,6 +345,8 @@ Mods: {
         EnableAreaMining: { Label: "EnableAreaMining", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
         EnableVeinMining: { Label: "EnableVeinMining", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
         EnableTreeFelling: { Label: "EnableTreeFelling", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
+        EnableAreaHarvest: { Label: "Allow area harvesting", Tooltip: "Only seed-ready vanilla herbs; preserves pots, planters and soil." }
+        EnableAutoReplant: { Label: "Allow auto replant", Tooltip: "Consume matching seeds to replant vanilla herbs, including single-pick harvesting." }
         EnableModOreMining: { Label: "EnableModOreMining", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
         MaxBlocksPerAction: { Label: "MaxBlocksPerAction", Tooltip: "Default 1000 including origin; 0 is unlimited total work. Not a talent level cap. Trees exceeding the limit are refused." }
         GatheringWorkPerTick: { Label: "GatheringWorkPerTick", Tooltip: "Default 32, range 1-256. Global work budget shared fairly by all players, including unlimited jobs." }
