@@ -113,6 +113,7 @@ Mods: {
   "MenuGroupVision": "视野与信息",
   "MenuGroupResources": "资源采集",
   "MenuGroupFishing": "钓鱼强化",
+  "MenuGroupMining": "挖掘与伐木",
   "MenuGroupHarvest": "拾取与收获",
   "MenuGroupTools": "工具效率",
   "MenuGroupConstruction": "建造辅助",

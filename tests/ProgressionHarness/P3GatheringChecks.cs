@@ -107,7 +107,7 @@ public sealed partial class RuntimeChecks
 
     private void RunFlexibleRange()
     {
-        Reset();A.Award(100000000*Experience.Scale);var p=A.Player;
+        Reset();A.Award(100000000*Experience.Scale);var p=A.Player;p.ResetEffects();
         p.Center=new Vector2(Main.spawnTileX*16,(Main.spawnTileY-15)*16);p.direction=1;
         A.ApplyTalent(TalentOperation.Upgrade,"MeleeRange",TalentCategory.Combat,10);
         foreach(int itemType in new[]{ItemID.BlandWhip,ItemID.FireWhip,ItemID.RainbowWhip}) {
@@ -118,6 +118,7 @@ public sealed partial class RuntimeChecks
             A.State.Talents["MeleeRange"].Enabled=false;Projectile.FillWhipControlPoints(q,native);
             A.State.Talents["MeleeRange"].Enabled=true;Projectile.FillWhipControlPoints(q,enlarged);
             Vector2 origin=native[0];
+            Check(native.Max(v=>Vector2.Distance(v,origin))>50,"native whip fixture has a real nonzero reach: "+itemType);
             Check(native.Count==enlarged.Count&&native.Zip(enlarged).All(pair=>Vector2.Distance(origin+(pair.First-origin)*2,pair.Second)<.1f),"native whip visible and collision control points double: "+itemType);
             var far=enlarged.MaxBy(v=>Vector2.DistanceSquared(v,origin));var target=new Rectangle((int)far.X-2,(int)far.Y-2,4,4);
             Check(q.Colliding(q.Hitbox,target),"enlarged whip reaches actual native collision target: "+itemType);

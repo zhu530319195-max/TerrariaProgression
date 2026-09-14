@@ -113,6 +113,7 @@ Mods: {
   "MenuGroupVision": "Vision & information",
   "MenuGroupResources": "Resource yield",
   "MenuGroupFishing": "Fishing",
+  "MenuGroupMining": "Mining and forestry",
   "MenuGroupHarvest": "Pickup & harvest",
   "MenuGroupTools": "Tool efficiency",
   "MenuGroupConstruction": "Construction",
