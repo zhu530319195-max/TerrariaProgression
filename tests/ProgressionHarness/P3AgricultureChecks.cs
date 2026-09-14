@@ -8,6 +8,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.ObjectData;
 using TerrariaProgression.Core;
 using TerrariaProgression.Config;
 using TerrariaProgression.Players;
@@ -65,8 +66,9 @@ public sealed partial class RuntimeChecks
         for(int style=0;style<7;style++)foreach(int container in new[]{0,1,2}) {
             Init();Buy("AreaHarvest");Buy("AutoReplant");Buy("HerbYield",10);
             if(container==2) {
-                Put(0,3,TileID.Stone);Put(1,3,TileID.Stone);
-                WorldGen.PlaceTile(x,y+2,TileID.ClayPot,forced:false);
+                var pot = TileObjectData.GetTileData(TileID.ClayPot, 0);
+                for (int dx=0;dx<pot.Width;dx++) Put(dx,1+pot.Height,TileID.Stone);
+                WorldGen.PlaceTile(x+pot.Origin.X,y+1+pot.Origin.Y,TileID.ClayPot,forced:false);
                 Check(Has(0,1)&&Main.tile[x,y+1].TileType==TileID.ClayPot,"native clay pot fixture placed");
                 Put(0,0,TileID.BloomingHerbs);var t=Main.tile[x,y];t.TileFrameX=(short)(style*18);
             } else Herb(0,0,style,TileID.BloomingHerbs,container==0?soils[style]:TileID.PlanterBox);
@@ -108,6 +110,9 @@ public sealed partial class RuntimeChecks
         Init();Buy("AreaHarvest");Buy("AutoReplant");Herb(0,0,0);Main.gameMenu=false;Main.drawingPlayerChat=false;A.Player.mouseInterface=false;
         var tool=typeof(Player).GetMethod("ItemCheck_UseMiningTools_ActuallyUseMiningTool",BindingFlags.Instance|BindingFlags.NonPublic)!;
         tool.Invoke(A.Player,new object[]{A.Player.HeldItem,false,x,y});Drain();Check(Seedling(0,0,0),"ordinary pick input routes through agriculture");
+        Init();Buy("AutoReplant");Herb(0,0,0);A.Player.GetModPlayer<GatheringPlayer>().BatchEnabled=false;Config.EnableAutoReplant=false;
+        tool.Invoke(A.Player,new object[]{A.Player.HeldItem,false,x,y});
+        Check(!Has(0,0)&&Items(ItemID.Daybloom)==1,"server-disabled replant preserves ordinary manual harvesting");
         // Nearby regrowth staff must not be mistaken for the harvesting player.
         Init();Buy("AutoReplant");Herb(0,0,0,TileID.MatureHerbs);Main.dayTime=false;
         B.Player.Center=new Vector2(x*16,y*16);A.Player.Center=B.Player.Center-new Vector2(40,0);B.Player.inventory[0]=new Item(ItemID.StaffofRegrowth);

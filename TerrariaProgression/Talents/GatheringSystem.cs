@@ -107,7 +107,7 @@ public sealed class GatheringSystem : ModSystem
     {
         var gp = player.GetModPlayer<GatheringPlayer>();
         bool herb = item.pick > 0 && AgricultureSystem.IsHerb(x, y);
-        bool singleHerb = herb && ExtendedTalentPlayer.Level(player, "AutoReplant") > 0;
+        bool singleHerb = herb && Enabled(GatheringMode.SingleHerb) && ExtendedTalentPlayer.Level(player, "AutoReplant") > 0;
         if (permitted != null || player.whoAmI != Main.myPlayer || !GatheringPlayer.InputAllowed || (!gp.BatchEnabled && !singleHerb)) {
             orig(player, item, out canHitWalls, x, y); return;
         }
