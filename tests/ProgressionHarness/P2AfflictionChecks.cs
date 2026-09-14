@@ -27,7 +27,7 @@ public sealed partial class RuntimeChecks
         var flags = typeof(NPC).GetMethod("UpdateNPC_BuffFlagsReset",BindingFlags.Instance|BindingFlags.NonPublic)!;
         var dot = typeof(NPC).GetMethod("UpdateNPC_BuffApplyDOTs",BindingFlags.Instance|BindingFlags.NonPublic)!;
         void SetTalent(ProgressionPlayer p,string id,int level) {
-            p.State.RefundAll(id); if(level>0)p.State.Invest(id,1,level);
+            p.State.RefundAll(id); if(level>0&&!p.State.Invest(id,1,level))throw new Exception("Insufficient fixture points for "+id);
         }
         NPC Target() {
             var n=Spawn(100000);foreach(var e in AfflictionNpc.Effects)n.buffImmune[e.Buff]=false;return n;
@@ -43,7 +43,7 @@ public sealed partial class RuntimeChecks
         }
         try {
             foreach(var e in AfflictionNpc.Effects) {
-                Reset();A.Award(1000000*Experience.Scale);
+                Reset();A.Award(100000000*Experience.Scale);
                 SetTalent(A,e.Talent,10);SetTalent(A,"AfflictionDamage",10);
                 var native=Target();native.AddBuff(e.Buff,1200);int normal=DamageTicks(native,600);
                 Check(Bonus(native)==0,"native-only status never acquires a talent damage source: "+e.Talent);
@@ -67,7 +67,7 @@ public sealed partial class RuntimeChecks
                 Check(one.buffTime[one.FindBuffIndex(e.Buff)]==120,"native level-one status lasts two seconds: "+e.Talent);
                 AfflictionNpc.ApplyHit(one,A.Player,10);Check(one.buffTime[one.FindBuffIndex(e.Buff)]==120,"refresh does not add duration: "+e.Talent);
             }
-            Reset();A.Award(1000000*Experience.Scale);B.Award(1000000*Experience.Scale);
+            Reset();A.Award(100000000*Experience.Scale);B.Award(100000000*Experience.Scale);
             SetTalent(A,"AttackBurn",10);SetTalent(B,"AttackBurn",10);SetTalent(A,"AfflictionDamage",10);SetTalent(B,"AfflictionDamage",5);
             var target=Target();ServerStrike(target,0,10);ServerStrike(target,1,10);
             Check(target.HasBuff(BuffID.OnFire)&&Bonus(target)==80,"confirmed server strikes select strongest source without stacking");
@@ -132,7 +132,7 @@ public sealed partial class RuntimeChecks
             NPCLoader.UpdateLifeRegen(huge,ref popup);
             Check(huge.lifeRegen==-120000000&&popup==1000000,"unlimited levels saturate engine output and bound native damage loops");
 
-            Reset();A.Award(1000000*Experience.Scale);SetTalent(A,"AttackVenom",10);SetTalent(A,"AfflictionDamage",10);
+            Reset();A.Award(100000000*Experience.Scale);SetTalent(A,"AttackVenom",10);SetTalent(A,"AfflictionDamage",10);
             var doomed=Target();doomed.life=doomed.lifeMax=60;EncounterSystem.Spawn(doomed,null);
             var xpBefore=A.State.TotalExperienceEarned;
             A.Player.ApplyDamageToNPC(doomed,10,0,1,false,DamageClass.Generic);DamageTicks(doomed);
@@ -140,7 +140,7 @@ public sealed partial class RuntimeChecks
             Settle(doomed);var xpAfter=A.State.TotalExperienceEarned;Settle(doomed);
             Check(xpAfter-xpBefore==60*Experience.Scale&&A.State.TotalExperienceEarned==xpAfter,"DoT kill follows existing maximum-life XP settlement exactly once");
 
-            Reset();A.Award(1000000*Experience.Scale);var p=A.Player;
+            Reset();A.Award(100000000*Experience.Scale);var p=A.Player;
             p.inventory[0]=new Item(ItemID.WoodFishingPole);p.inventory[1]=new Item(ItemID.MasterBait){stack=999};
             int Power(int level,int equipment=0) {
                 SetTalent(A,"FishingPower",level);p.ResetEffects();p.fishingSkill=equipment;PlayerLoader.UpdateEquips(p);
