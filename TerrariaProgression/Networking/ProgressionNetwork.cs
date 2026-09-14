@@ -12,7 +12,7 @@ internal enum ProgressionMessage : byte { JoinCharacter = 1, Snapshot = 2, Talen
 
 internal static class ProgressionNetwork
 {
-    internal const byte ProtocolVersion = 13;
+    internal const byte ProtocolVersion = 14;
     private static ModPacket Packet(ProgressionMessage kind)
     {
         var packet = ModContent.GetInstance<TerrariaProgression>().GetPacket();
@@ -64,7 +64,7 @@ internal static class ProgressionNetwork
         packet.Write((byte)operation);
         packet.Write(id);
         packet.Write((byte)category);
-        packet.Write((byte)count);
+        packet.Write((ushort)count);
         packet.Send();
     }
     internal static void SendGathering(ProgressionPlayer p, GatheringMode mode, int x, int y, uint sequence)
@@ -119,7 +119,7 @@ internal static class ProgressionNetwork
                 var operation = (TalentOperation)reader.ReadByte();
                 string id = reader.ReadString();
                 var category = (TalentCategory)reader.ReadByte();
-                int count = reader.ReadByte();
+                int count = reader.ReadUInt16();
                 if (id.Length > 128 || request == 0) return;
                 // One accepted request every 6 simulation ticks also bounds clone/encode work.
                 if (player.HasActionTick && Main.GameUpdateCount - player.LastActionTick < 6) return;

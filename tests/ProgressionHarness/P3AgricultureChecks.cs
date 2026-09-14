@@ -116,6 +116,34 @@ public sealed partial class RuntimeChecks
         Init();Buy("AreaMining");Herb(0,0,0);
         tool.Invoke(A.Player,new object[]{A.Player.HeldItem,false,x,y});
         Check(!Has(0,0),"batch mining without agriculture talents preserves ordinary single-herb input");
+        // Regression: batch ON must not swallow explicit single-plant input.
+        foreach (bool replant in new[] { false, true }) {
+            Init();Buy("AreaHarvest");if(replant)Buy("AutoReplant");
+            Main.dayTime=false;Herb(0,0,0,TileID.MatureHerbs);Herb(1,0,0,TileID.BloomingHerbs);
+            A.Player.inventory[1]=new Item(ItemID.DaybloomSeeds,2);
+            var oldActor=EconomySystem.Actor;EconomySystem.Actor=A.Player;
+            try {tool.Invoke(A.Player,new object[]{A.Player.HeldItem,false,x,y});}
+            finally {EconomySystem.Actor=oldActor;}
+            Check((replant?Seedling(0,0,0):!Has(0,0)) && Items(ItemID.Daybloom)==1
+                && Main.tile[x+1,y].TileType==TileID.BloomingHerbs && GatheringSystem.PendingCount==0,
+                "batch ON non-seeding mature target uses single harvest without starting area: replant="+replant);
+            Check(A.Player.inventory[1].stack==(replant?1:2),"single fallback consumes seeds only for successful replant");
+        }
+        Init();Buy("AreaHarvest");Herb(0,0,0);Config.EnableAreaHarvest=false;
+        var prior=EconomySystem.Actor;EconomySystem.Actor=A.Player;
+        try {tool.Invoke(A.Player,new object[]{A.Player.HeldItem,false,x,y});}
+        finally {EconomySystem.Actor=prior;}
+        Check(!Has(0,0)&&Items(ItemID.Daybloom)==1,"disabled area permission does not swallow manual herb pick");
+        Init();Buy("AreaHarvest");Buy("AutoReplant");Herb(0,0,0);Herb(1,0,0,TileID.ImmatureHerbs);Config.EnableWorldGathering=false;
+        prior=EconomySystem.Actor;EconomySystem.Actor=A.Player;
+        try {tool.Invoke(A.Player,new object[]{A.Player.HeldItem,false,x,y});}
+        finally {EconomySystem.Actor=prior;}
+        Check(!Has(0,0)&&Has(1,0),"master off preserves native targeted picking without auto replant");
+        Init();Buy("AreaHarvest");Herb(0,0,0);var targetWire=Main.tile[x,y];targetWire.RedWire=true;
+        prior=EconomySystem.Actor;EconomySystem.Actor=A.Player;
+        try {tool.Invoke(A.Player,new object[]{A.Player.HeldItem,false,x,y});}
+        finally {EconomySystem.Actor=prior;}
+        Check(!Has(0,0)&&GatheringSystem.PendingCount==0,"batch-protected herb remains manually targetable without an area request");
         // Nearby regrowth staff must not be mistaken for the harvesting player.
         Init();Buy("AutoReplant");Herb(0,0,0,TileID.MatureHerbs);Main.dayTime=false;
         B.Player.Center=new Vector2(x*16,y*16);A.Player.Center=B.Player.Center-new Vector2(40,0);B.Player.inventory[0]=new Item(ItemID.StaffofRegrowth);

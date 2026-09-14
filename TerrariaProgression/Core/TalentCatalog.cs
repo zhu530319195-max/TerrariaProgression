@@ -22,7 +22,7 @@ public static class TalentCatalog
         TalentCategory category, int count, out ProgressionState result)
     {
         result = original;
-        if (!Enum.IsDefined(operation) || !Enum.IsDefined(category) || count is < 1 or > 100)
+        if (!Enum.IsDefined(operation) || !Enum.IsDefined(category) || count < 1 || count > (operation == TalentOperation.Upgrade ? 1000 : 100))
             return TalentResult.InvalidRequest;
         if (operation <= TalentOperation.Disable && !TryGet(id, out _)) return TalentResult.UnknownTalent;
         if (operation is TalentOperation.RefundMenuGroup or TalentOperation.RefundMenuCategory &&

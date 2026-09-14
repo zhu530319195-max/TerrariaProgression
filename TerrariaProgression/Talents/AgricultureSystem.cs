@@ -53,7 +53,7 @@ public sealed class AgricultureSystem : ModSystem
         && Main.tile[x, y].TileType is TileID.ImmatureHerbs or TileID.MatureHerbs or TileID.BloomingHerbs;
     internal static bool ControlsInput(Player p) => p.HeldItem.pick > 0 &&
         ((Config.EnableWorldGathering && Config.EnableAutoReplant && ExtendedTalentPlayer.Level(p, "AutoReplant") > 0) ||
-         (p.GetModPlayer<GatheringPlayer>().BatchEnabled && ExtendedTalentPlayer.Level(p, "AreaHarvest") > 0));
+         (Config.EnableWorldGathering && Config.EnableAreaHarvest && p.GetModPlayer<GatheringPlayer>().BatchEnabled && ExtendedTalentPlayer.Level(p, "AreaHarvest") > 0));
     internal static bool CanHarvest(TilePoint pos, bool seedOnly)
     {
         if (!IsHerb(pos.X, pos.Y)) return false;

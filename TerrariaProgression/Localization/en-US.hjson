@@ -56,6 +56,7 @@ Mods: {
   "Intensity": "Active level: {0} (no refund)",
   "UnlockCost": "Unlock ({0} points)",
   "UpgradeCost": "Upgrade +1 ({0} points)",
+  "UpgradeManyCost": "Upgrade +{0} ({1} points)",
   "Unlocked": "Unlocked",
   "Locked": "Locked",
   "UnlockDetail": "Status: {0}\nEffect: {1}\nOne-time cost: {2} points\nActually paid: {3} points\nRefund returns the actual paid cost.",
@@ -330,6 +331,7 @@ Mods: {
       GatheringOff: "Batch gathering: OFF. Pending work cancelled. Single-herb auto replant follows its own talent toggle."
       GatheringBlocked: "Gathering blocked: check server permission, protection, tool, reach or the whole-tree budget."
       GatheringLimit: "Gathering reached the action limit; talent levels and paid points are unchanged."
+      GatheringSkipped: "Area mining finished with skipped targets (batch protection, unsupported tiles or pick power). Aim directly at a skipped tile to mine normally, even with Alt enabled. Furniture supports, wiring and falling blocks remain excluded from batches."
 
       LootLimit: "Extra loot reached the roll budget or item capacity; some extra rewards were not generated. Adjust the roll budget in Mod Config. Levels and points are unchanged."
       Status: "Level {0} | XP {1} / {2} | Total XP {3} | Available talent points {4} | Spent {5}"

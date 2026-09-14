@@ -104,7 +104,7 @@ Check(state.Talents["MaxLife"].TalentLevel == 2 && !state.Talents["MaxLife"].Ena
 Check(TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxMana", TalentCategory.BaseStats, 2, out copy) == TalentResult.NotEnoughPoints && ReferenceEquals(state,copy), "insufficient batch purchase atomic");
 Check(TalentCatalog.Apply(state, TalentOperation.Upgrade, "Unknown", TalentCategory.BaseStats, 1, out _) == TalentResult.UnknownTalent, "unknown talent rejected");
 Check(TalentCatalog.Apply(state, (TalentOperation)99, "MaxLife", TalentCategory.BaseStats, 1, out _) == TalentResult.InvalidRequest, "invalid operation rejected");
-Check(TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 101, out _) == TalentResult.InvalidRequest, "unbounded request rejected");
+Check(TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 1001, out _) == TalentResult.InvalidRequest, "unbounded request rejected");
 Check(!TalentCatalog.ValidateImported(new ProgressionState { Talents = { ["Unknown"] = new TalentState() } }), "unregistered imported talent rejected");
 state = new(); state.Award(1000000 * scale, 50000);
 for (int i = 0; i < 500; i++) {
@@ -397,4 +397,32 @@ Check(GatheringRules.Limit(GatheringMode.Vein,100,1000,10000)==1000,"server acti
 Check(GatheringRules.Limit(GatheringMode.Vein,100,0,10000)==2500,"zero budget means no server action cap");
 Check(GatheringRules.Radius(BigInteger.Pow(10,200),8400)==8400 && GatheringRules.Limit(GatheringMode.Vein,BigInteger.Pow(10,200),0,10000)==10000,"huge levels saturate world geometry without integer overflow");
 Check(GatheringRules.Square(new(0,0),int.MaxValue).Take(9).Count()==9,"huge range enumerates lazily");
+// Bulk purchases stay atomic and keep compressed actual-cost refund history.
+foreach (int amount in new[] { 10, 100, 300, 1000 }) {
+    state = new(); state.Award(1000000000 * scale, 50000);
+    var points = state.AvailableTalentPoints;
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,"AreaMining",TalentCategory.Utility,amount,out copy)==TalentResult.Success
+        && copy.Talents["AreaMining"].TalentLevel==amount && copy.AvailableTalentPoints==points-amount,"bulk purchase exact levels and cost: "+amount);
+    Check(copy.Talents["AreaMining"].CostRuns.Count==1 && copy.TotalSpentTalentPoints==amount,"bulk cost history compressed: "+amount);
+    copy.Talents["AreaMining"].Enabled=false; copy.Talents["AreaMining"].CurrentIntensity=3;
+    TalentCatalog.Apply(copy,TalentOperation.Upgrade,"AreaMining",TalentCategory.Utility,amount,out copy);
+    Check(!copy.Talents["AreaMining"].Enabled && copy.Talents["AreaMining"].CurrentIntensity==3,"bulk upgrade preserves switch and selected intensity: "+amount);
+    copy=StateCodec.Decode(StateCodec.Encode(copy));
+    Check(copy.Talents["AreaMining"].TalentLevel==amount*2 && TalentCatalog.ValidateImported(copy),"bulk save round-trip: "+amount);
+    TalentCatalog.Apply(copy,TalentOperation.RefundOne,"AreaMining",TalentCategory.Utility,1,out copy);
+    Check(copy.AvailableTalentPoints==points-amount*2+1,"bulk purchase single-level refund exact: "+amount);
+    TalentCatalog.Apply(copy,TalentOperation.RefundTalent,"AreaMining",TalentCategory.Utility,1,out copy);
+    Check(copy.AvailableTalentPoints==points && copy.TotalSpentTalentPoints==0,"bulk full refund exact: "+amount);
+    state=new();
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,"MaxLife",TalentCategory.BaseStats,amount,out copy)==TalentResult.NotEnoughPoints
+        && ReferenceEquals(copy,state) && state.Talents.Count==0,"insufficient bulk purchase has no partial mutation: "+amount);
+    state.Award(1000000000*scale,50000);
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,"AutoReplant",TalentCategory.Utility,amount,out copy)==TalentResult.NoChange
+        && ReferenceEquals(copy,state),"binary unlock cannot bulk purchase: "+amount);
+}
+foreach (int invalid in new[] { 0, -1, 1001, 65535, int.MaxValue }) {
+    Check(TalentCatalog.Apply(state,TalentOperation.Upgrade,"MaxLife",TalentCategory.BaseStats,invalid,out copy)==TalentResult.InvalidRequest
+        && ReferenceEquals(copy,state),"invalid bulk request is atomic: "+invalid);
+}
+Check(TalentCatalog.Apply(state,TalentOperation.IncreaseIntensity,"AreaMining",TalentCategory.Utility,101,out _)==TalentResult.InvalidRequest,"other operations retain their existing request bound");
 Console.WriteLine($"Final P3-Agriculture core checks passed: {checks}");

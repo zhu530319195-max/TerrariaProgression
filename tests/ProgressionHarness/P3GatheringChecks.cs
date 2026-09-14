@@ -92,6 +92,24 @@ public sealed partial class RuntimeChecks
         Packet(A.SessionId,4,x,0);Check(!Has(0,0)&&Has(1,0),"server decodes valid intent and owns initial break");Drain();
         Check(Items(ItemID.StoneBlock)==2,"server alone creates each real drop");Put(0,0,TileID.Stone);Advance();
         Packet(A.SessionId,4,x,0);Check(Has(0,0),"replayed accepted request cannot break a replacement tile");
+        // Actual tool entry: batch exclusions must not disable ordinary direct picking.
+        var tool=typeof(Player).GetMethod("ItemCheck_UseMiningTools_ActuallyUseMiningTool",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!;
+        void Pick(int dx=0,int dy=0) {
+            Main.gameMenu=false;Main.drawingPlayerChat=false;A.Player.mouseInterface=false;
+            tool.Invoke(A.Player,new object[]{A.Player.HeldItem,false,x+dx,y+dy});
+        }
+        Init();Buy("AreaMining");Put(0,0,TileID.Stone);var directWire=Main.tile[x,y];directWire.RedWire=true;
+        Check(!GatheringSystem.CanTouch(new(x,y),GatheringMode.Area),"wired target still excluded from batch");
+        Pick();Check(!Has(0,0)&&Items(ItemID.StoneBlock)==1&&GatheringSystem.PendingCount==0,"Alt ON ordinary pick removes excluded wired block exactly once");
+        Init();Buy("AreaMining");Put(0,0,TileID.Sand);Put(0,1,TileID.Stone);
+        Pick();Check(!Has(0,0)&&Items(ItemID.SandBlock)==1&&Has(0,1)&&GatheringSystem.PendingCount==0,"Alt ON directly picks falling block without batching support");
+        Init();Buy("AreaMining");Put(0,0,TileID.Stone);Config.EnableAreaMining=false;
+        Pick();Check(!Has(0,0)&&Items(ItemID.StoneBlock)==1,"server-disabled batch retains ordinary manual picking");
+        Init();Buy("VeinMining");A.Player.GetModPlayer<TerrariaProgression.Players.GatheringPlayer>().MiningMode=GatheringMode.Vein;Put(0,0,TileID.Stone);
+        Pick();Check(!Has(0,0)&&GatheringSystem.PendingCount==0,"vein mode permits ordinary picking of non-ore");
+        Init();Buy("AreaMining");A.Player.inventory[0]=new Item(ItemID.CopperPickaxe);Put(0,0,TileID.Meteorite);directWire=Main.tile[x,y];directWire.RedWire=true;
+        for(int n=0;n<8;n++)Pick();
+        Check(Has(0,0)&&Items(ItemID.Meteorite)==0,"manual fallback cannot bypass native pick power");
         // Native tree frames: hit the middle and finish the lower stump too.
         Init();Buy("TreeFelling");Buy("WoodYield",10);A.Player.inventory[0]=new Item(ItemID.PickaxeAxe);A.Player.HeldItem.axe=100; // Native bonusWood is then deterministic (two wood per tile).
         for(int dx=0;dx<=3;dx+=3){Put(dx,5,TileID.Grass);for(int dy=-4;dy<=4;dy++)Put(dx,dy,TileID.Trees);}
