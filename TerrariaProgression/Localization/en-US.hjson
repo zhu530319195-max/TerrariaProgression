@@ -116,7 +116,7 @@ Mods: {
   "ClearSearch": "Clear",
   "OwnedOnly": "Owned",
   "EnabledOnly": "Active",
-  "AllInCategory": "All",
+  "AllInCategory": "All in category",
   "GlobalResults": "Global results: {0}",
   "NoResults": "No matching talents",
   "NoResultsHint": "Clear the search or turn off filters.",

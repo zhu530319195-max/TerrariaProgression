@@ -119,17 +119,28 @@ internal sealed class TalentUIState : UIState
         foreach(var cat in TalentNavigation.Categories) {
             var groups=TalentNavigation.Groups.Where(g=>g.CategoryId==cat&&g.TalentIds.Any(id=>TalentCatalog.TryGet(id,out _))).ToArray();
             if(groups.Length==0)continue;
-            var button=new TalentButton(()=> (menuCategory==cat?"− ":"+ ")+Text("Menu"+cat),()=>Choose(cat,""),()=>true,()=>menuCategory==cat);
-            button.Width.Set(0,1); button.TextHAlign=0; navigation.Add(button);
+            var button=new TalentButton(()=>Text("Menu"+cat),()=>Choose(cat,""),()=>true,()=>menuCategory==cat) {
+                Expanded = () => menuCategory==cat
+            };
+            button.Width.Set(0,1); button.TextHAlign=0; button.PaddingLeft=19; navigation.Add(button);
             if(menuCategory!=cat)continue;
-            var all=new TalentButton(()=>"  "+Text("AllInCategory"),()=>Choose(cat,""),()=>true,()=>menuGroup.Length==0&&query.Length==0);
-            all.Width.Set(0,1); all.TextHAlign=0; navigation.Add(all);
+            var all=new TalentButton(()=>Text("AllInCategory"),()=>Choose(cat,""),()=>true,()=>menuGroup.Length==0&&query.Length==0);
+            AddNavigationChild(all);
             foreach(var g in groups) {
-                var entry=new TalentButton(()=>"  "+Text("MenuGroup"+g.Id),()=>Choose(cat,g.Id),()=>true,()=>menuGroup==g.Id&&query.Length==0);
-                entry.Width.Set(0,1); entry.TextHAlign=0; navigation.Add(entry);
+                var entry=new TalentButton(()=>Text("MenuGroup"+g.Id),()=>Choose(cat,g.Id),()=>true,()=>menuGroup==g.Id&&query.Length==0);
+                AddNavigationChild(entry, g == groups[^1]);
             }
         }
         navigation.ViewPosition=scroll;
+    }
+    private void AddNavigationChild(TalentButton button, bool last = false)
+    {
+        // UIList arranges the full-width row; the whole child button is inset,
+        // including its border and hit area. Dimensions scale with the game UI.
+        var row = new UIElement();
+        row.Width.Set(0,1); row.Height.Set(32,0); row.MarginBottom = last ? 8 : 0;
+        button.Left.Set(20,0); button.Width.Set(-20,1); button.TextHAlign=0;
+        row.Append(button); navigation.Add(row);
     }
     private void RefreshTalents()
     {
@@ -280,6 +291,7 @@ internal sealed class TalentUIState : UIState
 
 internal sealed class TalentButton : UITextPanel<string>
 {
+    internal Func<bool>? Expanded { get; init; }
     private readonly Func<string> label;
     private readonly Func<bool> enabled;
     private readonly Func<bool> selected;
@@ -299,9 +311,25 @@ internal sealed class TalentButton : UITextPanel<string>
         bool active = enabled();
         bool highlighted = selected();
         TextColor = highlighted ? new Color(245, 215, 148) : active ? Color.White : new Color(123, 135, 150);
-        BackgroundColor = highlighted ? new Color(40, 66, 79) : active && IsMouseHovering ? new Color(45, 93, 105) : new Color(30, 44, 65);
-        BorderColor = highlighted || (active && IsMouseHovering) ? new Color(214, 181, 105) : new Color(63, 80, 103);
+        BackgroundColor = highlighted ? (Expanded != null ? new Color(35, 49, 68) : new Color(40, 66, 79)) : active && IsMouseHovering ? new Color(45, 93, 105) : new Color(30, 44, 65);
+        BorderColor = Expanded == null && (highlighted || (active && IsMouseHovering)) ? new Color(214, 181, 105) : new Color(63, 80, 103);
         base.Update(gameTime);
+    }
+    protected override void DrawSelf(SpriteBatch spriteBatch)
+    {
+        base.DrawSelf(spriteBatch);
+        if (Expanded == null) return;
+        // Draw a pixel triangle instead of relying on font glyph coverage.
+        var bounds = GetDimensions();
+        bool expanded = Expanded();
+        int rows = expanded ? 4 : 7;
+        int x = (int)bounds.X + 6, y = (int)(bounds.Y + (bounds.Height - rows) / 2);
+        for (int row = 0; row < rows; row++) {
+            int offset = expanded ? row : 0;
+            int width = expanded ? 7 - 2 * row : 4 - Math.Abs(3 - row);
+            spriteBatch.Draw(Terraria.GameContent.TextureAssets.MagicPixel.Value,
+                new Rectangle(x + offset, y + row, width, 1), TextColor);
+        }
     }
 }
 

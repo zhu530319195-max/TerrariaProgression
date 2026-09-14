@@ -19,16 +19,16 @@ runtime_pass = next((line.strip() for line in runtime_log.read_text(errors="repl
 core_log = (output / "core-checks.log").read_text()
 core_count = re.search(r"Final P2-MenuFishing core checks passed: (\d+)", core_log)
 assert core_count and runtime_pass.startswith("TP_RUNTIME_PASS "), "Package requires passing core and native checks"
-info = (f"TerrariaProgression P2-MenuFishing 0.8.1\nCommit: {commit}\n"
+info = (f"TerrariaProgression P2-MenuFishing 0.8.2\nCommit: {commit}\n"
         f"Validation: official compilation and {core_count.group(1)} core checks passed; {runtime_pass}.\n"
         "Target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8\n"
         f"TerrariaProgression.tmod SHA256: {hashlib.sha256(mod).hexdigest()}\n"
         "P2-MenuFishing: 49 numeric entries plus 32 functional entries (including ten numeric effects), 81 total. No CI harness in the player package.\n")
-with zipfile.ZipFile(output / "TerrariaProgression_P2MenuFishing_0.8.1_Test.zip", "w", zipfile.ZIP_DEFLATED) as archive:
+with zipfile.ZipFile(output / "TerrariaProgression_P2MenuFishing_0.8.2_Test.zip", "w", zipfile.ZIP_DEFLATED) as archive:
     archive.writestr("TerrariaProgression.tmod", mod)
     archive.write(repo / "docs/P2MenuFishing_TEST_GUIDE_zh-CN.md", "安装与测试说明.md")
     archive.writestr("BUILD_INFO.txt", info)
-with zipfile.ZipFile(output / "TerrariaProgression_P2MenuFishing_0.8.1_Source.zip", "w", zipfile.ZIP_DEFLATED) as archive:
+with zipfile.ZipFile(output / "TerrariaProgression_P2MenuFishing_0.8.2_Source.zip", "w", zipfile.ZIP_DEFLATED) as archive:
     paths = subprocess.check_output(["git", "ls-files", "-z"], cwd=repo).decode().split("\0")
     for path in filter(None, paths):
         archive.writestr(path, subprocess.check_output(["git", "show", f"{commit}:{path}"], cwd=repo))

@@ -116,7 +116,7 @@ Mods: {
   "ClearSearch": "清空",
   "OwnedOnly": "已购买",
   "EnabledOnly": "已启用",
-  "AllInCategory": "全部",
+  "AllInCategory": "本类全部",
   "GlobalResults": "全局搜索结果：{0}",
   "NoResults": "没有符合条件的天赋",
   "NoResultsHint": "试试清空搜索或关闭筛选。",
