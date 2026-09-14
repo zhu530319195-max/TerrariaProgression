@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
+using TerrariaProgression.Players;
 
 namespace TerrariaProgression.UI;
 
@@ -14,26 +15,33 @@ public sealed class TalentUISystem : ModSystem
     private TalentUIState? panel;
     private GameTime lastTime = new();
     internal static bool Visible;
+    internal static bool IsTyping => Visible && ModContent.GetInstance<TalentUISystem>().panel?.SearchFocused == true;
+    internal static bool CanUseMenu => !Main.gameMenu && !Main.dedServ && !Main.LocalPlayer.dead
+        && Main.LocalPlayer.TryGetModPlayer<ProgressionPlayer>(out _);
     public override void Load()
     {
         ToggleKey = KeybindLoader.RegisterKeybind(Mod, "ToggleTalents", "P");
-        userInterface = new UserInterface();
-        panel = new TalentUIState();
-        panel.Activate();
+        // Load runs before the local player's ModPlayer array is populated.
+        // Create and activate widgets only on the first in-world open.
     }
-    public override void Unload() { ToggleKey = null; Visible = false; userInterface = null; panel = null; }
-    public override void OnWorldUnload() { Visible = false; userInterface?.SetState(null); }
+    public override void Unload() { panel?.EndSearch(); ToggleKey = null; Visible = false; userInterface = null; panel = null; }
+    public override void OnWorldUnload() { panel?.EndSearch(); Visible = false; userInterface?.SetState(null); }
     internal static void Toggle()
     {
-        if (Main.gameMenu || Main.dedServ) return;
-        Visible = !Visible;
+        if (!CanUseMenu) return;
         var system = ModContent.GetInstance<TalentUISystem>();
+        if (!Visible) {
+            system.userInterface ??= new UserInterface();
+            system.panel ??= new TalentUIState();
+        }
+        Visible = !Visible;
+        if (!Visible) system.panel?.EndSearch();
         system.userInterface?.SetState(Visible ? system.panel : null);
     }
     public override void UpdateUI(GameTime gameTime)
     {
         lastTime = gameTime;
-        if (Main.gameMenu || Main.LocalPlayer.dead) { Visible = false; userInterface?.SetState(null); }
+        if (!CanUseMenu) { panel?.EndSearch(); Visible = false; userInterface?.SetState(null); }
         if (Visible) userInterface?.Update(gameTime);
     }
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -41,7 +49,7 @@ public sealed class TalentUISystem : ModSystem
         int index = layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
         if (index < 0) index = layers.Count;
         layers.Insert(index, new LegacyGameInterfaceLayer("TerrariaProgression: Talents", () => {
-            if (Visible && !Main.gameMenu) userInterface?.Draw(Main.spriteBatch, lastTime);
+            if (Visible && CanUseMenu) userInterface?.Draw(Main.spriteBatch, lastTime);
             return true;
         }, InterfaceScaleType.UI));
     }

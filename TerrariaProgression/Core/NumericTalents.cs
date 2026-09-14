@@ -6,7 +6,7 @@ using System.Numerics;
 namespace TerrariaProgression.Core;
 
 public enum TalentCategory : byte { BaseStats, Recovery, Combat, Economy, Utility, World }
-public enum TalentOperation : byte { Upgrade, RefundOne, RefundTalent, Enable, Disable, RefundCategory, RefundEverything, EnableEverything, DisableEverything, DecreaseIntensity, IncreaseIntensity, MaximumIntensity, ToggleChild }
+public enum TalentOperation : byte { Upgrade, RefundOne, RefundTalent, Enable, Disable, RefundCategory, RefundEverything, EnableEverything, DisableEverything, DecreaseIntensity, IncreaseIntensity, MaximumIntensity, ToggleChild, RefundMenuGroup, RefundMenuCategory }
 public enum TalentResult : byte { Success, NotReady, UnknownTalent, InvalidRequest, NotEnoughPoints, NoChange, StaleRequest, Capacity }
 public enum EffectUnit { Flat, Percent, PerSecond, RemainingMultiplier, Flag, Multiplier, Seconds }
 public sealed record TalentDefinition(string Id, TalentCategory Category, decimal PerLevel, EffectUnit Unit, bool Adjustable = false, int DefaultCost = 1, int MaxLevel = 0);
@@ -56,6 +56,8 @@ public static class NumericTalents
         new TalentDefinition("WoodYield", TalentCategory.Economy, 10, EffectUnit.Percent),
         new TalentDefinition("HerbYield", TalentCategory.Economy, 10, EffectUnit.Percent),
         new TalentDefinition("GemYield", TalentCategory.Economy, 10, EffectUnit.Percent),
+        new TalentDefinition("BaitSaving", TalentCategory.Economy, .93m, EffectUnit.RemainingMultiplier, true),
+        new TalentDefinition("CrateChance", TalentCategory.Economy, .95m, EffectUnit.RemainingMultiplier, true),
         new TalentDefinition("FishingYield", TalentCategory.Economy, 10, EffectUnit.Percent),
         new TalentDefinition("SellPrice", TalentCategory.Economy, 5, EffectUnit.Percent),
         new TalentDefinition("BuyDiscount", TalentCategory.Economy, .95m, EffectUnit.RemainingMultiplier),
@@ -136,3 +138,4 @@ public static class TalentMath
         return current + amount;
     }
 }
+

@@ -110,7 +110,8 @@ public sealed class ProgressionPlayer : ModPlayer
     }
     public override void ProcessTriggers(Terraria.GameInput.TriggersSet triggersSet)
     {
-        if (UI.TalentUISystem.ToggleKey?.JustPressed == true) UI.TalentUISystem.Toggle();
+        if (!UI.TalentUISystem.IsTyping && UI.TalentUISystem.ToggleKey?.JustPressed == true) UI.TalentUISystem.Toggle();
     }
     // No death or world save hook modifies progression.
 }
+

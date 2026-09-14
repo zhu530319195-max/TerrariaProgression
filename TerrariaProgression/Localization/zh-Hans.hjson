@@ -85,7 +85,49 @@ Mods: {
   "ChildChilled": "寒冷",
   "ChildFrozen": "冰冻",
   "ChildStoned": "石化",
-  "ChildOnFire": "燃烧"
+  "ChildOnFire": "燃烧",
+  "MenuSurvival": "生存与恢复",
+  "MenuBattle": "战斗与召唤",
+  "MenuMovement": "移动与探索",
+  "MenuGathering": "采集与钓鱼",
+  "MenuBuilding": "建筑与工具",
+  "MenuTrading": "掉落与交易",
+  "MenuGroupVitals": "生命与魔力",
+  "MenuGroupRecovery": "恢复与治疗",
+  "MenuGroupDefense": "防御与抗性",
+  "MenuGroupProtection": "环境与异常防护",
+  "MenuGroupOffense": "攻击强化",
+  "MenuGroupHandling": "攻击方式",
+  "MenuGroupSummoning": "消耗与召唤",
+  "MenuGroupAfflictions": "异常攻击",
+  "MenuGroupRetaliation": "受击反应",
+  "MenuGroupGround": "地面移动",
+  "MenuGroupJumping": "跳跃与攀爬",
+  "MenuGroupFlight": "飞行与游泳",
+  "MenuGroupVision": "视野与信息",
+  "MenuGroupResources": "资源采集",
+  "MenuGroupFishing": "钓鱼强化",
+  "MenuGroupHarvest": "拾取与收获",
+  "MenuGroupTools": "工具效率",
+  "MenuGroupConstruction": "建造辅助",
+  "MenuGroupLoot": "战利品",
+  "MenuGroupCommerce": "商店与重铸",
+  "Search": "全局搜索",
+  "ClearSearch": "清空",
+  "OwnedOnly": "已购买",
+  "EnabledOnly": "已启用",
+  "AllInCategory": "本类全部",
+  "GlobalResults": "全局搜索结果：{0}",
+  "NoResults": "没有符合条件的天赋",
+  "NoResultsHint": "试试清空搜索或关闭筛选。",
+  "RefundOneAmount": "回退一级 · 返还{0}点",
+  "RefundTalentAmount": "退款当前天赋 · {0}点",
+  "RefundGroupAmount": "退款分组【{0}】· {1}点",
+  "RefundMenuAmount": "退款分类【{0}】· {1}点",
+  "RefundAllAmount": "退款全部天赋 · {0}点",
+  "BaitRemaining": "原鱼饵消耗概率 ×{0}%",
+  "CrateRemaining": "原宝匣判定失败概率 ×{0}%",
+  "NoSelection": "未选择"
 }
     TalentNames: {
   "MaxLife": "最大生命",
@@ -166,7 +208,9 @@ Mods: {
   "WallPlacementSpeed": "墙壁放置速度",
   "NightVision": "夜视",
   "SelfLight": "角色自发光",
-  "DangerSense": "危险感知"
+  "DangerSense": "危险感知",
+  "BaitSaving": "鱼饵节约",
+  "CrateChance": "宝匣概率"
 }
     TalentHints: {
   "MaxLife": "每级 +25 HP。提高上限不会补血；降低上限仅截断当前生命。",
@@ -247,7 +291,9 @@ Mods: {
   "WallPlacementSpeed": "每级+20%墙壁放置速度，10级3倍，可调强度。与普通建造分开开关；不是拆墙速度，不节约墙材，保留原版放置条件，最快每帧一次。",
   "NightVision": "2点解锁原生夜视，独立开关。不提供真实光源；关闭后保留装备或药水提供的夜视。",
   "SelfLight": "2点解锁随角色移动的光源，亮度采用原生光芒药水的颜色强度，不占用增益栏。独立开关，不替代夜视，不提供回血。",
-  "DangerSense": "2点解锁原生危险感知，显示原版可识别的危险方块和陷阱；不是完整电线视图，不保证识别未知MOD机关。关闭保留药水效果。"
+  "DangerSense": "2点解锁原生危险感知，显示原版可识别的危险方块和陷阱；不是完整电线视图，不保证识别未知MOD机关。关闭保留药水效果。",
+  "BaitSaving": "每级使原鱼饵消耗概率乘0.93，Lv.10约节约51.6%。与装备节约效果叠加；不强制消耗，不免除鱼竿、鱼饵和钓鱼条件。所有合法鱼饵沿用该规则，包括特殊鱼饵。可调当前等级。",
+  "CrateChance": "每级使原宝匣判定失败概率乘0.95。若原判定率10%，Lv.10约46.1%。只增强宝匣资格，保持原生种类、稀有度、任务与敌人判定、池塘及液体条件；蜂蜜跳过，岩浆保留额外筛选，最终宝匣比例不一定等于资格概率。可调当前等级。"
 }
     Messages: {
       LootLimit: "额外战利品达到单次抽取保护或物品容量，部分额外奖励未生成；可在 MOD 配置调整抽取保护。天赋等级与点数不变。"
@@ -298,3 +344,4 @@ Mods: {
     }
   }
 }
+

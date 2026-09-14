@@ -25,6 +25,8 @@ public static class TalentCatalog
         if (!Enum.IsDefined(operation) || !Enum.IsDefined(category) || count is < 1 or > 100)
             return TalentResult.InvalidRequest;
         if (operation <= TalentOperation.Disable && !TryGet(id, out _)) return TalentResult.UnknownTalent;
+        if (operation is TalentOperation.RefundMenuGroup or TalentOperation.RefundMenuCategory &&
+            !TalentNavigation.ValidScope(id, operation == TalentOperation.RefundMenuGroup)) return TalentResult.InvalidRequest;
         try {
             var next = StateCodec.Decode(StateCodec.Encode(original));
             bool changed = false;
@@ -70,8 +72,10 @@ public static class TalentCatalog
                     break;
                 default:
                     foreach (var key in next.Talents.Keys.ToArray()) {
+                        if (operation is TalentOperation.RefundMenuGroup or TalentOperation.RefundMenuCategory &&
+                            !TalentNavigation.InScope(key, id, operation == TalentOperation.RefundMenuGroup)) continue;
                         if (operation == TalentOperation.RefundCategory && (!TryGet(key, out var def) || def.Category != category)) continue;
-                        if (operation is TalentOperation.RefundCategory or TalentOperation.RefundEverything) changed |= next.RefundAll(key) > 0;
+                        if (operation is TalentOperation.RefundCategory or TalentOperation.RefundEverything or TalentOperation.RefundMenuGroup or TalentOperation.RefundMenuCategory) changed |= next.RefundAll(key) > 0;
                         else {
                             bool enabled = operation == TalentOperation.EnableEverything;
                             changed |= next.Talents[key].Enabled != enabled;
@@ -90,3 +94,4 @@ public static class TalentCatalog
         catch (Exception error) when (error is System.IO.IOException or System.IO.InvalidDataException) { return TalentResult.Capacity; }
     }
 }
+

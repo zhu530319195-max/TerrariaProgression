@@ -23,16 +23,19 @@ namespace TerrariaProgression.UI;
 internal sealed class TalentUIState : UIState
 {
     private readonly UIPanel panel = new();
-    private readonly UIList list = new(), detailsList = new();
-    private readonly UIElement left = new(), rightArea = new(), detailCard = new(), actions = new();
-    private readonly List<TalentButton> tabs = new();
+    private readonly UIList navigation = new(), list = new(), detailsList = new(), actionList = new();
+    private readonly UIElement navArea = new(), left = new(), rightArea = new(), detailCard = new(), actions = new(), actionCard = new();
     private readonly List<TalentButton> actionButtons = new();
     private readonly UIText header = new("", .8f), totals = new("", .72f), title = new("", 1.05f);
-    private readonly UIText detail = new("", .8f), hint = new("", .72f), feedback = new("", .7f);
-    private TalentCategory category;
-    private string selected = "MaxLife";
+    private readonly UIText detail = new("", .8f), hint = new("", .72f), feedback = new("", .7f), pathLabel = new("", .7f);
+    private const TalentCategory category = TalentCategory.BaseStats; // legacy single-talent packet field; not a display category
+    private string menuCategory = "Survival", menuGroup = "", selected = "MaxLife", query = "";
+    private bool ownedOnly, enabledOnly;
+    private ProgressionState? filteredState;
+    private string filteredLanguage = "";
     private float lastWidth, lastHeight;
-    private TalentButton? resync;
+    private TalentButton? resync, search, ownedFilter, enabledFilter, clearSearch;
+    internal bool SearchFocused { get; private set; }
     private readonly List<TalentButton> childButtons = new();
     private string childSelection = "";
     private ProgressionPlayer Player => Main.LocalPlayer.GetModPlayer<ProgressionPlayer>();
@@ -43,147 +46,166 @@ internal sealed class TalentUIState : UIState
     public override void OnInitialize()
     {
         panel.BackgroundColor = new Color(20, 29, 48, 248);
-        panel.BorderColor = new Color(176, 146, 84);
-        panel.SetPadding(12);
-        foreach (var label in new[] { header, totals, title, detail, hint, feedback }) {
-            label.TextOriginX = 0;
-            label.WrappedTextBottomPadding = 0;
-            label.DynamicallyScaleDownToWidth = true;
+        panel.BorderColor = new Color(176, 146, 84); panel.SetPadding(12);
+        foreach (var label in new[] { header, totals, title, detail, hint, feedback, pathLabel }) {
+            label.TextOriginX = 0; label.WrappedTextBottomPadding = 0; label.DynamicallyScaleDownToWidth = true;
         }
-        title.TextColor = new Color(229, 199, 132);
-        totals.TextColor = new Color(160, 213, 208);
-        hint.TextColor = new Color(174, 188, 209);
-        panel.HAlign = panel.VAlign = .5f;
-        Append(panel);
-        Place(header, panel, 0, 3, 1, -100, 26);
-        Place(totals, panel, 0, 31, 1, 0, 22);
-        var close = Button("Close", () => TalentUISystem.Toggle());
-        close.Left.Set(-80, 1); close.Top.Set(0, 0); close.Width.Set(80, 0); panel.Append(close);
-        for (int i = 0; i < 6; i++) {
-            var value = (TalentCategory)i;
-            var tab = new TalentButton(() => Text("Category" + (int)value), () => SelectCategory(value), () => true, () => category == value);
-            tabs.Add(tab);
-            panel.Append(tab);
+        title.TextColor = new Color(229,199,132); totals.TextColor = new Color(160,213,208);
+        hint.TextColor = pathLabel.TextColor = new Color(174,188,209);
+        panel.HAlign = panel.VAlign = .5f; Append(panel);
+        Place(header,panel,0,3,1,-90,26); Place(totals,panel,0,31,1,0,22);
+        var close=Button("Close",TalentUISystem.Toggle); close.Left.Set(-80,1); close.Width.Set(80,0); panel.Append(close);
+        search=new TalentButton(() => Text("Search")+": "+query+(SearchFocused ? " |" : ""), () => { SearchFocused=true; Main.clrInput(); Main.blockInput=true; }, () => true, () => SearchFocused);
+        search.TextHAlign=0; panel.Append(search);
+        clearSearch=Button("ClearSearch",()=>{query=""; EndSearch(); RefreshTalents();}); panel.Append(clearSearch);
+        ownedFilter=new TalentButton(()=>Text("OwnedOnly")+" "+Text(ownedOnly?"On":"Off"),()=>{ownedOnly=!ownedOnly;RefreshTalents();},()=>true,()=>ownedOnly); panel.Append(ownedFilter);
+        enabledFilter=new TalentButton(()=>Text("EnabledOnly")+" "+Text(enabledOnly?"On":"Off"),()=>{enabledOnly=!enabledOnly;RefreshTalents();},()=>true,()=>enabledOnly); panel.Append(enabledFilter);
+        Place(pathLabel,panel,0,100,1,0,22);
+        panel.Append(navArea); panel.Append(left); panel.Append(rightArea);
+        AttachList(navArea,navigation); AttachList(left,list); AttachList(rightArea,detailsList);
+        detailCard.Width.Set(0,1); detailsList.Add(detailCard);
+        Place(title,detailCard,0,0,1,0,26); Place(detail,detailCard,0,32,1,0,0); detail.IsWrapped=true;
+        Place(hint,detailCard,0,140,1,0,0); hint.IsWrapped=true;
+        actions.Width.Set(0,1); rightArea.Append(actions); AttachList(actions,actionList);
+        actionCard.Width.Set(0,1); actionList.Add(actionCard);
+        AddAction(()=>TalentCatalog.TryGet(selected,out var d)?Text(d.MaxLevel==1?"UnlockCost":"UpgradeCost",d.DefaultCost):Text("Upgrade"),
+            ()=>Request(TalentOperation.Upgrade),()=>CanAct && TalentCatalog.TryGet(selected,out var d) && Player.State.AvailableTalentPoints>=d.DefaultCost && (d.MaxLevel==0 || (Player.State.Talents.GetValueOrDefault(selected)?.TalentLevel??0)<d.MaxLevel));
+        AddAction(()=>Text("RefundOneAmount",Compact(HasSelected?Player.State.Talents[selected].CostRuns[^1].Cost:0)),()=>Request(TalentOperation.RefundOne),()=>CanAct&&HasSelected);
+        AddAction(()=>Text("RefundTalentAmount",Compact(HasSelected?Player.State.Talents[selected].InvestedPoints:0)),()=>Request(TalentOperation.RefundTalent),()=>CanAct&&HasSelected);
+        AddAction(()=>Text("Enable"),()=>Request(TalentOperation.Enable),()=>CanAct&&HasSelected&&!Player.State.Talents[selected].Enabled);
+        AddAction(()=>Text("Disable"),()=>Request(TalentOperation.Disable),()=>CanAct&&HasSelected&&Player.State.Talents[selected].Enabled);
+        foreach(var op in new[]{TalentOperation.DecreaseIntensity,TalentOperation.IncreaseIntensity,TalentOperation.MaximumIntensity})
+            AddAction(()=>Text(op.ToString()),()=>Request(op),()=>CanAct&&HasSelected&&TalentCatalog.TryGet(selected,out var d)&&d.Adjustable);
+        AddAction(()=>Text("RefundGroupAmount",ScopeLabel(true),Compact(TalentNavigation.RefundAmount(Player.State,RefundScope(true),true))),
+            ()=>Player.RequestTalent(TalentOperation.RefundMenuGroup,RefundScope(true)),()=>CanAct&&TalentNavigation.RefundAmount(Player.State,RefundScope(true),true)>0);
+        AddAction(()=>Text("RefundMenuAmount",ScopeLabel(false),Compact(TalentNavigation.RefundAmount(Player.State,RefundScope(false),false))),
+            ()=>Player.RequestTalent(TalentOperation.RefundMenuCategory,RefundScope(false)),()=>CanAct&&TalentNavigation.RefundAmount(Player.State,RefundScope(false),false)>0);
+        var footerOps=new[]{TalentOperation.EnableEverything,TalentOperation.DisableEverything,TalentOperation.RefundEverything};
+        for(int i=0;i<footerOps.Length;i++) {
+            var op=footerOps[i];
+            var button=new TalentButton(()=>op==TalentOperation.RefundEverything?Text("RefundAllAmount",Compact(Player.State.TotalSpentTalentPoints)):Text(op.ToString()),()=>Player.RequestTalent(op),()=>CanAct&&Player.State.Talents.Count>0);
+            button.Left.Set(i*4,i/3f); button.Top.Set(-62,1); button.Width.Set(-8,1/3f); panel.Append(button);
         }
-        panel.Append(left);
-        list.Width.Set(-20, 1); list.Height.Set(0, 1); list.ListPadding = 5;
-        list.ManualSortMethod = _ => { }; left.Append(list);
-        var scroll = new TalentScrollbar(list);
-        scroll.Left.Set(-18, 1); scroll.Height.Set(0, 1); left.Append(scroll);
-        list.SetScrollbar(scroll);
-        panel.Append(rightArea);
-        detailsList.Width.Set(-20, 1); detailsList.Height.Set(-114, 1); rightArea.Append(detailsList);
-        var detailScroll = new TalentScrollbar(detailsList);
-        detailScroll.Left.Set(-18, 1); detailScroll.Height.Set(-114, 1); rightArea.Append(detailScroll);
-        detailsList.SetScrollbar(detailScroll);
-        detailCard.Width.Set(0, 1); detailsList.Add(detailCard);
-        Place(title, detailCard, 0, 0, 1, 0, 26);
-        Place(detail, detailCard, 0, 32, 1, 0, 0); detail.IsWrapped = true;
-        Place(hint, detailCard, 0, 140, 1, 0, 0); hint.IsWrapped = true;
-        actions.Width.Set(0, 1); actions.Height.Set(106, 0); actions.Top.Set(-106, 1); rightArea.Append(actions);
-        var purchase = new TalentButton(() => TalentCatalog.TryGet(selected, out var d)
-            ? Text(d.MaxLevel == 1 ? "UnlockCost" : "UpgradeCost", d.DefaultCost) : Text("Upgrade"),
-            () => Request(TalentOperation.Upgrade), () => CanAct && TalentCatalog.TryGet(selected, out var d)
-                && Player.State.AvailableTalentPoints >= d.DefaultCost
-                && (d.MaxLevel == 0 || (Player.State.Talents.GetValueOrDefault(selected)?.TalentLevel ?? 0) < d.MaxLevel));
-        actionButtons.Add(purchase); actions.Append(purchase);
-        ActionButton(actions, "RefundOne", () => Request(TalentOperation.RefundOne), () => CanAct && HasSelected);
-        ActionButton(actions, "RefundTalent", () => Request(TalentOperation.RefundTalent), () => CanAct && HasSelected);
-        ActionButton(actions, "Enable", () => Request(TalentOperation.Enable), () => CanAct && HasSelected && !Player.State.Talents[selected].Enabled);
-        ActionButton(actions, "Disable", () => Request(TalentOperation.Disable), () => CanAct && HasSelected && Player.State.Talents[selected].Enabled);
-        ActionButton(actions, "RefundCategory", () => Player.RequestTalent(TalentOperation.RefundCategory, category: category), () => CanAct && Player.State.Talents.Keys.Any(id => TalentCatalog.TryGet(id, out var d) && d.Category == category));
-        foreach (var op in new[] { TalentOperation.DecreaseIntensity, TalentOperation.IncreaseIntensity, TalentOperation.MaximumIntensity })
-            ActionButton(actions, op.ToString(), () => Request(op), () => CanAct && HasSelected && TalentCatalog.TryGet(selected, out var d) && d.Adjustable);
-        var footerOps = new[] { TalentOperation.EnableEverything, TalentOperation.DisableEverything, TalentOperation.RefundEverything };
-        for (int i = 0; i < footerOps.Length; i++) {
-            var op = footerOps[i];
-            var button = Button(op.ToString(), () => Player.RequestTalent(op), () => CanAct && Player.State.Talents.Count > 0);
-            button.Left.Set(i * 4, i / 3f); button.Top.Set(-62, 1); button.Width.Set(-8, 1 / 3f); panel.Append(button);
-        }
-        Place(feedback, panel, 0, -27, 1, 0, 25, 1);
-        resync = Button("Resync", () => ProgressionNetwork.RequestSnapshot(), () => Main.netMode == NetmodeID.MultiplayerClient && Player.RequestTimedOut);
-        resync.Left.Set(-90, 1); resync.Top.Set(-30, 1); resync.Width.Set(90, 0);
-        SelectCategory(TalentCategory.BaseStats);
+        Place(feedback,panel,0,-27,1,0,25,1);
+        resync=Button("Resync",()=>ProgressionNetwork.RequestSnapshot(),()=>Main.netMode==NetmodeID.MultiplayerClient&&Player.RequestTimedOut);
+        resync.Left.Set(-90,1); resync.Top.Set(-30,1); resync.Width.Set(90,0);
+        // Initialization builds only the layout. The first in-world Update
+        // binds the current character, including after changing characters.
+        RefreshNavigation();
     }
-    private void Request(TalentOperation operation) => Player.RequestTalent(operation, selected, category);
-    private void SelectCategory(TalentCategory value)
+    private static void AttachList(UIElement parent,UIList target)
     {
-        category = value;
-        list.Clear();
-        list.ViewPosition = 0;
-        detailsList.ViewPosition = 0;
-        var talents = TalentCatalog.All.Where(t => t.Category == category).ToArray();
-        selected = talents.FirstOrDefault()?.Id ?? "";
-        string? lastGroup = null;
-        foreach (var definition in talents.OrderBy(t => category == TalentCategory.Utility ? FunctionalTalentRegistry.GroupOf(t.Id) : "")) {
-            if (category == TalentCategory.Utility && lastGroup != FunctionalTalentRegistry.GroupOf(definition.Id)) {
-                lastGroup = FunctionalTalentRegistry.GroupOf(definition.Id);
-                var group = new UIText(Text("Group" + lastGroup), .75f) { TextColor = new Color(229,199,132) };
-                group.Width.Set(0,1); group.Height.Set(25,0); list.Add(group);
+        target.Width.Set(-20,1); target.Height.Set(0,1); target.ListPadding=5; target.ManualSortMethod=_=>{}; parent.Append(target);
+        var scroll=new TalentScrollbar(target); scroll.Left.Set(-18,1); scroll.Height.Set(0,1); parent.Append(scroll); target.SetScrollbar(scroll);
+    }
+    internal void EndSearch() { if(SearchFocused) {SearchFocused=false; Main.blockInput=false; PlayerInput.WritingText=false;} }
+    public override void OnDeactivate() { EndSearch(); base.OnDeactivate(); }
+    private string ScopeLabel(bool group) => RefundScope(group).Length == 0 ? Text("NoSelection") : Text((group ? "MenuGroup" : "Menu") + RefundScope(group));
+    private string RefundScope(bool group)
+    {
+        var location=TalentNavigation.Find(selected);
+        // Search is global: scope labels and requests follow the selected result.
+        if(query.Trim().Length>0) return location==null?"":group?location.Id:location.CategoryId;
+        return group?(menuGroup.Length>0?menuGroup:location?.Id??""):menuCategory;
+    }
+    private void Request(TalentOperation operation) => Player.RequestTalent(operation,selected,category);
+    private void Choose(string cat,string group)
+    {
+        menuCategory=cat; menuGroup=group; query=""; EndSearch(); RefreshNavigation(); RefreshTalents();
+    }
+    private void RefreshNavigation()
+    {
+        float scroll=navigation.ViewPosition; navigation.Clear();
+        foreach(var cat in TalentNavigation.Categories) {
+            var groups=TalentNavigation.Groups.Where(g=>g.CategoryId==cat&&g.TalentIds.Any(id=>TalentCatalog.TryGet(id,out _))).ToArray();
+            if(groups.Length==0)continue;
+            var button=new TalentButton(()=>Text("Menu"+cat),()=>Choose(cat,""),()=>true,()=>menuCategory==cat) {
+                Expanded = () => menuCategory==cat
+            };
+            button.Width.Set(0,1); button.TextHAlign=0; button.PaddingLeft=19; navigation.Add(button);
+            if(menuCategory!=cat)continue;
+            var all=new TalentButton(()=>Text("AllInCategory"),()=>Choose(cat,""),()=>true,()=>menuGroup.Length==0&&query.Length==0);
+            AddNavigationChild(all);
+            foreach(var g in groups) {
+                var entry=new TalentButton(()=>Text("MenuGroup"+g.Id),()=>Choose(cat,g.Id),()=>true,()=>menuGroup==g.Id&&query.Length==0);
+                AddNavigationChild(entry, g == groups[^1]);
             }
-            var id = definition.Id;
-            var entry = new TalentButton(() => {
-                var owned = Player.State.Talents.GetValueOrDefault(id);
-                return Name(id) + "  " + (definition.MaxLevel == 1 ? Text(owned == null ? "Locked" : "Unlocked") : Compact(owned?.TalentLevel ?? 0));
-            }, () => { selected = id; detailsList.ViewPosition = 0; }, () => true, () => selected == id);
-            entry.Width.Set(0, 1); entry.Height.Set(32, 0);
-            entry.TextHAlign = 0; entry.PaddingLeft = 10;
-            list.Add(entry);
         }
+        navigation.ViewPosition=scroll;
     }
-    private void ActionButton(UIElement parent, string key, Action action, Func<bool> enabled)
+    private void AddNavigationChild(TalentButton button, bool last = false)
     {
-        var button = Button(key, action, enabled);
-        actionButtons.Add(button);
-        parent.Append(button);
+        // UIList arranges the full-width row; the whole child button is inset,
+        // including its border and hit area. Dimensions scale with the game UI.
+        var row = new UIElement();
+        row.Width.Set(0,1); row.Height.Set(32,0); row.MarginBottom = last ? 8 : 0;
+        button.Left.Set(20,0); button.Width.Set(-20,1); button.TextHAlign=0;
+        row.Append(button); navigation.Add(row);
     }
-    private static TalentButton Button(string key, Action action, Func<bool>? enabled = null) => new(() => Text(key), action, enabled ?? (() => true));
-    private static void Place(UIElement item, UIElement parent, float x, float y, float widthPercent, float widthPixels, float height, float topPercent = 0)
+    private void RefreshTalents()
     {
-        item.Left.Set(x, 0); item.Top.Set(y, topPercent); item.Width.Set(widthPixels, widthPercent); item.Height.Set(height, 0); parent.Append(item);
-    }
-    internal static string Compact(BigInteger value) => value.ToString().Length <= 10 ? value.ToString() : value.ToString()[..4] + "… (" + value.ToString().Length + Text("Digits") + ")";
-    private static string Xp(BigInteger units)
-    {
-        string value = Experience.Format(units);
-        return value.Length <= 12 ? value : Compact(units / Experience.Scale);
-    }
-    private static string Effect(TalentDefinition definition, BigInteger level)
-    {
-        if (definition.Unit == EffectUnit.Flag) return Text(level > 0 ? "On" : "Off");
-        if (definition.Unit == EffectUnit.RemainingMultiplier)
-            return Text("Remaining", (100 * TalentMath.Remaining((double)definition.PerLevel, level)).ToString("0.##", CultureInfo.InvariantCulture));
-        // Defaults have at most two decimal places, preserving huge integer levels.
-        var hundredths = level * (int)(definition.PerLevel * 100);
-        string value = hundredths < 1000000000000 ? ((decimal)hundredths / 100).ToString("0.##", CultureInfo.InvariantCulture) : Compact(hundredths / 100);
-        if (definition.Unit == EffectUnit.Multiplier) return Text("NativeDamageMultiplier", value);
-        if (definition.Unit == EffectUnit.Seconds) return Text("EffectSeconds", value);
-        return "+" + value + (definition.Unit == EffectUnit.Percent ? "%" : definition.Unit == EffectUnit.PerSecond ? Text("PerSecond") : "");
-    }
-    private void Resize(float width, float height)
-    {
-        panel.Width.Set(width, 0); panel.Height.Set(height, 0);
-        int columns = width >= 600 ? 6 : 3;
-        int rows = 6 / columns;
-        for (int i = 0; i < tabs.Count; i++) {
-            tabs[i].Left.Set(0, (i % columns) / (float)columns);
-            tabs[i].Top.Set(62 + i / columns * 34, 0);
-            tabs[i].Width.Set(-5, 1f / columns);
-            tabs[i].Height.Set(28, 0);
+        float scroll=list.ViewPosition; list.Clear();
+        var ids=TalentNavigation.Visible(Player.State,menuCategory,menuGroup,query,ownedOnly,enabledOnly,Name);
+        if(!ids.Contains(selected)) {selected=ids.FirstOrDefault()??"";scroll=0;detailsList.ViewPosition=0;}
+        foreach(var id in ids) {
+            TalentCatalog.TryGet(id,out var definition);
+            var entry=new TalentButton(()=> {
+                var owned=Player.State.Talents.GetValueOrDefault(id);
+                return Name(id)+"  "+(definition.MaxLevel==1?Text(owned==null?"Locked":"Unlocked"):Compact(owned?.TalentLevel??0));
+            },()=>{selected=id;detailsList.ViewPosition=0;},()=>true,()=>selected==id);
+            entry.Width.Set(0,1); entry.TextHAlign=0; entry.PaddingLeft=8; list.Add(entry);
+            if(query.Trim().Length>0 && TalentNavigation.Find(id) is {} g) {
+                var location=new UIText(Text("Menu"+g.CategoryId)+" / "+Text("MenuGroup"+g.Id),.6f) {TextColor=new Color(174,188,209),DynamicallyScaleDownToWidth=true};
+                location.Width.Set(0,1);location.Height.Set(20,0);location.MinWidth.Set(0,0);list.Add(location);
+            }
         }
-        float contentTop = 62 + rows * 34 + 10;
-        left.Top.Set(contentTop, 0); left.Width.Set(-12, .30f); left.Height.Set(-contentTop - 72, 1);
-        rightArea.Left.Set(0, .30f); rightArea.Top.Set(contentTop, 0);
-        rightArea.Width.Set(0, .70f); rightArea.Height.Set(-contentTop - 72, 1);
-        for (int i = 0; i < actionButtons.Count; i++) {
-            actionButtons[i].Left.Set(0, i % 3 / 3f);
-            actionButtons[i].Top.Set(i / 3 * 36, 0);
-            actionButtons[i].Width.Set(-5, 1f / 3);
+        list.ViewPosition=scroll; filteredState=Player.State; filteredLanguage=Language.ActiveCulture.Name;
+    }
+    private void AddAction(Func<string> text,Action action,Func<bool> enabled)
+    {var b=new TalentButton(text,action,enabled);actionButtons.Add(b);actionCard.Append(b);}
+    private static TalentButton Button(string key,Action action,Func<bool>? enabled=null)=>new(()=>Text(key),action,enabled??(()=>true));
+    private static void Place(UIElement item,UIElement parent,float x,float y,float wp,float w,float h,float tp=0)
+    {item.Left.Set(x,0);item.Top.Set(y,tp);item.Width.Set(w,wp);item.Height.Set(h,0);parent.Append(item);}
+    internal static string Compact(BigInteger value)=>value.ToString().Length<=10?value.ToString():value.ToString()[..4]+"… ("+value.ToString().Length+Text("Digits")+")";
+    private static string Xp(BigInteger units) {string value=Experience.Format(units);return value.Length<=12?value:Compact(units/Experience.Scale);}
+    private static string Effect(TalentDefinition definition,BigInteger level)
+    {
+        if(definition.Unit==EffectUnit.Flag)return Text(level>0?"On":"Off");
+        if(definition.Unit==EffectUnit.RemainingMultiplier)return Text(definition.Id=="CrateChance"?"CrateRemaining":definition.Id=="BaitSaving"?"BaitRemaining":"Remaining",(100*TalentMath.Remaining((double)definition.PerLevel,level)).ToString("0.##",CultureInfo.InvariantCulture));
+        var hundredths=level*(int)(definition.PerLevel*100);
+        string value=hundredths<1000000000000?((decimal)hundredths/100).ToString("0.##",CultureInfo.InvariantCulture):Compact(hundredths/100);
+        if(definition.Unit==EffectUnit.Multiplier)return Text("NativeDamageMultiplier",value);
+        if(definition.Unit==EffectUnit.Seconds)return Text("EffectSeconds",value);
+        return "+"+value+(definition.Unit==EffectUnit.Percent?"%":definition.Unit==EffectUnit.PerSecond?Text("PerSecond"):"");
+    }
+    private void Resize(float width,float height)
+    {
+        panel.Width.Set(width,0);panel.Height.Set(height,0);
+        search!.Left.Set(0,0);search.Top.Set(62,0);search.Width.Set(-8,.44f);
+        clearSearch!.Left.Set(0,.44f);clearSearch.Top.Set(62,0);clearSearch.Width.Set(-6,.12f);
+        ownedFilter!.Left.Set(0,.56f);ownedFilter.Top.Set(62,0);ownedFilter.Width.Set(-6,.22f);
+        enabledFilter!.Left.Set(0,.78f);enabledFilter.Top.Set(62,0);enabledFilter.Width.Set(0,.22f);
+        const float contentTop=128;
+        navArea.Top.Set(contentTop,0);navArea.Width.Set(-8,.24f);navArea.Height.Set(-contentTop-72,1);
+        left.Left.Set(0,.24f);left.Top.Set(contentTop,0);left.Width.Set(-8,.30f);left.Height.Set(-contentTop-72,1);
+        rightArea.Left.Set(0,.54f);rightArea.Top.Set(contentTop,0);rightArea.Width.Set(0,.46f);rightArea.Height.Set(-contentTop-72,1);
+        float actionHeight=Math.Min(150,Math.Max(72,(height-24-contentTop-72)*.45f));
+        detailsList.Height.Set(-actionHeight-8,1);
+        foreach(var child in rightArea.Children)if(child is TalentScrollbar)child.Height.Set(-actionHeight-8,1);
+        actions.Height.Set(actionHeight,0);actions.Top.Set(-actionHeight,1);
+        // Two columns; long scoped refunds occupy an entire row. Scroll when height is limited.
+        for(int i=0;i<actionButtons.Count;i++) {
+            bool wide=i>=8;
+            actionButtons[i].Left.Set(0,wide?0:i%2/2f);
+            actionButtons[i].Top.Set((wide?4+i-8:i/2)*36,0);
+            actionButtons[i].Width.Set(wide?0:-5,wide?1:.5f);
         }
-        Recalculate();
-        // UIText wraps using its previous inner width. The second pass uses the new
-        // viewport width so changing UI scale while open doesn't leave stale wrapping.
-        Recalculate();
+        actionCard.Height.Set(6*36,0);Recalculate();Recalculate();
+    }
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        base.Draw(spriteBatch);
+        if(SearchFocused && search!=null) Main.instance.DrawWindowsIMEPanel(search.GetDimensions().Position()+new Microsoft.Xna.Framework.Vector2(0,32),1);
     }
     private void FitDetailText()
     {
@@ -211,11 +233,23 @@ internal sealed class TalentUIState : UIState
     }
     public override void Update(GameTime gameTime)
     {
-        float width = Math.Min(960, Main.screenWidth / Main.UIScale - 24);
-        float height = Math.Min(700, Main.screenHeight / Main.UIScale - 24);
+        float width = Math.Min(1180, Main.screenWidth / Main.UIScale - 24);
+        float height = Math.Min(800, Main.screenHeight / Main.UIScale - 24);
         if (width != lastWidth || height != lastHeight) {
             lastWidth = width; lastHeight = height; Resize(width, height);
         }
+        if (SearchFocused) {
+            if (Main.mouseLeft && Main.mouseLeftRelease && search!=null && !search.ContainsPoint(Main.MouseScreen)) EndSearch();
+            else {
+                Main.blockInput=true; PlayerInput.WritingText=true; Main.instance.HandleIME();
+                string input=Main.GetInputText(query); if(input.Length>80)input=input[..80];
+                if(input!=query){query=input;RefreshTalents();}
+                if(Main.keyState.IsKeyDown(Keys.Enter)||Main.keyState.IsKeyDown(Keys.Escape)){EndSearch();base.Update(gameTime);return;}
+            }
+        }
+        if (!ReferenceEquals(filteredState,Player.State) || filteredLanguage!=Language.ActiveCulture.Name) RefreshTalents();
+        var location=TalentNavigation.Find(selected);
+        pathLabel.SetText(query.Trim().Length>0?Text("GlobalResults",query):Text("Menu"+menuCategory)+" / "+(menuGroup.Length>0?Text("MenuGroup"+menuGroup):Text("AllInCategory")));
         if (Main.keyState.IsKeyDown(Keys.Escape) && !Main.oldKeyState.IsKeyDown(Keys.Escape)) {
             TalentUISystem.Toggle();
             return;
@@ -245,11 +279,11 @@ internal sealed class TalentUIState : UIState
             hint.SetText(Language.GetTextValue("Mods.TerrariaProgression.TalentHints." + selected) +
                 (definition.Adjustable ? "\n" + Text("Intensity", Compact(owned == null ? 0 : NumericTalents.EffectiveLevel(owned))) : ""));
         }
-        else { title.SetText(Text("Category" + (int)category)); detail.SetText(Text("ComingLater")); hint.SetText(""); }
+        else { title.SetText(Text("NoResults")); detail.SetText(Text("NoResultsHint")); hint.SetText(""); }
         feedback.SetText(!Player.SessionReady ? Text("Waiting") : Player.RequestTimedOut ? Text("Timeout") : Player.RequestPending ? Text("Waiting") : Player.HasResult ? Text("Result" + Player.LastResult) : Text("Help"));
         // Non-wrapped UIText updates its minimum width when text changes; release
         // that minimum so long numbers can fit instead of expanding over the close button.
-        foreach (var label in new[] { header, totals, title, feedback }) label.MinWidth.Set(0, 0);
+        foreach (var label in new[] { header, totals, title, feedback, pathLabel }) label.MinWidth.Set(0, 0);
         FitDetailText();
         base.Update(gameTime);
     }
@@ -257,6 +291,7 @@ internal sealed class TalentUIState : UIState
 
 internal sealed class TalentButton : UITextPanel<string>
 {
+    internal Func<bool>? Expanded { get; init; }
     private readonly Func<string> label;
     private readonly Func<bool> enabled;
     private readonly Func<bool> selected;
@@ -276,9 +311,25 @@ internal sealed class TalentButton : UITextPanel<string>
         bool active = enabled();
         bool highlighted = selected();
         TextColor = highlighted ? new Color(245, 215, 148) : active ? Color.White : new Color(123, 135, 150);
-        BackgroundColor = highlighted ? new Color(40, 66, 79) : active && IsMouseHovering ? new Color(45, 93, 105) : new Color(30, 44, 65);
-        BorderColor = highlighted || (active && IsMouseHovering) ? new Color(214, 181, 105) : new Color(63, 80, 103);
+        BackgroundColor = highlighted ? (Expanded != null ? new Color(35, 49, 68) : new Color(40, 66, 79)) : active && IsMouseHovering ? new Color(45, 93, 105) : new Color(30, 44, 65);
+        BorderColor = Expanded == null && (highlighted || (active && IsMouseHovering)) ? new Color(214, 181, 105) : new Color(63, 80, 103);
         base.Update(gameTime);
+    }
+    protected override void DrawSelf(SpriteBatch spriteBatch)
+    {
+        base.DrawSelf(spriteBatch);
+        if (Expanded == null) return;
+        // Draw a pixel triangle instead of relying on font glyph coverage.
+        var bounds = GetDimensions();
+        bool expanded = Expanded();
+        int rows = expanded ? 4 : 7;
+        int x = (int)bounds.X + 6, y = (int)(bounds.Y + (bounds.Height - rows) / 2);
+        for (int row = 0; row < rows; row++) {
+            int offset = expanded ? row : 0;
+            int width = expanded ? 7 - 2 * row : 4 - Math.Abs(3 - row);
+            spriteBatch.Draw(Terraria.GameContent.TextureAssets.MagicPixel.Value,
+                new Rectangle(x + offset, y + row, width, 1), TextColor);
+        }
     }
 }
 

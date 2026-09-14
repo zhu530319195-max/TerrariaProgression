@@ -1,22 +1,26 @@
 # PROJECT_STATUS.md
 
 ## Current phase
-P2-A 0.4.1 was accepted by the user and PR #6 merged into main at `bb36b53721db5f4a1758591b2406d6b0c88595d5` on 2026-09-13. Final CI run 34765157029 passed 2848 core checks and 252 native checks. The latest acceptance and merge authorization supersede all earlier pending P2-A notes.
+PR #1–#9 merged. P2 completion 0.7.0 was explicitly accepted by the user; PR #9 merged at `1301fea8a9805347150d204c36d5e47191859d24`, tested head `11c207ad162e92610c4f3d54c6f96592f5d523e0`. Final CI 34775077627: 2956 core checks, 399 native checks; both mod builds zero warnings/errors. This supersedes older pending acceptance text in all previous stage documents.
 
-P2-B 0.5.0 was accepted by the user and PR #7 merged at `a3ac45aeccb739b42bbcf3d317a7ced45075b539`. Final CI run 34766385691 passed 2884 core checks and 304 native checks. This acceptance supersedes earlier pending P2-B notes.
+0.8.2 on `feat/p2-menu-fishing` implements the user-approved two-level menu, global search/owned/active filters, exact scope refunds, bait conservation, crate eligibility, and passive accessory discovery/reporting. 81 talents: 49 numeric-registry entries + 32 functional-registry entries. Six display categories and 20 populated subgroups. New version needs separate in-game acceptance and explicit merge authorization.
 
-P2-C 0.6.0 was accepted by the user and PR #8 merged at `936f076ab16d827dc99805155ee0e34ab5be73bb`. Final CI run 34768703007 passed 2919 core and 357 native checks. This supersedes all earlier pending P2-C notes.
+## 0.8.1 client loading correction
+User reported that 0.8.0 failed client loading: TalentUISystem.Load activated TalentUIState, whose OnInitialize/RefreshTalents accessed an uninitialized local ModPlayer array. The former dedicated-server CI excluded this client-only system and did not prove graphical-client loading. User confirmed 0.8.1 testing passed, then requested the navigation-only polish in 0.8.2. PR #10 remains open; no merge was authorized. 0.8.1 defers widget creation until first in-world open, checks native TryGetModPlayer readiness, and binds the character on UI update. Added native regression checks explicitly invoke client-system Load with an empty player component array. Final corrected CI counts and exact artifact hashes belong in PR/BUILD_INFO; The 0.8.1 client fix is user-accepted; the 0.8.2 presentation change needs a visual check.
 
-P2 completion batch 1 (0.7.0) on `feat/p2-completion` adds FlightTime, FlightSpeed, SwimSpeed, PlacementSpeed, WallPlacementSpeed, NightVision, SelfLight and DangerSense. The user approved continuing the proposed eight-feature batch. Five numeric entries cost 1/level and are adjustable; three binary entries cost 2 once. Catalog: 47 numeric-registry + 32 functional-registry entries (ten numeric), 79 total.
+## 0.8.2 navigation polish
+Approved: inset entire child buttons by20 UI pixels, rename All to 本类全部, draw right/down triangles, use subdued parent highlight and gold selected-child border, add8 UI pixels after expanded children. Preserve three columns, text size and existing navigation behavior. Reuse 3060 core/440 native regression checks; exact final evidence is in PR/BUILD_INFO.
 
 ## Repository state
-- PR #1–#8 merged. Completion PR #9 remains unmerged until in-game acceptance and explicit authorization.
-- Target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
-- CI 34774979949 on 6a2c0b489dd406fa1f0aa97b6179be4e50eefe7b passed 2956 core and 398 native checks with zero compile warnings/errors. PR #9 records final validation including an additional buoyancy regression. Rendering and real multiplayer need in-game tests.
-- Save v3 imports v1/v2 and retains paid-cost refunds/retired AutoJump migration. Protocol 9 requires all peers on 0.7.0.
-- Real multiplayer, segmented/multi-stage bosses, potion duration/fishing yield and tiered crit remain previously deferred. No acceptance is implied for them.
-- Next after this batch: remaining P2 catalog candidates and scanner; P3 world operations remain future work. Independent jump height and dodge semantics still need a decision; cancelled AutoJump/world chest enhancement stay cancelled.
-- See `docs/P2Completion_IMPLEMENTATION.md` and `docs/P2Completion_TEST_GUIDE_zh-CN.md`.
+- Target remains tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8.
+- Save v3 retained, old IDs and paid-cost ledger unchanged. Protocol10 requires all peers on0.8.0.
+- New display taxonomy does not renumber legacy saved/network category values. Server validates new category/group refund scopes.
+- CI 34779551529 on `b4d6de949720c2681aa970203e0cc29972658aa4` passed 3060 core checks and 431 native checks; production and harness builds each report zero warnings/errors. Local native execution was blocked by runtime process-map access and is not counted as a pass.
+- Final delivered commit, CI count and package hashes are recorded in PR/BUILD_INFO.
+- Real multiplayer, potion sickness/fishing yield, special/segmented/multi-stage Bosses and per-player private loot retain their individual unaccepted/incomplete states. Tiered crit remains user-deferred.
+- Liquid/honey movement assistance, wires, actuators and independent jump height removed from the future development scope by user. Existing swim/jump speed remains. Hover/dodge deferred. Abnormal damage strengthening and further attack debuffs are a separate future batch, not this release. P3 world operations remain unimplemented.
+- AutoJump/world-chest enhancement remain cancelled; historical AutoJump purchases still refund once.
+- See `docs/P2MenuFishing_IMPLEMENTATION.md` and `docs/P2MenuFishing_TEST_GUIDE_zh-CN.md`.
 
 ## Confirmed core rules
 - Initial level: 1.
@@ -101,7 +105,8 @@ The core progression rules, P1 default balance direction, utility unlock pricing
 - PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
 
 ## Next implementation task
-Deliver the eight-feature P2 completion batch from passing CI for in-game acceptance. P2-D scanner and P3 remain future tasks.
+Deliver 0.8.0 menu/fishing/scanner from passing CI for separate in-game acceptance. Do not merge until explicitly authorized.
 
 ## P1 merge authorization supersedes earlier notes
 The earlier acceptance sections above record history at the time of feedback. PR #4 and #5 were subsequently explicitly authorized and merged. Their tested code is the P2-A base.
+

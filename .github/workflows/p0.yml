@@ -41,6 +41,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TerrariaProgression-P2Completion
+          name: TerrariaProgression-P2MenuFishing
           if-no-files-found: warn
           path: artifacts/
+
