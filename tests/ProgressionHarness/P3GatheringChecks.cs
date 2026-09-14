@@ -25,7 +25,7 @@ public sealed partial class RuntimeChecks
             Config.EnableModOreMining=false; Config.MaxBlocksPerAction=1000; Config.GatheringWorkPerTick=32; Config.ProtectedTileAreas.Clear();
             A.Player.inventory[0]=new Item(ItemID.PickaxeAxe);A.Player.selectedItem=0;A.Player.pickSpeed=1;
             A.Player.Center=new Vector2(x*16,y*16);
-            for(int dx=-15;dx<=20;dx++)for(int dy=-20;dy<=15;dy++)Main.tile[x+dx,y+dy].ClearEverything();
+            for(int dx=-15;dx<=20;dx++)for(int dy=-40;dy<=15;dy++)Main.tile[x+dx,y+dy].ClearEverything();
             foreach(var i in Main.item)i.active=false; Array.Clear(Main.timeItemSlotCannotBeReusedFor);
         }
         void Put(int dx,int dy,ushort type) { var t=Main.tile[x+dx,y+dy];t.ClearEverything();t.HasTile=true;t.TileType=type; }
@@ -102,14 +102,16 @@ public sealed partial class RuntimeChecks
         Check(!Request(GatheringMode.Tree)&&Has(0,0),"protected crown refuses whole tree before starting");
         Init();Buy("TreeFelling");Put(0,0,TileID.WoodBlock);Check(!Request(GatheringMode.Tree)&&Has(0,0),"tree mode cannot fell wooden construction");
         foreach(bool palm in new[]{false,true}) {
-            Init();Buy("TreeFelling");
+            Init();Buy("TreeFelling");if(palm)Buy("WoodYield",10);
             for(int dx=-3;dx<=3;dx++)Put(dx,5,palm?TileID.Sand:TileID.Grass);
             bool grew=palm?WorldGen.GrowPalmTree(x,y+5):WorldGen.GrowTree(x,y+5);
             Check(grew,"actual native tree generation succeeds: palm="+palm);
             int TreeTiles()=>Enumerable.Range(-3,7).Sum(dx=>Enumerable.Range(-20,25).Count(dy=>Has(dx,dy)&&GatheringSystem.NativeTree(Main.tile[x+dx,y+dy].TileType)));
-            Check(TreeTiles()>=5,"generated tree has native trunk and crown frames");
+            int originalCount=TreeTiles();
+            Check(originalCount>=5,"generated tree has native trunk and crown frames; count="+originalCount);
             for(int n=0;n<10&&Has(0,2);n++)Request(GatheringMode.Tree,0,2);Drain();
             Check(TreeTiles()==0&&Has(0,5),"generated whole tree including branches is cleared, ground preserved: palm="+palm);
+            if(palm)Check(Items(ItemID.PalmWood)==originalCount*2,"native palm wood participates in existing yield exactly once");
         }
         GatheringSystem.Clear();Config.ProtectedTileAreas.Clear();Config.MaxBlocksPerAction=1000;Config.GatheringWorkPerTick=32;
         Main.netMode=NetmodeID.SinglePlayer;

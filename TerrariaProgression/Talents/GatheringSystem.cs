@@ -66,7 +66,7 @@ public sealed class GatheringSystem : ModSystem
         GatheringMode.Area => Config.EnableAreaMining, GatheringMode.Vein => Config.EnableVeinMining,
         GatheringMode.Tree => Config.EnableTreeFelling, _ => false
     };
-    internal static bool NativeTree(int type) => type > 0 && type < TileID.Count && TileID.Sets.IsATreeTrunk[type];
+    internal static bool NativeTree(int type) => type > 0 && type < TileID.Count && (TileID.Sets.IsATreeTrunk[type] || type == TileID.PalmTree);
     internal static bool Ore(int type) => type >= 0 && type < TileID.Sets.Ore.Length && TileID.Sets.Ore[type]
         && (type < TileID.Count || Config.EnableModOreMining);
     internal static bool CanTouch(TilePoint pos, GatheringMode mode)

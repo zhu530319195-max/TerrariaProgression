@@ -131,7 +131,7 @@ public sealed class EconomySystem : ModSystem
         if (ResourceAdapters.TryGetValue(tile, out var adapter)) return adapter(item);
         if (item.type is ItemID.Amethyst or ItemID.Topaz or ItemID.Sapphire or ItemID.Emerald or ItemID.Ruby or ItemID.Diamond or ItemID.Amber) return "GemYield";
         if (TileID.Sets.Ore[tile]) return "MiningYield";
-        if (TileID.Sets.IsATreeTrunk[tile] || TileID.Sets.CountsAsGemTree[tile])
+        if (TileID.Sets.IsATreeTrunk[tile] || TileID.Sets.CountsAsGemTree[tile] || tile == TileID.PalmTree)
             return item.createTile > -1 && !ItemID.Sets.IsAPickup[item.type] && item.type != ItemID.Acorn ? "WoodYield" : null;
         if (tile is TileID.ImmatureHerbs or TileID.MatureHerbs or TileID.BloomingHerbs) return "HerbYield";
         return null;
@@ -210,3 +210,4 @@ public sealed class EconomyItem : GlobalItem
         EconomySystem.BoostWorld(item, source, ExtendedTalentPlayer.Level(player, id));
     }
 }
+
