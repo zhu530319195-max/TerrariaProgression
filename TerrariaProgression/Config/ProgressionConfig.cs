@@ -53,6 +53,8 @@ public sealed class ProgressionConfig : ModConfig
     [DefaultValue(true)] public bool EnableTreeFelling = true;
     [DefaultValue(true)] public bool EnableAreaHarvest = true;
     [DefaultValue(true)] public bool EnableAutoReplant = true;
+    [DefaultValue(true)] public bool EnableBlastRadius = true;
+    [DefaultValue(32), Range(7, 128)] public int MaxBlastRadius = 32;
     [DefaultValue(false)] public bool EnableModOreMining;
     [DefaultValue(1000), Range(0, int.MaxValue)] public int MaxBlocksPerAction = 1000;
     [DefaultValue(32), Range(1, 256)] public int GatheringWorkPerTick = 32;
@@ -67,6 +69,7 @@ public sealed class ProgressionConfig : ModConfig
         StatueExperienceMultiplier = float.IsFinite(StatueExperienceMultiplier) ? Math.Clamp(StatueExperienceMultiplier, 0f, 10f) : 0f;
         ExperienceRequirementCap = Math.Max(0, ExperienceRequirementCap);
         MaxBlocksPerAction = Math.Max(0, MaxBlocksPerAction);
+        MaxBlastRadius = Math.Clamp(MaxBlastRadius, 7, 128);
         GatheringWorkPerTick = Math.Clamp(GatheringWorkPerTick, 1, 256);
         ProtectedTileAreas ??= new();
         MaxExtraLootRollsPerEvent = Math.Clamp(MaxExtraLootRollsPerEvent, 1, 100000);

@@ -17,7 +17,7 @@ namespace TerrariaProgression.Talents;
 
 public sealed class GatheringSystem : ModSystem
 {
-    internal static ModKeybind? ActionKey, ModeKey;
+    internal static ModKeybind? ActionKey, ModeKey, ProtectionKey;
     private static ProgressionConfig Config => ModContent.GetInstance<ProgressionConfig>();
     private static readonly Dictionary<int, Job> jobs = new();
     private static readonly Dictionary<int, (Guid Session, uint Sequence, ulong Tick)> requests = new();
@@ -27,12 +27,14 @@ public sealed class GatheringSystem : ModSystem
     private static int killDepth;
     private static int pickDamage;
     private static int nextPlayer;
+    private static bool nativeMining;
     internal static int PendingCount => jobs.Count;
     public override void Load()
     {
         if (!Main.dedServ) {
             ActionKey = KeybindLoader.RegisterKeybind(Mod, "GatheringAction", "LeftAlt");
             ModeKey = KeybindLoader.RegisterKeybind(Mod, "GatheringMode", "G");
+            ProtectionKey = KeybindLoader.RegisterKeybind(Mod, "MiningProtection", "K");
         }
         On_Player.ItemCheck_UseMiningTools_ActuallyUseMiningTool += UseTool;
         On_Player.GetPickaxeDamage += PickDamage;
@@ -43,10 +45,10 @@ public sealed class GatheringSystem : ModSystem
         On_Player.ItemCheck_UseMiningTools_ActuallyUseMiningTool -= UseTool;
         On_Player.GetPickaxeDamage -= PickDamage;
         On_WorldGen.KillTile -= GuardKill;
-        ActionKey = ModeKey = null; Clear();
+        ActionKey = ModeKey = ProtectionKey = null; Clear();
     }
     public override void OnWorldUnload() => Clear();
-    internal static void Clear() { jobs.Clear(); requests.Clear(); notices.Clear(); permitted = manualTarget = null; killDepth = nextPlayer = 0; }
+    internal static void Clear() { foreach (var job in jobs.Values) job.Dispose(); jobs.Clear(); requests.Clear(); notices.Clear(); permitted = manualTarget = null; killDepth = nextPlayer = 0; nativeMining = false; }
     private static int PickDamage(On_Player.orig_GetPickaxeDamage orig, Player player, int x, int y, int power, int buffer, Tile tile)
     {
         int damage = orig(player, x, y, power, buffer, tile);
@@ -55,6 +57,7 @@ public sealed class GatheringSystem : ModSystem
     }
     private static void GuardKill(On_WorldGen.orig_KillTile orig, int x, int y, bool fail, bool effectOnly, bool noItem)
     {
+        if (nativeMining) { orig(x, y, fail, effectOnly, noItem); return; }
         if (permitted == null) {
             // Managed pick harvesting owns herb removal. Prevent the same swing
             // from cutting seedlings or bypassing server requests via vanilla cuts.
@@ -104,6 +107,29 @@ public sealed class GatheringSystem : ModSystem
         }
         return WorldGen.CanKillTile(x, y);
     }
+    internal static bool CanTouch(Player player, TilePoint pos, GatheringMode mode)
+    {
+        if (mode is not (GatheringMode.Area or GatheringMode.Vein) || player.GetModPlayer<GatheringPlayer>().ProtectionEnabled)
+            return CanTouch(pos, mode);
+        if (!WorldGen.InWorld(pos.X, pos.Y, 10)) return false;
+        var tile = Main.tile[pos.X, pos.Y];
+        // Pick-only eligibility mirrors native mining input. Herbs keep their
+        // separate harvest/seedling rules; axes and hammers keep their own tools.
+        return tile.HasTile && !Main.tileAxe[tile.TileType] && !Main.tileHammer[tile.TileType]
+            && !AgricultureSystem.IsHerb(pos.X, pos.Y) && (mode != GatheringMode.Vein || Ore(tile.TileType))
+            && WorldGen.CanKillTile(pos.X, pos.Y);
+    }
+    internal static bool SetProtection(Player p, Guid session, uint sequence, bool enabled)
+    {
+        var state = p.GetModPlayer<ProgressionPlayer>();
+        if (Main.netMode == NetmodeID.MultiplayerClient || !p.active || !state.SessionReady || session != state.SessionId || sequence == 0) return false;
+        requests.TryGetValue(p.whoAmI, out var last);
+        if (last.Session == session && sequence <= last.Sequence) return false;
+        requests[p.whoAmI] = (session, sequence, last.Session == session ? last.Tick : unchecked(Main.GameUpdateCount - (ulong)Interval(p, GatheringMode.Area)));
+        p.GetModPlayer<GatheringPlayer>().ProtectionEnabled = enabled;
+        if (jobs.TryGetValue(p.whoAmI, out var job) && job.IsMining) Cancel(p.whoAmI);
+        return true;
+    }
     private static void NativeTool(On_Player.orig_ItemCheck_UseMiningTools_ActuallyUseMiningTool orig, Player player, Item item, out bool canHitWalls, int x, int y)
     {
         // Only the explicitly targeted tile bypasses our swing-wide herb guard.
@@ -118,7 +144,7 @@ public sealed class GatheringSystem : ModSystem
         var gp = player.GetModPlayer<GatheringPlayer>();
         var target = new TilePoint(x, y);
         bool Eligible(GatheringMode candidate) => Enabled(candidate)
-            && ExtendedTalentPlayer.Level(player, GatheringRules.Talent(candidate)) > 0 && CanTouch(target, candidate);
+            && ExtendedTalentPlayer.Level(player, GatheringRules.Talent(candidate)) > 0 && CanTouch(player, target, candidate);
         mode = gp.MiningMode;
         if (item.pick > 0 && AgricultureSystem.IsHerb(x, y)) {
             if (gp.BatchEnabled && Eligible(GatheringMode.Harvest)) { mode = GatheringMode.Harvest; return true; }
@@ -191,7 +217,7 @@ public sealed class GatheringSystem : ModSystem
         requests[p.whoAmI] = (session, seq, Main.GameUpdateCount);
         if (jobs.ContainsKey(p.whoAmI)) return false;
         var origin = new TilePoint(x, y);
-        if ((mode != GatheringMode.SingleHerb && !p.GetModPlayer<GatheringPlayer>().BatchEnabled) || !Enabled(mode) || ExtendedTalentPlayer.Level(p, GatheringRules.Talent(mode)) <= 0 || !InReach(p, origin) || !CanTouch(origin, mode)
+        if ((mode != GatheringMode.SingleHerb && !p.GetModPlayer<GatheringPlayer>().BatchEnabled) || !Enabled(mode) || ExtendedTalentPlayer.Level(p, GatheringRules.Talent(mode)) <= 0 || !InReach(p, origin) || !CanTouch(p, origin, mode)
             || (mode == GatheringMode.Tree ? p.HeldItem.axe <= 0 : p.HeldItem.pick <= 0)) {
             Notice(p, "GatheringBlocked"); return false;
         }
@@ -209,7 +235,8 @@ public sealed class GatheringSystem : ModSystem
     // One real native pick/axe hit per work unit; no repeated damage bonus/drop replay.
     internal static bool Hit(Player p, TilePoint pos, GatheringMode mode)
     {
-        var oldActor = EconomySystem.Actor; var oldPermit = permitted;
+        var oldActor = EconomySystem.Actor; var oldPermit = permitted; var oldNative = nativeMining;
+        nativeMining = mode is GatheringMode.Area or GatheringMode.Vein && !p.GetModPlayer<GatheringPlayer>().ProtectionEnabled;
         EconomySystem.Actor = p; permitted = pos; pickDamage = 0;
         try {
             if (mode is GatheringMode.Harvest or GatheringMode.SingleHerb) return AgricultureSystem.Harvest(p, pos, mode == GatheringMode.Harvest);
@@ -217,7 +244,7 @@ public sealed class GatheringSystem : ModSystem
             else {
                 int buffer = p.hitTile.HitObject(pos.X, pos.Y, 1);
                 int damage = Main.tileNoFail[Main.tile[pos.X, pos.Y].TileType] ? 100 : 0;
-                damage += (int)(p.HeldItem.axe * 1.2f);
+                damage += (int)(ToolPowerSystem.AxePower(p, p.HeldItem) * 1.2f);
                 if (Main.getGoodWorld) damage = (int)(damage * 1.3);
                 pickDamage = damage;
                 bool done = p.hitTile.AddDamage(buffer, damage) >= 100;
@@ -227,9 +254,9 @@ public sealed class GatheringSystem : ModSystem
             if (Main.netMode == NetmodeID.Server) NetMessage.SendTileSquare(-1, pos.X, pos.Y, 3);
             return !Main.tile[pos.X, pos.Y].HasTile;
         }
-        finally { permitted = oldPermit; EconomySystem.Actor = oldActor; }
+        finally { permitted = oldPermit; EconomySystem.Actor = oldActor; nativeMining = oldNative; }
     }
-    private static void Notice(Player p, string key)
+    internal static void Notice(Player p, string key)
     {
         if (notices.TryGetValue(p.whoAmI, out var tick) && Main.GameUpdateCount - tick < 120) return;
         notices[p.whoAmI] = Main.GameUpdateCount;
@@ -267,6 +294,7 @@ public sealed class GatheringSystem : ModSystem
         private int attempts;
         private bool skipped;
         public long Removed, Limit;
+        public bool IsMining => mode is GatheringMode.Area or GatheringMode.Vein;
         public Job(Player p, GatheringMode mode, TilePoint origin, ushort ore, BigInteger level)
         {
             owner = p.whoAmI; slot = p.selectedItem; itemType = p.HeldItem.type;
@@ -316,7 +344,7 @@ public sealed class GatheringSystem : ModSystem
                 if (mode == GatheringMode.Vein) { if (!vein.TryDequeue(out candidate)) return Finish(p); }
                 else { if (scan == null || !scan.MoveNext()) return Finish(p); candidate = scan.Current; }
                 if (candidate == origin) return true;
-                if (!CanTouch(candidate, mode)) {
+                if (!CanTouch(p, candidate, mode)) {
                     if (mode == GatheringMode.Area && WorldGen.InWorld(candidate.X, candidate.Y, 10) && Main.tile[candidate.X, candidate.Y].HasTile) skipped = true;
                     return true;
                 }
@@ -324,7 +352,7 @@ public sealed class GatheringSystem : ModSystem
                 current = candidate; currentType = Main.tile[candidate.X, candidate.Y].TileType; attempts = 0;
             }
             var pos = current.Value;
-            if (!CanTouch(pos, mode) || Main.tile[pos.X, pos.Y].TileType != currentType) { current = null; return true; }
+            if (!CanTouch(p, pos, mode) || Main.tile[pos.X, pos.Y].TileType != currentType) { current = null; return true; }
             if (Hit(p, pos, mode)) {
                 Removed++; current = null;
                 if (mode == GatheringMode.Vein) AddNeighbours(pos);

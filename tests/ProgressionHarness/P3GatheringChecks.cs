@@ -20,7 +20,7 @@ public sealed partial class RuntimeChecks
         uint seq=0;
         void Advance(ulong ticks=100)=>typeof(Main).GetField("_gameUpdateCount",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic)!.SetValue(null,unchecked(Main.GameUpdateCount+(uint)ticks));
         void Init() {
-            Reset(); GatheringSystem.Clear(); A.Player.GetModPlayer<TerrariaProgression.Players.GatheringPlayer>().BatchEnabled=true; seq=0; A.Award(100000000*Experience.Scale);
+            Reset(); GatheringSystem.Clear(); A.Player.GetModPlayer<TerrariaProgression.Players.GatheringPlayer>().BatchEnabled=true; A.Player.GetModPlayer<TerrariaProgression.Players.GatheringPlayer>().ProtectionEnabled=true; seq=0; A.Award(100000000*Experience.Scale);
             Config.EnableWorldGathering=Config.EnableAreaMining=Config.EnableVeinMining=Config.EnableTreeFelling=true;
             Config.EnableModOreMining=false; Config.MaxBlocksPerAction=1000; Config.GatheringWorkPerTick=32; Config.ProtectedTileAreas.Clear();
             A.Player.inventory[0]=new Item(ItemID.PickaxeAxe);A.Player.selectedItem=0;A.Player.pickSpeed=1;

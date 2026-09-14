@@ -74,6 +74,8 @@ internal sealed class TalentUIState : UIState
             AddAction(() => Text("UpgradeManyCost", count, TalentCatalog.TryGet(selected, out var d) ? Compact((BigInteger)d.DefaultCost * count) : "0"),
                 () => Player.RequestTalent(TalentOperation.Upgrade, selected, category, count),
                 () => CanAct && TalentCatalog.TryGet(selected, out var d) && d.MaxLevel == 0 && Player.State.AvailableTalentPoints >= (BigInteger)d.DefaultCost * count);
+        AddAction(()=>Text(Main.LocalPlayer.GetModPlayer<GatheringPlayer>().ProtectionEnabled?"ProtectionOn":"ProtectionOff"),
+            ()=>Main.LocalPlayer.GetModPlayer<GatheringPlayer>().ToggleProtection(),()=>CanAct && selected is "AreaMining" or "VeinMining");
         AddAction(()=>Text("RefundOneAmount",Compact(HasSelected?Player.State.Talents[selected].CostRuns[^1].Cost:0)),()=>Request(TalentOperation.RefundOne),()=>CanAct&&HasSelected);
         AddAction(()=>Text("RefundTalentAmount",Compact(HasSelected?Player.State.Talents[selected].InvestedPoints:0)),()=>Request(TalentOperation.RefundTalent),()=>CanAct&&HasSelected);
         AddAction(()=>Text("Enable"),()=>Request(TalentOperation.Enable),()=>CanAct&&HasSelected&&!Player.State.Talents[selected].Enabled);
@@ -174,6 +176,8 @@ internal sealed class TalentUIState : UIState
     private static string Xp(BigInteger units) {string value=Experience.Format(units);return value.Length<=12?value:Compact(units/Experience.Scale);}
     private static string Effect(TalentDefinition definition,BigInteger level)
     {
+        if(definition.Id is "PickPower" or "AxePower")return Text("PowerPoints",Compact(level*10));
+        if(definition.Id=="BlastRadius")return Text("BlastTiles",Compact(level));
         if(definition.Id is "AreaMining" or "AreaHarvest")return Text("MiningArea",Compact(level*2+1));
         if(definition.Id=="VeinMining")return Text("MiningCount",Compact(level*25));
         if(definition.Unit==EffectUnit.Flag)return Text(level>0?"On":"Off");
@@ -286,6 +290,8 @@ internal sealed class TalentUIState : UIState
                 (definition.Adjustable ? "\n" + Text("Intensity", Compact(owned == null ? 0 : NumericTalents.EffectiveLevel(owned))) : ""));
         }
         else { title.SetText(Text("NoResults")); detail.SetText(Text("NoResultsHint")); hint.SetText(""); }
+        if (selected is "AreaMining" or "VeinMining")
+            hint.SetText(hint.Text + "\n" + Text(Main.LocalPlayer.GetModPlayer<GatheringPlayer>().ProtectionEnabled ? "ProtectionOn" : "ProtectionOff"));
         feedback.SetText(!Player.SessionReady ? Text("Waiting") : Player.RequestTimedOut ? Text("Timeout") : Player.RequestPending ? Text("Waiting") : Player.HasResult ? Text("Result" + Player.LastResult) : Text("Help"));
         // Non-wrapped UIText updates its minimum width when text changes; release
         // that minimum so long numbers can fit instead of expanding over the close button.
