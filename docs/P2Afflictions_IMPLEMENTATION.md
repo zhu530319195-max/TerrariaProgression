@@ -24,7 +24,9 @@ Reports use the loaded Mod.Version. Added 31 explicit mappings: 13 information a
 
 ## Validation
 
-Local core checks: 3112 passed. Production and runtime-harness compile with pinned official tModLoader v2026.07.3.0. Local dedicated-server startup is blocked by container `/proc/maps` access and MonoMod clrjit discovery; authoritative native test evidence will come from the repository's existing GitHub Actions workflow. Full CI and acceptance status are recorded in the PR and exact-build `BUILD_INFO.txt` after completion.
+Verification commit `e77444fd35d7038e16082f5d044f176ca22227c4`: [CI 34813485999](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34813485999) passed **3112 core / 523 native checks**, zero production/harness warnings or errors; player and source packaging passed. The final package's BUILD_INFO binds the exact delivered commit and mod SHA256. Local dedicated-server startup is blocked by container `/proc/maps` access and MonoMod clrjit discovery; native evidence comes from the existing GitHub Actions runner.
+
+Native damage measured over 600 isolated regen ticks: burn 40→120, poison 60→180, frostburn 80→240, cursed inferno 240→720, venom 300→900; Ichor 0→0 with unchanged defense modifier. Damage-loop tests keep the global source clock fixed to isolate rate; lease expiration is independently covered by core checks. Runtime tests also passed the server/client extra-AI boundary, actual item/summon dispatch, existing kill XP settlement, final native fishing power and passive mapping assertions. These automated results do not constitute player acceptance.
 
 New native checks measure actual health loss for all six statuses; level-one fractional damage; weapon-only exclusion; immunity; refresh; native item and summon hit dispatch; confirmed server strikes; current strength/disable/refund/disconnect; NPC/world lifetime; extra-AI authority; oiled exclusion; saturation; existing XP settlement; native final fishing power and equipment addition; report version and mapping scope. Real two-client testing and all earlier deferred/incomplete items remain separate.
 

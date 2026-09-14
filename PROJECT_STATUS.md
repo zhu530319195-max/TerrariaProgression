@@ -12,11 +12,13 @@
 
 ## 最新任务审查入口
 
-本分支实现0.9.0 P2异常／渔力批次，共87项天赋（51项数值注册、36项功能注册），存档v3、协议11；当前进入自动验证，尚未实机验收或合并。正式已验收main仍是上面的0.8.2。
+本分支实现0.9.0 P2异常／渔力批次，共87项天赋（51项数值注册、36项功能注册），存档v3、协议11；自动检查通过，尚未实机验收或合并。正式已验收main仍是上面的0.8.2。
 
 见[中文任务清单](docs/TASK_CHECKLIST_zh-CN.md)、[批准设计](docs/P2_AFFLICTIONS_DESIGN_zh-CN.md)、[实现记录](docs/P2Afflictions_IMPLEMENTATION.md)和[中文验收说明](docs/P2Afflictions_TEST_GUIDE_zh-CN.md)。本批NEXT-01／02／03已实装：异常伤害+20%/级，霜冻／诅咒焰／毒液／灵液2秒/级，渔力+5/级；均1点/级、无限、可调。保留已有燃烧／中毒ID、存档及投入。
 
 MAINT-01读取实际加载版本；MAINT-02补充31项明确映射（信息读数、免疫子项、钓鱼和建筑工具）。原报告450项、映射11／部分16／未映射423仅作为0.8.2历史样本，不冒充新报告结果；扫描仍不执行未知第三方饰品逻辑。
+
+验证代码 `e77444fd35d7038e16082f5d044f176ca22227c4`：[CI 34813485999](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34813485999) 通过3112项核心、523项原生检查，生产与测试MOD编译零警告、零错误。最终包的精确提交及校验值见BUILD_INFO。玩家实机验收仍待进行。
 
 ## 必须单独保留的状态
 
@@ -111,7 +113,7 @@ P0/P1 and the delivered P2 batches are stage-accepted through0.8.2, subject to t
 - PR #4 and dependent PR #5 remain open. No explicit merge authorization in this feedback.
 
 ## Next implementation task
-第一步规则定稿已完成；第二步0.9.0整批实现已进入自动验证和统一交付准备。下一步等待玩家验收，P3尚未开工。文档PR #11与功能PR均不自动合并。
+第一步规则定稿已完成；第二步0.9.0整批实现与自动检查已完成，准备统一交付。下一步等待玩家验收，P3尚未开工。文档PR #11与功能PR均不自动合并。
 
 ## P1 merge authorization supersedes earlier notes
 The earlier acceptance sections above record history at the time of feedback. PR #4 and #5 were subsequently explicitly authorized and merged. Their tested code is the P2-A base.
