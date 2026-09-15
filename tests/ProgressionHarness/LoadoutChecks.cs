@@ -87,7 +87,7 @@ public sealed partial class RuntimeChecks
                 && A.State.TotalTalentPointsEarned>100,"shared experience increases every allocation allowance");
             // A pending real wall job must be cancelled before the next work frame.
             Reset();GatheringSystem.Clear();TreeReplantSystem.Clear();Config.EnableWorldGathering=Config.EnableAreaWallRemoval=true;
-            A.Award(1000000*Experience.Scale);Action(TalentOperation.Upgrade,"AreaWallRemoval",10);
+            A.Award(1000000*Experience.Scale);Action(TalentOperation.Upgrade,"AreaWallRemoval",10);Action(TalentOperation.Upgrade,"HammerPower",10);
             Action(TalentOperation.CopyLoadout,"另一拆墙方案");first=A.State.Loadouts[0].Id;
             int x=Main.spawnTileX+180,y=Main.spawnTileY-15;
             p=A.Player;p.Center=new Vector2(x*16,y*16);p.inventory[0]=new Item(ItemID.WoodenHammer);p.selectedItem=0;
