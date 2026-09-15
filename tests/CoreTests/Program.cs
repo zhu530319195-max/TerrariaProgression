@@ -92,7 +92,7 @@ Check(state.Invest("MaxLife", 1, BigInteger.Pow(10, 30)), "unlimited compressed 
 Check(state.Talents["MaxLife"].CostRuns.Count == 1 && StateCodec.Encode(state).Length < 512, "huge same-price levels fit a compact snapshot");
 copy = StateCodec.Decode(StateCodec.Encode(state));
 Check(copy.RefundOne("MaxLife") == 1 && copy.RefundAll("MaxLife") == BigInteger.Pow(10, 30) - 1, "constant-time huge refunds preserve exact costs");
-Check(NumericTalents.All.Count == 51 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "51 implemented unlimited numeric talents registered");
+Check(NumericTalents.All.Count == 52 && NumericTalents.All.All(t => t.DefaultCost == 1 && t.MaxLevel == 0), "52 implemented unlimited numeric talents registered");
 state = new(); state.Award(1000 * scale, 50000);
 var result = TalentCatalog.Apply(state, TalentOperation.Upgrade, "MaxLife", TalentCategory.BaseStats, 1, out copy);
 Check(result == TalentResult.Success && copy.AvailableTalentPoints == 2 && state.AvailableTalentPoints == 3, "transaction copy commits without mutating original");
@@ -281,7 +281,7 @@ Console.WriteLine($"Final P2-Completion core checks passed: {checks}");
 
 // 0.8.0 navigation membership and atomic new-scope refunds, independent of old enums.
 var menuIds=TalentNavigation.Groups.SelectMany(g=>g.TalentIds).ToArray();
-Check(menuIds.Length==95 && menuIds.Distinct().Count()==95 && menuIds.Order().SequenceEqual(TalentCatalog.All.Select(t=>t.Id).Order()),"all 95 implemented talents appear once in the menu");
+Check(menuIds.Length==100 && menuIds.Distinct().Count()==100 && menuIds.Order().SequenceEqual(TalentCatalog.All.Select(t=>t.Id).Order()),"all 100 implemented talents appear once in the menu");
 Check(TalentNavigation.Categories.Count==6 && TalentNavigation.Groups.All(g=>g.TalentIds.Count>0&&TalentNavigation.Categories.Contains(g.CategoryId)),"six populated categories and no empty or orphan groups");
 Check(!menuIds.Contains("AutoJump")&&!menuIds.Contains("JumpHeight"),"cancelled jumps absent from navigation");
 state=new();state.Award(100000000*scale,50000);
@@ -292,12 +292,12 @@ foreach(var scope in TalentNavigation.Categories) {
     var amount=TalentNavigation.RefundAmount(state,scope,false);
     Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuCategory,scope,TalentCategory.BaseStats,1,out copy)==TalentResult.Success,"new category refund accepted: "+scope);
     Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.TotalSpentTalentPoints==state.TotalSpentTalentPoints-amount,"category refund uses historical costs: "+scope);
-    Check(copy.Talents.Keys.All(id=>!TalentNavigation.InScope(id,scope,false)) && copy.Talents.Count==95-menuIds.Count(id=>TalentNavigation.InScope(id,scope,false)),"category refund exact membership: "+scope);
+    Check(copy.Talents.Keys.All(id=>!TalentNavigation.InScope(id,scope,false)) && copy.Talents.Count==100-menuIds.Count(id=>TalentNavigation.InScope(id,scope,false)),"category refund exact membership: "+scope);
 }
 foreach(var g in TalentNavigation.Groups) {
     var amount=TalentNavigation.RefundAmount(state,g.Id,true);
     Check(TalentCatalog.Apply(state,TalentOperation.RefundMenuGroup,g.Id,TalentCategory.Economy,1,out copy)==TalentResult.Success,"new subgroup refund accepted: "+g.Id);
-    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.Talents.Count==95-g.TalentIds.Count,"subgroup exact historical refund: "+g.Id);
+    Check(copy.AvailableTalentPoints==state.AvailableTalentPoints+amount && copy.Talents.Count==100-g.TalentIds.Count,"subgroup exact historical refund: "+g.Id);
     Check(copy.Talents.Keys.All(id=>!g.TalentIds.Contains(id)) && snapshot.SequenceEqual(StateCodec.Encode(state)),"refund leaves source and other groups intact: "+g.Id);
 }
 foreach(var invalid in new[]{"","NotAGroup","AutoJump","../../Survival"}) {
@@ -462,3 +462,40 @@ Check(oldKeys["TerrariaProgression/ToggleTalents"].Count==0&&oldKeys["TerrariaPr
 oldKeys["TerrariaProgression/MiningProtection"].Clear();
 Check(!DefaultKeybindRules.Initialize("Legacy/Keyboard",oldKeys,oldMarkers)&&oldKeys["TerrariaProgression/MiningProtection"].Count==0,"intentional K clear persists after its one-time migration");
 Console.WriteLine($"Final P3-NativeTerrain core checks passed: {checks}");
+
+// Server limits constrain execution and purchasing, never the portable paid ledger.
+var limited = new ProgressionState(); limited.Award(1000000000*Experience.Scale,50000);
+Check(limited.Invest("AreaMining",3,20),"limit fixture preserves historical non-default cost");
+limited.Talents["AreaMining"].CurrentIntensity=15;
+byte[] originalLimitsSave=StateCodec.Encode(limited);
+TalentLimits.Configure("10",Array.Empty<KeyValuePair<string,string>>());
+Check(NumericTalents.ActiveLevel(limited,"AreaMining")==10 && limited.Talents["AreaMining"].TalentLevel==20,"server cap only clips actual effect");
+Check(StateCodec.Encode(limited).SequenceEqual(originalLimitsSave)&&TalentCatalog.ValidateImported(limited),"limits do not rewrite or reject above-cap saved progress");
+Check(TalentLimits.PurchaseCount(limited,"AreaMining",1000)==0,"already above cap cannot buy more");
+TalentLimits.Configure("0",new Dictionary<string,string>{{"AreaMining","-1"},{"NoFallDamage","10"}});
+Check(NumericTalents.ActiveLevel(limited,"AreaMining")==15&&TalentLimits.Cap("Damage")==0,"override can open a globally forbidden talent");
+Check(TalentLimits.Cap("NoFallDamage")==1,"binary ceiling survives server override");
+TalentLimits.Configure("0",Array.Empty<KeyValuePair<string,string>>());
+Check(NumericTalents.ActiveLevel(limited,"AreaMining")==0,"zero pauses owned talent");
+var beforeRefund=limited.AvailableTalentPoints;
+Check(TalentCatalog.Apply(limited,TalentOperation.RefundTalent,"AreaMining",TalentCategory.World,1,out var refundedLimited)==TalentResult.Success&&refundedLimited.AvailableTalentPoints==beforeRefund+60,"disabled above-cap talent refunds actual 60 paid");
+TalentLimits.Configure("-1",new Dictionary<string,string>{{"Damage","12"}});
+var bulkLimited=new ProgressionState();bulkLimited.Award(1000000000*Experience.Scale,50000);bulkLimited.Invest("Damage",1,10);
+var bulkPoints=bulkLimited.AvailableTalentPoints;
+Check(TalentLimits.PurchaseCount(bulkLimited,"Damage",1000)==2,"bulk quote clips to two remaining levels");
+Check(TalentCatalog.Apply(bulkLimited,TalentOperation.Upgrade,"Damage",TalentCategory.Combat,1000,out var clipped)==TalentResult.Success&&clipped.Talents["Damage"].TalentLevel==12&&clipped.AvailableTalentPoints==bulkPoints-2,"clipped purchase charges exactly two");
+var poor=new ProgressionState();poor.Award(Experience.Requirement(1,50000),50000);var poorBytes=StateCodec.Encode(poor);
+Check(TalentCatalog.Apply(poor,TalentOperation.Upgrade,"Damage",TalentCategory.Combat,1000,out var unchangedPoor)==TalentResult.NotEnoughPoints&&StateCodec.Encode(unchangedPoor).SequenceEqual(poorBytes),"insufficient clipped price rejects whole transaction, no partial purchase");
+TalentLimits.Configure("-1",Array.Empty<KeyValuePair<string,string>>());
+Check(NumericTalents.ActiveLevel(limited,"AreaMining")==15&&StateCodec.Encode(limited).SequenceEqual(originalLimitsSave),"restoring defaults restores saved strength without changing ledger");
+foreach(var def in TalentCatalog.All) {
+    var c=new ProgressionState();c.Award(1000000000*Experience.Scale,50000);c.Invest(def.Id,def.DefaultCost,1);
+    TalentLimits.Configure("0",Array.Empty<KeyValuePair<string,string>>());
+    Check(NumericTalents.ActiveLevel(c,def.Id)==0&&TalentLimits.PurchaseCount(c,def.Id,1)==0,"all catalogs honor global zero: "+def.Id);
+    TalentLimits.Configure("-1",new Dictionary<string,string>{{def.Id,"0"}});
+    Check(NumericTalents.ActiveLevel(c,def.Id)==0,"per-talent zero honored: "+def.Id);
+}
+TalentLimits.Configure("-1",Array.Empty<KeyValuePair<string,string>>());
+Check(TalentLimits.TryParse(BigInteger.Pow(10,60).ToString(),out _)&&!TalentLimits.TryParse("-2",out _)&&!TalentLimits.TryParse("1.5",out _),"cap input supports arbitrary integers and rejects invalid semantics");
+Check(ToolPowerRules.Hammer(25,10)==125&&ToolPowerRules.Hammer(0,10)==0,"hammer adds displayed points only to real hammers");
+Console.WriteLine($"Final P3-ResourcesLimits core checks passed: {checks}");

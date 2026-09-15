@@ -27,11 +27,11 @@ public static class TalentNavigation
         G("Movement", "Jumping", "JumpSpeed", "MultiJump", "WallClimb", "WallSlide", "NoFallDamage"),
         G("Movement", "Flight", "FlightTime", "FlightSpeed", "UnlimitedFlight", "SwimSpeed", "WaterWalking", "LavaWalking"),
         G("Movement", "Vision", "NightVision", "SelfLight", "DangerSense", "AllInformation"),
-        G("Gathering", "Resources", "MiningYield", "WoodYield", "HerbYield", "GemYield"),
+        G("Gathering", "Resources", "BasicBlockYield", "MiningYield", "WoodYield", "HerbYield", "GemYield"),
         G("Gathering", "Fishing", "FishingPower", "FishingYield", "BaitSaving", "CrateChance", "FishingLine", "LavaFishing"),
         G("Gathering", "Mining", "AreaMining", "VeinMining", "TreeFelling", "BlastRadius"),
-        G("Gathering", "Harvest", "AreaHarvest", "AutoReplant", "PickupRange"),
-        G("Building", "Tools", "ToolReach", "ToolSpeed", "PickPower", "AxePower"),
+        G("Gathering", "Harvest", "HerbGrowth", "AutoReplantTree", "AreaHarvest", "AutoReplant", "PickupRange"),
+        G("Building", "Tools", "ToolReach", "ToolSpeed", "PickPower", "AxePower", "HammerPower", "AreaWallRemoval"),
         G("Building", "Construction", "BuildReach", "PlacementSpeed", "WallPlacementSpeed", "AutoPaint", "BuildingRuler"),
         G("Trading", "Loot", "Coins", "LootQuantity", "DropChance", "BagQuantity"),
         G("Trading", "Commerce", "BuyDiscount", "SellPrice", "ReforgeDiscount")
@@ -48,6 +48,6 @@ public static class TalentNavigation
             (query.Length > 0 ? name(id).Contains(query, StringComparison.OrdinalIgnoreCase) || id.Contains(query, StringComparison.OrdinalIgnoreCase)
                 : InScope(id, group.Length > 0 ? group : category, group.Length > 0)) &&
             (!ownedOnly || state.Talents.ContainsKey(id)) &&
-            (!enabledOnly || (state.Talents.TryGetValue(id, out var t) && t.Enabled && NumericTalents.EffectiveLevel(t) > 0))).ToArray();
+            (!enabledOnly || NumericTalents.ActiveLevel(state, id) > 0)).ToArray();
     }
 }

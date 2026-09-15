@@ -1,0 +1,3 @@
+0.13.1 — 无尽潜能 · Boundless Potential
+统一模组列表名称、天赋面板标题与服务器设置标题；更新100项天赋的中英文介绍。内部标识、角色存档v3和协议17保持不变，玩法与已验收0.13.0一致。
+Updated the display name, talent panel and server configuration titles, plus bilingual descriptions for all 100 talents. Internal identity, save v3 and protocol 17 are unchanged; gameplay matches the accepted 0.13.0 build.

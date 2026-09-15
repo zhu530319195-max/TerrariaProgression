@@ -50,7 +50,8 @@ public static class TalentCatalog
                     break;
                 case TalentOperation.Upgrade:
                     var definition = byId[id];
-                    if (definition.MaxLevel > 0 && (next.Talents.GetValueOrDefault(id)?.TalentLevel ?? 0) + count > definition.MaxLevel) return TalentResult.NoChange;
+                    count = TalentLimits.PurchaseCount(next, id, count);
+                    if (count == 0) return TalentResult.NoChange;
                     if (!next.Invest(id, byId[id].DefaultCost, count)) return TalentResult.NotEnoughPoints;
                     changed = true;
                     break;

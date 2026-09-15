@@ -1,1 +1,14 @@
-Independent character progression with 79 talents. P2 completion adds wing duration/speed, swimming speed, night vision, personal light, dangersense and tile/wall placement speed. Press P or use /tptalents. Chinese and English.
+无尽潜能 · Boundless Potential
+
+在冒险中积累经验，自由搭配天赋，让战斗、采集与生产能力不断成长。
+击败敌人升级，使用天赋点培养角色。100项天赋覆盖属性、战斗、资源获取、采集与农业；数值天赋默认无限升级，可调当前强度、批量加点，并按实际投入退款。服务器可统一或逐项限制等级。
+
+P：天赋面板；左Alt：开关批量采集；G：切换范围／矿脉；K：开关额外挖矿保护（默认关闭）。
+
+Earn experience from defeated enemies and shape your character with 100 talents across combat, gathering and farming. Numeric talents are uncapped by default, with adjustable strength, bulk purchases and refunds based on points actually paid. Servers can set global and per-talent level limits.
+
+P: talents. Left Alt: toggle batch gathering. G: area/vein mode. K: extra mining protection (off by default).
+
+简体中文 / English. tModLoader v2026.07.3.0 / Terraria 1.4.4.9.
+0.13.0功能已通过作者实机验收；0.13.1更新名称与介绍。真实多人暂未实测，未知第三方MOD兼容性未作保证。特殊Boss及多人独立掉落增产尚未全面覆盖。
+The 0.13.0 feature batch passed author playtesting; 0.13.1 updates branding and descriptions. Live multiplayer and compatibility with arbitrary third-party mods are not verified. Special bosses and player-instanced extra loot remain incomplete.

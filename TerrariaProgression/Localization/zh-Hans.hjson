@@ -10,6 +10,10 @@ Mods: {
   }
 }
     TalentsUI: {
+      RestoreTalentLimits: "恢复默认天赋等级限制"
+      ServerLevels: "服务器上限：{0}级｜实际生效：{1}级"
+      UnlimitedLimit: "无限"
+
       ProtectionOn: "挖矿保护：开启（点击关闭）"
       ProtectionOff: "挖矿保护：关闭（点击开启）"
       PowerPoints: "+{0} 个百分点"
@@ -37,7 +41,7 @@ Mods: {
   "Digits": "位",
   "Remaining": "消耗概率／比例 ×{0}%",
   "PerSecond": " / 秒",
-  "Header": "天赋  ·  Lv.{0}   |   经验 {1} / {2}",
+  "Header": "无尽潜能  ·  Lv.{0}   |   经验 {1} / {2}",
   "Totals": "可用点数 {0}   ·   已投入 {1}   ·   累计经验 {2}",
   "Detail": "天赋等级：{0}（无限） · {1}\n当前效果：{2}\n下一级解锁效果：{3}\n升级花费：{4} 点\n累计投入：{5} 点",
   "Off": "已关闭",
@@ -143,6 +147,12 @@ Mods: {
   "NoSelection": "未选择"
 }
     TalentNames: {
+      BasicBlockYield: "基础方块产量"
+      HerbGrowth: "植物生长加速"
+      HammerPower: "锤力增强"
+      AreaWallRemoval: "范围拆墙"
+      AutoReplantTree: "自动补种树苗"
+
   "MaxLife": "最大生命",
   "MaxMana": "最大魔力",
   "Defense": "防御力",
@@ -240,6 +250,12 @@ Mods: {
   "CrateChance": "宝匣概率"
 }
     TalentHints: {
+      BasicBlockYield: "每级+10%基础方块产量，Lv10为两倍。覆盖30种，含雪块、四种冰、泥沙、雪泥、沙漠化石；天然与自己放置均生效。只结算一种资源加成。"
+      HerbGrowth: "每级+20%原版七种草药生长速度，Lv10目标三倍。人物周围半径50格圆形，隔墙生效；多人取最高。保留开花条件，仅存活在线生效。全服每帧最多4096次额外原生草药更新，极端强度会饱和。"
+      HammerPower: "每级锤力+10个百分点，只增强已有锤子能力；不改变物品基础属性。普通锤击与范围拆墙均生效，锤速沿用方块破坏效率。"
+      AreaWallRemoval: "Alt开关批量采集，用锤子敲背景墙。每级半径+1，Lv1为3×3、Lv10为21×21；保留原版边缘拆墙条件、当前锤力与服务器预算。只批量处理墙，不批量改变斜坡或敲祭坛。"
+      AutoReplantTree: "一次2点，独立开关。普通和一键伐木都适用，不要求Alt；清完残桩并结束作业后原根补种。普通树／棕榈消耗1普通橡实，宝石树消耗1对应宝石橡实。本次收获优先、再用背包；无材料照常砍树，失败不扣，有苗不重复扣。"
+
   "MaxLife": "每级 +25 HP。提高上限不会补血；降低上限仅截断当前生命。",
   "MaxMana": "每级 +20 MP。提高上限不会补魔；降低上限仅截断当前魔力。",
   "Defense": "每级 +4 防御，与装备加算。",
@@ -337,6 +353,8 @@ Mods: {
   "CrateChance": "每级使原宝匣判定失败概率乘0.95。若原判定率10%，Lv.10约46.1%。只增强宝匣资格，保持原生种类、稀有度、任务与敌人判定、池塘及液体条件；蜂蜜跳过，岩浆保留额外筛选，最终宝匣比例不一定等于资格概率。可调当前等级。"
 }
     Messages: {
+      EffectiveHammerPower: "锤力：{0}% → 天赋后 {1}%"
+
       MiningProtectionOn: "挖矿额外保护：已开启。跳过沙子、线路、家具支撑等；当前挖矿作业已停止。"
       MiningProtectionOff: "挖矿额外保护：已关闭。每格按原版镐力挖掘；当前挖矿作业已停止。"
       EffectivePickPower: "镐力（天赋）：{0}% → {1}%"
@@ -357,8 +375,19 @@ Mods: {
       ServerConfigLocked: "请在开服前设置成长规则；专用服务器请修改配置文件后重启。"
     }
     Configs: {
+      TalentLevelOverride: {
+        TalentId: { Label: "天赋ID" }
+        Limit: { Label: "等级上限（-1无限，0禁用）" }
+      }
       ProgressionConfig: {
-        DisplayName: 成长规则（服务器）
+        GlobalTalentLevelLimit: { Label: "全局天赋等级上限", Tooltip: "-1无限；0禁购并暂停生效；正整数限级。不删除已购等级、不自动退款。单项覆盖优先。" }
+        TalentLevelOverrides: { Label: "单项天赋等级覆盖", Tooltip: "添加条目，用天赋ID指定限制（面板可搜索ID）。-1无限、0禁用、正整数限级；未列出继承全局。重复ID取最后一项。" }
+        RestoreDefaultTalentLimits: { Label: "恢复默认天赋等级限制", Tooltip: "点击后保存设置：只将全局恢复-1并清空单项覆盖。其他设置、角色数据和投入保持。" }
+        EnableHerbGrowth: { Label: "允许植物生长加速", Tooltip: "原版七种草药，固定人物周围50格。" }
+        EnableAutoReplantTree: { Label: "允许自动补种树苗", Tooltip: "普通树、棕榈和宝石树，消耗对应种植材料。" }
+        EnableAreaWallRemoval: { Label: "允许范围拆墙", Tooltip: "沿用原版拆墙条件与采集预算。" }
+
+        DisplayName: 无尽潜能：成长规则（服务器）
         EnableWorldGathering: { Label: "允许批量采集", Tooltip: "P3世界操作总开关。仍须购买对应天赋；按一次采集键开启批量操作。自动补种也受此总许可控制。" }
         EnableAreaMining: { Label: "允许范围挖矿", Tooltip: "允许范围挖矿模式。" }
         EnableVeinMining: { Label: "允许矿脉连锁", Tooltip: "仅连接同种矿石，包括斜角。" }

@@ -63,6 +63,7 @@ public sealed class EconomySystem : ModSystem
         try {
             int index = orig(source, x, y, width, height, clone, type, stack, noBroadcast, prefix, noDelay, reverse);
             AgricultureSystem.RecordDrop(source, index);
+            TreeReplantSystem.RecordDrop(source, index);
             return index;
         }
         finally { SpawningBonus = old; }
@@ -138,6 +139,7 @@ public sealed class EconomySystem : ModSystem
         if (TileID.Sets.IsATreeTrunk[tile] || TileID.Sets.CountsAsGemTree[tile] || tile == TileID.PalmTree)
             return item.createTile > -1 && !ItemID.Sets.IsAPickup[item.type] && item.type != ItemID.Acorn ? "WoodYield" : null;
         if (tile is TileID.ImmatureHerbs or TileID.MatureHerbs or TileID.BloomingHerbs) return "HerbYield";
+        if (tile < TileID.Count && BasicBlockResources.Items.Contains(item.type)) return "BasicBlockYield";
         return null;
     }
     // Explicit extension point; no mod-name matching or reflection.

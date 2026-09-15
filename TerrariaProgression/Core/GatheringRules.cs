@@ -4,11 +4,11 @@ using System.Numerics;
 
 namespace TerrariaProgression.Core;
 
-public enum GatheringMode : byte { Area, Vein, Tree, Harvest, SingleHerb }
+public enum GatheringMode : byte { Area, Vein, Tree, Harvest, SingleHerb, Wall }
 public readonly record struct TilePoint(int X, int Y);
 public static class GatheringRules
 {
-    public static string Talent(GatheringMode mode) => mode switch { GatheringMode.Area => "AreaMining", GatheringMode.Vein => "VeinMining", GatheringMode.Tree => "TreeFelling", GatheringMode.Harvest => "AreaHarvest", GatheringMode.SingleHerb => "AutoReplant", _ => "" };
+    public static string Talent(GatheringMode mode) => mode switch { GatheringMode.Area => "AreaMining", GatheringMode.Vein => "VeinMining", GatheringMode.Tree => "TreeFelling", GatheringMode.Harvest => "AreaHarvest", GatheringMode.SingleHerb => "AutoReplant", GatheringMode.Wall => "AreaWallRemoval", _ => "" };
     public static int Radius(BigInteger level, int worldExtent) => (int)BigInteger.Clamp(level, 0, Math.Max(0, worldExtent));
     public static long Limit(GatheringMode mode, BigInteger level, int serverLimit, long worldTiles)
     {

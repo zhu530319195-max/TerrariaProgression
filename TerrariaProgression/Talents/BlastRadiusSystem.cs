@@ -23,23 +23,26 @@ public sealed class BlastRadiusSystem : ModSystem
     internal static Vector2 TerrainOrigin(Projectile p) => p.Center - new Vector2(BaseRadius(p.type) == 4 ? 11 : 5);
     internal static int Radius(Projectile p) => BaseRadius(p.type) + (int)BigInteger.Clamp(
         ExtendedTalentPlayer.Level(Main.player[p.owner], "BlastRadius"), 0, Math.Clamp(Config.MaxBlastRadius, 7, 128) - BaseRadius(p.type));
-    internal static bool Enabled(Projectile p, Guid session) => BaseRadius(p.type) > 0 && !p.npcProj && !p.trap
+    internal static bool ActorValid(Projectile p, Guid session) => BaseRadius(p.type) > 0 && !p.npcProj && !p.trap
         && p.owner >= 0 && p.owner < Main.maxPlayers && Main.player[p.owner].active
         && Main.player[p.owner].GetModPlayer<ProgressionPlayer>().SessionReady
-        && Main.player[p.owner].GetModPlayer<ProgressionPlayer>().SessionId == session
+        && Main.player[p.owner].GetModPlayer<ProgressionPlayer>().SessionId == session;
+    internal static bool Enabled(Projectile p, Guid session) => ActorValid(p,session)
         && Config.EnableWorldGathering && Config.EnableBlastRadius
         && ExtendedTalentPlayer.Level(Main.player[p.owner], "BlastRadius") > 0;
+    internal static bool Handles(Projectile p, Guid session) => ActorValid(p,session)
+        && (Enabled(p,session) || ExtendedTalentPlayer.Level(Main.player[p.owner],"BasicBlockYield") > 0);
     public override void Load() => On_Projectile.ExplodeTiles += Explode;
     public override void Unload() => On_Projectile.ExplodeTiles -= Explode;
     private static void Explode(On_Projectile.orig_ExplodeTiles orig, Projectile p, Vector2 origin, int radius, int minX, int maxX, int minY, int maxY, bool walls)
     {
-        if (!p.TryGetGlobalProjectile<BlastRadiusProjectile>(out var state) || !Enabled(p, state.Session)) {
+        if (!p.TryGetGlobalProjectile<BlastRadiusProjectile>(out var state) || !Handles(p, state.Session)) {
             orig(p, origin, radius, minX, maxX, minY, maxY, walls); return;
         }
         // The owner client's native core must not duplicate server-owned terrain.
         if (Main.netMode == NetmodeID.MultiplayerClient || state.Consumed) return;
         state.Consumed = true;
-        radius = Radius(p);
+        radius = Enabled(p,state.Session) ? Radius(p) : BaseRadius(p.type);
         // Native wall framing touches neighbours one cell beyond the scan bounds.
         minX = Math.Max(1, (int)(origin.X / 16f - radius)); maxX = Math.Min(Main.maxTilesX - 2, (int)(origin.X / 16f + radius));
         minY = Math.Max(1, (int)(origin.Y / 16f - radius)); maxY = Math.Min(Main.maxTilesY - 2, (int)(origin.Y / 16f + radius));
@@ -69,7 +72,7 @@ public sealed class BlastRadiusProjectile : GlobalProjectile
     {
         // In vanilla only the owner client executes ExplodeTiles from Kill.
         // Run the same native terrain operation once on the dedicated server.
-        if (Main.netMode != NetmodeID.Server || Consumed || !BlastRadiusSystem.Enabled(p, Session)) return;
+        if (Main.netMode != NetmodeID.Server || Consumed || !BlastRadiusSystem.Handles(p, Session)) return;
         p.ExplodeTiles(BlastRadiusSystem.TerrainOrigin(p), BlastRadiusSystem.BaseRadius(p.type), 0, 0, 0, 0, false);
     }
 }
