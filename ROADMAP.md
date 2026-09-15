@@ -1,3 +1,15 @@
+## 0.14.0 自动验证完成，等待用户验收
+
+[PR #17](https://github.com/zhu530319195-max/TerrariaProgression/pull/17)未合并。功能提交`1d87d847da5f40e92fee89aa3024374136f4441a`通过[CI34960846015](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34960846015)：3454核心、1722原生（比基线增加40项），正式及测试MOD编译零警告、零错误。本地完成双MOD编译，原生运行证据来自CI。
+
+全服经验共享默认关闭；开启后，每个在线且角色数据就绪的玩家各领完整经验，包含未参战／异队／远距／死亡等待复活。自动验证了贡献分配回归、不叠加、不重复发放、掉线和重连无补发、旧配置默认及序列化、原存档持久化、倍率、NPC排除、分裂预算与实际服务器快照；不等于真实多人已验收。
+
+测试包直接来自[CI产物10392769440](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34960846015/artifacts/10392769440)。BUILD_INFO为临时PR测试提交`ef9808598ab4eba1d563b998295e7c8237e12031`，147个源码文件逐一匹配功能提交；不是main合并。后续只更新Markdown验证记录，代码和测试包一致，复用以上证据。
+
+测试ZIP SHA256：`7db97ede4181940d5329ca88ee717a7fd1d8bf38ed9ee55adbce39ddec78e08e`；源码ZIP：`51f2d52cc799759e15ac4a9a665d087888c01dedffea9ad0749c4adb32848bc6`；tmod：`da9e364017d284f42a981e2827a3d921e70dea902d8755a183415724ac534103`。玩家包不含ProgressionHarness。验收见[共享经验测试步骤](docs/SHARED_XP_TEST_GUIDE_zh-CN.md)。
+
+版本0.14.0／100项／存档v3／协议17，main保持0.13.1。本批没有合并授权，尚未上传Steam；其他未实机验证、未完成、暂缓及第三方兼容边界不变。以下为开发阶段历史记录。
+
 ## 0.14.0 全服经验共享：实现与测试阶段
 
 用户确认每人全额领取。新增服务器ShareExperienceServerWide，默认false；开启时全服在线且角色数据就绪者各得完整合法击杀经验，含死亡等待复活，不限距离／队伍／参战，无离线补发、不统一旧等级、不叠加贡献份额。关闭保持旧贡献分配。仍需玩家有效贡献，原雕像／城镇NPC／遭遇去重规则保留。
