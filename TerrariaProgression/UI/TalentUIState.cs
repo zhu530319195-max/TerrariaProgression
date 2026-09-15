@@ -20,7 +20,7 @@ using TerrariaProgression.Players;
 
 namespace TerrariaProgression.UI;
 
-internal sealed class TalentUIState : UIState
+internal sealed partial class TalentUIState : UIState
 {
     private readonly UIPanel panel = new();
     private readonly UIList navigation = new(), list = new(), detailsList = new(), actionList = new();
@@ -42,7 +42,8 @@ internal sealed class TalentUIState : UIState
     private ProgressionPlayer Player => Main.LocalPlayer.GetModPlayer<ProgressionPlayer>();
     internal static string Text(string key, params object[] args) => Language.GetTextValue("Mods.TerrariaProgression.TalentsUI." + key, args);
     private static string Name(string id) => Language.GetTextValue("Mods.TerrariaProgression.TalentNames." + id);
-    private bool CanAct => Player.SessionReady && !Player.RequestPending && !Player.RequestCoolingDown && !Main.LocalPlayer.dead;
+    private bool CanAct => loadoutOverlay == null && CanManageLoadouts;
+    private bool CanManageLoadouts => Player.SessionReady && !Player.RequestPending && !Player.RequestCoolingDown && !Main.LocalPlayer.dead;
     private bool HasSelected => Player.State.Talents.ContainsKey(selected);
     public override void OnInitialize()
     {
@@ -56,12 +57,13 @@ internal sealed class TalentUIState : UIState
         panel.HAlign = panel.VAlign = .5f; Append(panel);
         Place(header,panel,0,3,1,-90,26); Place(totals,panel,0,31,1,0,22);
         var close=Button("Close",TalentUISystem.Toggle); close.Left.Set(-80,1); close.Width.Set(80,0); panel.Append(close);
+        InitializeLoadouts();
         search=new TalentButton(() => Text("Search")+": "+query+(SearchFocused ? " |" : ""), () => { SearchFocused=true; Main.clrInput(); Main.blockInput=true; }, () => true, () => SearchFocused);
         search.TextHAlign=0; panel.Append(search);
         clearSearch=Button("ClearSearch",()=>{query=""; EndSearch(); RefreshTalents();}); panel.Append(clearSearch);
         ownedFilter=new TalentButton(()=>Text("OwnedOnly")+" "+Text(ownedOnly?"On":"Off"),()=>{ownedOnly=!ownedOnly;RefreshTalents();},()=>true,()=>ownedOnly); panel.Append(ownedFilter);
         enabledFilter=new TalentButton(()=>Text("EnabledOnly")+" "+Text(enabledOnly?"On":"Off"),()=>{enabledOnly=!enabledOnly;RefreshTalents();},()=>true,()=>enabledOnly); panel.Append(enabledFilter);
-        Place(pathLabel,panel,0,100,1,0,22);
+        Place(pathLabel,panel,0,140,1,0,22);
         panel.Append(navArea); panel.Append(left); panel.Append(rightArea);
         AttachList(navArea,navigation); AttachList(left,list); AttachList(rightArea,detailsList);
         detailCard.Width.Set(0,1); detailsList.Add(detailCard);
@@ -105,7 +107,7 @@ internal sealed class TalentUIState : UIState
         target.Width.Set(-20,1); target.Height.Set(0,1); target.ListPadding=5; target.ManualSortMethod=_=>{}; parent.Append(target);
         var scroll=new TalentScrollbar(target); scroll.Left.Set(-18,1); scroll.Height.Set(0,1); parent.Append(scroll); target.SetScrollbar(scroll);
     }
-    internal void EndSearch() { if(SearchFocused) {SearchFocused=false; Main.blockInput=false; PlayerInput.WritingText=false;} }
+    internal void EndSearch() { CloseLoadoutOverlay(); if(SearchFocused) {SearchFocused=false; Main.blockInput=false; PlayerInput.WritingText=false;} }
     public override void OnDeactivate() { EndSearch(); base.OnDeactivate(); }
     private string ScopeLabel(bool group) => RefundScope(group).Length == 0 ? Text("NoSelection") : Text((group ? "MenuGroup" : "Menu") + RefundScope(group));
     private string RefundScope(bool group)
@@ -192,11 +194,11 @@ internal sealed class TalentUIState : UIState
     private void Resize(float width,float height)
     {
         panel.Width.Set(width,0);panel.Height.Set(height,0);
-        search!.Left.Set(0,0);search.Top.Set(62,0);search.Width.Set(-8,.44f);
-        clearSearch!.Left.Set(0,.44f);clearSearch.Top.Set(62,0);clearSearch.Width.Set(-6,.12f);
-        ownedFilter!.Left.Set(0,.56f);ownedFilter.Top.Set(62,0);ownedFilter.Width.Set(-6,.22f);
-        enabledFilter!.Left.Set(0,.78f);enabledFilter.Top.Set(62,0);enabledFilter.Width.Set(0,.22f);
-        const float contentTop=128;
+        search!.Left.Set(0,0);search.Top.Set(102,0);search.Width.Set(-8,.44f);
+        clearSearch!.Left.Set(0,.44f);clearSearch.Top.Set(102,0);clearSearch.Width.Set(-6,.12f);
+        ownedFilter!.Left.Set(0,.56f);ownedFilter.Top.Set(102,0);ownedFilter.Width.Set(-6,.22f);
+        enabledFilter!.Left.Set(0,.78f);enabledFilter.Top.Set(102,0);enabledFilter.Width.Set(0,.22f);
+        const float contentTop=168;
         navArea.Top.Set(contentTop,0);navArea.Width.Set(-8,.24f);navArea.Height.Set(-contentTop-72,1);
         left.Left.Set(0,.24f);left.Top.Set(contentTop,0);left.Width.Set(-8,.30f);left.Height.Set(-contentTop-72,1);
         rightArea.Left.Set(0,.54f);rightArea.Top.Set(contentTop,0);rightArea.Width.Set(0,.46f);rightArea.Height.Set(-contentTop-72,1);
@@ -216,6 +218,7 @@ internal sealed class TalentUIState : UIState
     public override void Draw(SpriteBatch spriteBatch)
     {
         base.Draw(spriteBatch);
+        DrawLoadoutIME();
         if(SearchFocused && search!=null) Main.instance.DrawWindowsIMEPanel(search.GetDimensions().Position()+new Microsoft.Xna.Framework.Vector2(0,32),1);
     }
     private void FitDetailText()
@@ -249,6 +252,7 @@ internal sealed class TalentUIState : UIState
         if (width != lastWidth || height != lastHeight) {
             lastWidth = width; lastHeight = height; Resize(width, height);
         }
+        UpdateLoadoutInput();
         if (SearchFocused) {
             if (Main.mouseLeft && Main.mouseLeftRelease && search!=null && !search.ContainsPoint(Main.MouseScreen)) EndSearch();
             else {
@@ -262,6 +266,7 @@ internal sealed class TalentUIState : UIState
         var location=TalentNavigation.Find(selected);
         pathLabel.SetText(query.Trim().Length>0?Text("GlobalResults",query):Text("Menu"+menuCategory)+" / "+(menuGroup.Length>0?Text("MenuGroup"+menuGroup):Text("AllInCategory")));
         if (Main.keyState.IsKeyDown(Keys.Escape) && !Main.oldKeyState.IsKeyDown(Keys.Escape)) {
+            if (loadoutOverlay != null) { CloseLoadoutOverlay(); base.Update(gameTime); return; }
             TalentUISystem.Toggle();
             return;
         }

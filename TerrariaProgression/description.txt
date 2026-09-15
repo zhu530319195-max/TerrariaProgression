@@ -3,12 +3,16 @@
 在冒险中积累经验，自由搭配天赋，让战斗、采集与生产能力不断成长。
 击败敌人升级，使用天赋点培养角色。100项天赋覆盖属性、战斗、资源获取、采集与农业；数值天赋默认无限升级，可调当前强度、批量加点，并按实际投入退款。服务器可统一或逐项限制等级；可选开启全服经验共享，让每位在线玩家各得完整击杀经验（默认关闭）。
 
+新增多套天赋方案：每套独立分配全部已获点数，仅当前方案生效，支持新建、复制、改名、删除。
+
 P：天赋面板；左Alt：开关批量采集；G：切换范围／矿脉；K：开关额外挖矿保护（默认关闭）。
 
 Earn experience from defeated enemies and shape your character with 100 talents across combat, gathering and farming. Numeric talents are uncapped by default, with adjustable strength, bulk purchases and refunds based on points actually paid. Servers can set global and per-talent level limits, and optionally share full kill XP with every online player (off by default).
 
+Create independent talent loadouts, each using your full earned point budget. Only the active build applies.
+
 P: talents. Left Alt: toggle batch gathering. G: area/vein mode. K: extra mining protection (off by default).
 
 简体中文 / English. tModLoader v2026.07.3.0 / Terraria 1.4.4.9.
-0.13.0功能已通过作者实机验收；0.13.1更新名称与介绍，0.14.0新增可选全服经验共享，等待实机验收。真实多人暂未实测，未知第三方MOD兼容性未作保证。特殊Boss及多人独立掉落增产尚未全面覆盖。
-The 0.13.0 feature batch passed author playtesting; 0.13.1 updates branding; 0.14.0 adds optional server-wide XP sharing pending playtesting. Live multiplayer and compatibility with arbitrary third-party mods are not verified. Special bosses and player-instanced extra loot remain incomplete.
+0.13.0功能已通过作者实机验收；0.13.1更新名称与介绍，0.14.0全服经验共享已授权合并，0.15.0天赋方案等待实机验收，存档v4／协议18，升级前备份角色。真实多人暂未实测，未知第三方MOD兼容性未作保证。特殊Boss及多人独立掉落增产尚未全面覆盖。
+The 0.13.0 feature batch passed author playtesting; 0.13.1 updates branding; 0.14.0 XP sharing was merged with author authorization; 0.15.0 loadouts await playtesting (save v4 / protocol18; back up characters before upgrading). Live multiplayer and compatibility with arbitrary third-party mods are not verified. Special bosses and player-instanced extra loot remain incomplete.

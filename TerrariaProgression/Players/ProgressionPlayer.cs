@@ -42,7 +42,7 @@ public sealed class ProgressionPlayer : ModPlayer
     public override void LoadData(TagCompound tag)
     {
         if (!tag.ContainsKey("DataVersion")) { State = new(); return; }
-        if (tag.GetInt("DataVersion") is not (1 or 2 or ProgressionState.DataVersion))
+        if (tag.GetInt("DataVersion") is not (1 or 2 or 3 or ProgressionState.DataVersion))
             throw new InvalidDataException("Unsupported TerrariaProgression save version; save was not reset.");
         State = StateCodec.Decode(tag.GetByteArray("Progression"));
     }
@@ -82,7 +82,14 @@ public sealed class ProgressionPlayer : ModPlayer
     {
         if (Main.netMode == NetmodeID.MultiplayerClient || !SessionReady || Player.dead) return TalentResult.NotReady;
         var result = TalentCatalog.Apply(State, operation, id, category, count, out var updated);
-        if (result == TalentResult.Success) { State = updated; TalentRevision++; }
+        if (result == TalentResult.Success) {
+            if (State.ActiveLoadoutId != updated.ActiveLoadoutId) {
+                Talents.GatheringSystem.Cancel(Player.whoAmI);
+                Talents.TreeReplantSystem.Cancel(Player.whoAmI);
+            }
+            State = updated;
+            TalentRevision++;
+        }
         return result;
     }
     internal void RequestTalent(TalentOperation operation, string id = "", TalentCategory category = TalentCategory.BaseStats, int count = 1)

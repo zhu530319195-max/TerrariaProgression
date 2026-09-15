@@ -15,7 +15,7 @@ public sealed class TalentUISystem : ModSystem
     private TalentUIState? panel;
     private GameTime lastTime = new();
     internal static bool Visible;
-    internal static bool IsTyping => Visible && ModContent.GetInstance<TalentUISystem>().panel?.SearchFocused == true;
+    internal static bool IsTyping => Visible && ModContent.GetInstance<TalentUISystem>().panel?.IsTyping == true;
     internal static bool CanUseMenu => !Main.gameMenu && !Main.dedServ && !Main.LocalPlayer.dead
         && Main.LocalPlayer.TryGetModPlayer<ProgressionPlayer>(out _);
     public override void Load()

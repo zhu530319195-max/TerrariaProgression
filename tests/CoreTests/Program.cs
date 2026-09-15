@@ -499,3 +499,98 @@ TalentLimits.Configure("-1",Array.Empty<KeyValuePair<string,string>>());
 Check(TalentLimits.TryParse(BigInteger.Pow(10,60).ToString(),out _)&&!TalentLimits.TryParse("-2",out _)&&!TalentLimits.TryParse("1.5",out _),"cap input supports arbitrary integers and rejects invalid semantics");
 Check(ToolPowerRules.Hammer(25,10)==125&&ToolPowerRules.Hammer(0,10)==0,"hammer adds displayed points only to real hammers");
 Console.WriteLine($"Final P3-ResourcesLimits core checks passed: {checks}");
+
+// Independent loadouts: one lifetime budget, many allocations, one active effect.
+var pagesState = new ProgressionState();
+pagesState.Award(Experience.Cost(1,100,50000),50000);
+Guid combatId = pagesState.ActiveLoadoutId;
+TalentResult PageAction(TalentOperation operation,string value="",int count=1) => TalentCatalog.Apply(pagesState,operation,value,TalentCategory.BaseStats,count,out pagesState);
+void PageLedger(string message) => Check(pagesState.Loadouts.All(p=>p.AvailablePoints+p.SpentPoints==pagesState.TotalTalentPointsEarned
+    && p.Talents.Values.Aggregate(BigInteger.Zero,(sum,t)=>sum+t.InvestedPoints)==p.SpentPoints),message);
+Check(PageAction(TalentOperation.RenameLoadout,"战斗")==TalentResult.Success,"rename original allocation");
+Check(PageAction(TalentOperation.Upgrade,"Damage",100)==TalentResult.Success && pagesState.AvailableTalentPoints==0,"first loadout spends all 100 points");
+Check(PageAction(TalentOperation.CreateLoadout,"采矿")==TalentResult.Success && pagesState.AvailableTalentPoints==100 && pagesState.Talents.Count==0,"second empty loadout independently receives all 100 earned points");
+Guid miningId=pagesState.ActiveLoadoutId;
+Check(PageAction(TalentOperation.Upgrade,"PickPower",100)==TalentResult.Success && NumericTalents.ActiveLevel(pagesState,"Damage")==0,"mining spends all 100 with no combat effect stacking");
+Check(pagesState.TotalTalentPointsEarned==100 && pagesState.Loadouts.Sum(p=>(int)p.SpentPoints)==200,"two full allocations do not multiply lifetime budget");
+PageLedger("both full ledgers conserved");
+Check(PageAction(TalentOperation.ActivateLoadout,combatId.ToString("N"))==TalentResult.Success && NumericTalents.ActiveLevel(pagesState,"Damage")==100 && NumericTalents.ActiveLevel(pagesState,"PickPower")==0,"switch restores only combat effects");
+pagesState.Award(Experience.Cost(pagesState.Level,2,50000),50000,3);
+Check(pagesState.TotalTalentPointsEarned==106 && pagesState.Loadouts.All(p=>p.AvailablePoints==6),"changed per-level reward adds six points to active and inactive builds");
+Check(PageAction(TalentOperation.RefundEverything)==TalentResult.Success && pagesState.AvailableTalentPoints==106 && pagesState.Loadouts.Single(p=>p.Id==miningId).SpentPoints==100,"refund everything is scoped to current build");
+Check(pagesState.Invest("AfflictionDamage",3,20),"historical-price allocation fixture");
+pagesState.Talents["AfflictionDamage"].CurrentIntensity=7;pagesState.Talents["AfflictionDamage"].Enabled=false;
+Check(pagesState.Invest("DebuffImmunity",2),"child toggle fixture");
+// Use a registered child-bearing talent rather than depending on the name of a child.
+var childDef=FunctionalTalentRegistry.All.First(t=>t.ChildEffects.Count>0);
+pagesState.RefundAll("DebuffImmunity");pagesState.Invest(childDef.Definition.Id,childDef.Definition.DefaultCost);
+pagesState.Talents[childDef.Definition.Id].DisabledEffects.Add(childDef.ChildEffects[0]);
+var originalCombat=pagesState.ActiveLoadout;
+Check(PageAction(TalentOperation.CopyLoadout,"备份")==TalentResult.Success,"copy allocation");
+Guid backupId=pagesState.ActiveLoadoutId;
+Check(backupId!=combatId && pagesState.Talents["AfflictionDamage"].CostRuns.Single().Cost==3 && pagesState.Talents["AfflictionDamage"].CurrentIntensity==7 && !pagesState.Talents["AfflictionDamage"].Enabled,"copy preserves stable identity separation, paid history, intensity and disabled state");
+Check(pagesState.Talents[childDef.Definition.Id].DisabledEffects.SetEquals(originalCombat.Talents[childDef.Definition.Id].DisabledEffects),"copy preserves child toggles");
+Check(PageAction(TalentOperation.RefundOne,"AfflictionDamage")==TalentResult.Success && pagesState.Talents["AfflictionDamage"].TalentLevel==19 && pagesState.Loadouts.Single(p=>p.Id==combatId).Talents["AfflictionDamage"].TalentLevel==20,"copy refund exact cost never changes source");
+Check(PageAction(TalentOperation.ToggleChild,childDef.Definition.Id)==TalentResult.Success && pagesState.Loadouts.Single(p=>p.Id==combatId).Talents[childDef.Definition.Id].DisabledEffects.Count==1,"child toggle copy is independent");
+var loadoutBytes=StateCodec.Encode(pagesState);var pagesRoundTrip=StateCodec.Decode(loadoutBytes);
+Check(StateCodec.Encode(pagesRoundTrip).SequenceEqual(loadoutBytes) && TalentCatalog.ValidateImported(pagesRoundTrip),"v4 preserves active ID, names, and all ledgers exactly");
+foreach(var op in new[]{TalentOperation.CreateLoadout,TalentOperation.CopyLoadout,TalentOperation.RenameLoadout}) {
+ foreach(string name in new[]{"","  ","x\ny","[c/ff0000:bad]",new string('x',33),"\ud800","bad\u202ename"})
+  Check(PageAction(op,name)==TalentResult.InvalidLoadoutName && StateCodec.Encode(pagesState).SequenceEqual(loadoutBytes),"bad name rejected atomically: "+op);
+ Check(PageAction(op,"合理名称",2)==TalentResult.InvalidRequest,"loadout operation rejects bulk count: "+op);
+}
+Check(PageAction(TalentOperation.RenameLoadout,"  战斗  ")==TalentResult.Success && pagesState.ActiveLoadout.Name=="战斗","trim names and allow duplicate labels with distinct IDs");
+Check(PageAction(TalentOperation.DeleteLoadout,miningId.ToString("N"))==TalentResult.Success && pagesState.ActiveLoadoutId==backupId && pagesState.TotalTalentPointsEarned==106,"deleting inactive allocation creates no points or switch");
+Check(PageAction(TalentOperation.DeleteLoadout,backupId.ToString("N"))==TalentResult.Success && pagesState.ActiveLoadoutId==combatId,"deleting active allocation selects first remaining");
+Check(PageAction(TalentOperation.DeleteLoadout,combatId.ToString("N"))==TalentResult.LastLoadout,"last allocation cannot be deleted");
+Check(PageAction(TalentOperation.ActivateLoadout,combatId.ToString("N"))==TalentResult.NoChange,"active selection is a no-op");
+Check(PageAction(TalentOperation.ActivateLoadout,Guid.NewGuid().ToString("N"))==TalentResult.InvalidRequest,"unknown stable ID rejected");
+Check(PageAction(TalentOperation.CreateLoadout,"受限方案")==TalentResult.Success,"create limit test allocation");
+TalentLimits.Configure("0",Array.Empty<KeyValuePair<string,string>>());
+Check(PageAction(TalentOperation.Upgrade,"AfflictionDamage",10)==TalentResult.NoChange,"new page obeys server zero");
+PageAction(TalentOperation.ActivateLoadout,combatId.ToString("N"));
+Check(TalentCatalog.ValidateImported(pagesState) && NumericTalents.ActiveLevel(pagesState,"AfflictionDamage")==0,"existing allocations import and pause under zero");
+TalentLimits.Configure("-1",Array.Empty<KeyValuePair<string,string>>());
+Check(PageAction(TalentOperation.Enable,"AfflictionDamage")==TalentResult.Success && NumericTalents.ActiveLevel(pagesState,"AfflictionDamage")==7,"raising cap restores saved intensity on selected allocation");
+PageLedger("post management ledgers conserved");
+var badInactive=StateCodec.Decode(StateCodec.Encode(pagesState));badInactive.Pages[1].AvailablePoints++;
+bool badPageRejected=false;try{StateCodec.Decode(StateCodec.Encode(badInactive));}catch(InvalidDataException){badPageRejected=true;}
+Check(badPageRejected,"corrupt inactive ledger rejected");
+badInactive=StateCodec.Decode(StateCodec.Encode(pagesState));badInactive.Pages[1].Talents.Add("Unknown",new TalentState());
+Check(!TalentCatalog.ValidateImported(badInactive),"network import validates inactive talent registry");
+badInactive=StateCodec.Decode(StateCodec.Encode(pagesState));badInactive.Pages[1].Id=badInactive.Pages[0].Id;
+badPageRejected=false;try{StateCodec.Decode(StateCodec.Encode(badInactive));}catch(InvalidDataException){badPageRejected=true;}
+Check(badPageRejected,"duplicate saved IDs rejected");
+badInactive=StateCodec.Decode(StateCodec.Encode(pagesState));badInactive.ActiveLoadoutId=Guid.NewGuid();
+badPageRejected=false;try{StateCodec.Decode(StateCodec.Encode(badInactive));}catch(InvalidDataException){badPageRejected=true;}
+Check(badPageRejected,"missing active allocation rejected");
+byte[] LegacyThree(ProgressionState old) {
+ using var m=new MemoryStream();using var w=new BinaryWriter(m);
+ w.Write(3);foreach(var n in new[]{old.Level,old.CurrentExperience,old.TotalExperienceEarned,old.AvailableTalentPoints,old.TotalSpentTalentPoints,old.TotalTalentPointsEarned})StateCodec.WriteInteger(w,n);
+ w.Write(old.Talents.Count);foreach(var (id,t) in old.Talents){w.Write(id);w.Write(t.Enabled);w.Write(t.CurrentIntensity.HasValue);if(t.CurrentIntensity.HasValue)w.Write(t.CurrentIntensity.Value);w.Write(t.DisabledEffects.Count);foreach(var c in t.DisabledEffects)w.Write(c);w.Write(t.CostRuns.Count);foreach(var run in t.CostRuns){StateCodec.WriteInteger(w,run.Cost);StateCodec.WriteInteger(w,run.Count);}}
+ return m.ToArray();
+}
+var migratedThree=StateCodec.Decode(LegacyThree(pagesState));
+Check(migratedThree.Loadouts.Count==1 && migratedThree.TotalTalentPointsEarned==106 && migratedThree.AvailableTalentPoints==pagesState.AvailableTalentPoints && migratedThree.TotalSpentTalentPoints==pagesState.TotalSpentTalentPoints,"v3 becomes one allocation with configured historical points intact");
+Check(migratedThree.Talents["AfflictionDamage"].CostRuns.SequenceEqual(pagesState.Talents["AfflictionDamage"].CostRuns) && migratedThree.Talents["AfflictionDamage"].CurrentIntensity==7 && migratedThree.Talents[childDef.Definition.Id].DisabledEffects.SetEquals(pagesState.Talents[childDef.Definition.Id].DisabledEffects),"v3 migration preserves actual paid costs, intensity and child toggles");
+var capacityState=new ProgressionState();capacityState.Award(Experience.Cost(1,100,50000),50000);
+for(int i=0;i<1100;i++) {
+ byte[] beforeCapacity=StateCodec.Encode(capacityState);
+ var creation=TalentCatalog.Apply(capacityState,TalentOperation.CreateLoadout,new string('界',32),TalentCategory.BaseStats,1,out var afterCapacity);
+ if(creation==TalentResult.Capacity){Check(ReferenceEquals(afterCapacity,capacityState)&&StateCodec.Encode(afterCapacity).SequenceEqual(beforeCapacity),"capacity failure leaves every allocation and active ID untouched");break;}
+ capacityState=afterCapacity;
+ if(i==1099)Check(false,"bounded packet eventually refuses more pages");
+}
+var pageRandom=new Random(15100);
+for(int i=0;i<250;i++) {
+ switch(pageRandom.Next(5)) {
+ case 0:PageAction(TalentOperation.ActivateLoadout,pagesState.Loadouts[pageRandom.Next(pagesState.Loadouts.Count)].Id.ToString("N"));break;
+ case 1:PageAction(TalentOperation.Upgrade,"AfflictionDamage",pageRandom.Next(1,15));break;
+ case 2:PageAction(TalentOperation.RefundOne,"AfflictionDamage");break;
+ case 3:PageAction(TalentOperation.RefundEverything);break;
+ case 4:pagesState.Award(Experience.Cost(pagesState.Level,1,50000),50000);break;
+ }
+ PageLedger("mixed loadout transaction conserves every allowance "+i);
+ Check(TalentCatalog.ValidateImported(StateCodec.Decode(StateCodec.Encode(pagesState))),"mixed transaction remains transport valid "+i);
+}
+Console.WriteLine($"Final Loadouts core checks passed: {checks}");
