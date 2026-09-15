@@ -1,3 +1,11 @@
+## 0.15.0 天赋方案：自动验证通过，待用户实机验收
+
+[PR #18](https://github.com/zhu530319195-max/TerrariaProgression/pull/18)未合并。构建提交`55976c060f54b01db5158e571decc4a7b8f10397`通过[CI34980331304](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34980331304)：**4013核心、1788原生检查**，正式及测试MOD零编译警告、零错误。方案独立预算、实际投入退款、旧存档迁移、服务器过期消息、原生属性不叠加／不回复、冷却跳数保留、共享升级、停止拆墙和取消待补种均已自动检查。
+
+玩家与源码包来自[CI产物10401375921](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34980331304/artifacts/10401375921)，152个源码文件逐一匹配构建提交。BUILD_INFO的`01318aca1dab016e02a986d8ee94580f4c7bdb6f`是临时PR测试提交，不是main合并；后续只追加Markdown记录，复用同一有效测试包。详细哈希与范围见[验证记录](docs/TALENT_LOADOUTS_VERIFICATION_zh-CN.md)，操作见[中文步骤](docs/TALENT_LOADOUTS_TEST_GUIDE_zh-CN.md)。
+
+0.15.0／100项／存档v4／协议18。旧角色加点自动迁为第一套，升级前备份角色，联机双方同版。界面和中文输入等待玩家实机确认；自动服务器消息测试不代表真人联机通过。新PR未获合并授权，main仍0.14.0；此前PR #17已经授权合并。其他未验收／未完成／暂缓边界保持，未上传Steam。以下为开发与历史记录。
+
 ## 0.15.0 天赋方案：实现与验证阶段
 
 基线[PR #17](https://github.com/zhu530319195-max/TerrariaProgression/pull/17)已按用户“好，可以合并”授权合并，main为`6be301e6d44ef405bc81bdea50dd9ed48c03c5fb`（0.14.0）。该授权不扩展到本批，也不代表真实多人通过。
