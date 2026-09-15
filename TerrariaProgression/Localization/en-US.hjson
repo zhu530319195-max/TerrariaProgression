@@ -10,6 +10,21 @@ Mods: {
   }
 }
     TalentsUI: {
+      LoadoutCurrent: "Loadout: {0} ▾"
+      LoadoutChoose: "Choose a loadout (each gets your full earned point budget)"
+      LoadoutEntry: "{0}   Available {1}   Spent {2}"
+      CreateLoadout: "New"
+      CopyLoadout: "Copy"
+      RenameLoadout: "Rename"
+      DeleteLoadout: "Delete"
+      LoadoutCancel: "Cancel"
+      LoadoutConfirm: "Confirm"
+      LoadoutDefault: "Loadout {0}"
+      LoadoutNameHelp: "Enter up to 32 characters. New starts empty; Copy preserves talents, toggles and intensity. Both become active immediately. Rename changes only this name."
+      LoadoutDeleteConfirm: "Delete \"{0}\"? This removes only this loadout and does not add earned points. Deleting the active loadout activates the first remaining one."
+      ResultInvalidLoadoutName: "Use 1–32 characters without control characters or square brackets."
+      ResultLastLoadout: "Keep at least one loadout."
+
       RestoreTalentLimits: "Restore default talent level limits"
       ServerLevels: "Server cap: {0} | Effective level: {1}"
       UnlimitedLimit: "Unlimited"

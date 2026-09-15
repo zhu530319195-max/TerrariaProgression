@@ -6,14 +6,19 @@ namespace TerrariaProgression.Core;
 
 public sealed class ProgressionState
 {
-    public const int DataVersion = 3;
+    public const int DataVersion = 4;
     public BigInteger Level { get; internal set; } = 1;
     public BigInteger CurrentExperience { get; internal set; }
     public BigInteger TotalExperienceEarned { get; internal set; }
-    public BigInteger AvailableTalentPoints { get; internal set; }
+    public BigInteger AvailableTalentPoints { get => ActiveLoadout.AvailablePoints; internal set => ActiveLoadout.AvailablePoints = value; }
     public BigInteger TotalTalentPointsEarned { get; internal set; }
-    public BigInteger TotalSpentTalentPoints { get; internal set; }
-    public Dictionary<string, TalentState> Talents { get; } = new(StringComparer.Ordinal);
+    public BigInteger TotalSpentTalentPoints { get => ActiveLoadout.SpentPoints; internal set => ActiveLoadout.SpentPoints = value; }
+    internal readonly List<TalentLoadout> Pages = new() { new TalentLoadout() };
+    public IReadOnlyList<TalentLoadout> Loadouts => Pages.AsReadOnly();
+    public TalentLoadout ActiveLoadout => Pages.Find(page => page.Id == ActiveLoadoutId)!;
+    public Guid ActiveLoadoutId { get; internal set; }
+    public Dictionary<string, TalentState> Talents => ActiveLoadout.Talents;
+    public ProgressionState() => ActiveLoadoutId = Pages[0].Id;
 
     public BigInteger Award(BigInteger units, BigInteger cap, BigInteger? pointsPerLevel = null)
     {
@@ -24,7 +29,7 @@ public sealed class ProgressionState
         var levels = Experience.LevelsAffordable(Level, CurrentExperience, cap);
         CurrentExperience -= Experience.Cost(Level, levels, cap);
         Level += levels;
-        AvailableTalentPoints += levels * reward;
+        foreach (var page in Pages) page.AvailablePoints += levels * reward;
         TotalTalentPointsEarned += levels * reward;
         return levels;
     }

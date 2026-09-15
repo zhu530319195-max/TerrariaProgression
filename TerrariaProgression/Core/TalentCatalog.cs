@@ -11,10 +11,10 @@ public static class TalentCatalog
     public static readonly IReadOnlyList<TalentDefinition> All = Array.AsReadOnly(NumericTalents.All.Concat(FunctionalTalentRegistry.All.Select(t => t.Definition)).ToArray());
     private static readonly Dictionary<string, TalentDefinition> byId = All.ToDictionary(t => t.Id, StringComparer.Ordinal);
     public static bool TryGet(string id, out TalentDefinition talent) => byId.TryGetValue(id, out talent!);
-    public static bool ValidateImported(ProgressionState state) => state.Talents.All(pair =>
+    public static bool ValidateImported(ProgressionState state) => state.Loadouts.All(page => page.Talents.All(pair =>
         byId.TryGetValue(pair.Key, out var def) && (def.MaxLevel == 0 || pair.Value.TalentLevel <= def.MaxLevel) &&
         pair.Value.DisabledEffects.All(child => FunctionalTalentRegistry.HasChild(pair.Key, child)) && (pair.Value.CurrentIntensity == null ||
-            (def.Adjustable && pair.Value.CurrentIntensity >= 0 && decimal.Truncate(pair.Value.CurrentIntensity.Value) == pair.Value.CurrentIntensity && new BigInteger(pair.Value.CurrentIntensity.Value) <= pair.Value.TalentLevel)));
+            (def.Adjustable && pair.Value.CurrentIntensity >= 0 && decimal.Truncate(pair.Value.CurrentIntensity.Value) == pair.Value.CurrentIntensity && new BigInteger(pair.Value.CurrentIntensity.Value) <= pair.Value.TalentLevel))));
 
     // A bounded request describes intent only. Neither price nor a resulting level
     // is accepted from a client. Clone/validate/commit makes mutations atomic.
@@ -31,6 +31,16 @@ public static class TalentCatalog
             var next = StateCodec.Decode(StateCodec.Encode(original));
             bool changed = false;
             switch (operation) {
+                case TalentOperation.CreateLoadout:
+                case TalentOperation.CopyLoadout:
+                case TalentOperation.RenameLoadout:
+                case TalentOperation.DeleteLoadout:
+                case TalentOperation.ActivateLoadout:
+                    if (count != 1) return TalentResult.InvalidRequest;
+                    var pageResult = TalentLoadouts.Apply(next, operation, id);
+                    if (pageResult != TalentResult.Success) return pageResult;
+                    changed = true;
+                    break;
                 case TalentOperation.DecreaseIntensity:
                 case TalentOperation.IncreaseIntensity:
                 case TalentOperation.MaximumIntensity:

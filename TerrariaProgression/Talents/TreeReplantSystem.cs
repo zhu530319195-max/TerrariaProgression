@@ -37,6 +37,11 @@ public sealed class TreeReplantSystem : ModSystem
     }
     public override void OnWorldUnload() => Clear();
     internal static void Clear() { pending.Clear(); current = null; }
+    internal static void Cancel(int owner)
+    {
+        pending.Remove(owner);
+        if (current?.Player.whoAmI == owner) current = null;
+    }
     internal static bool Enabled(Player p) => Main.netMode != NetmodeID.MultiplayerClient && p.active && !p.dead && !p.CCed && !p.noItems && !p.noBuilding
         && ModContent.GetInstance<ProgressionConfig>().EnableWorldGathering && ModContent.GetInstance<ProgressionConfig>().EnableAutoReplantTree
         && ExtendedTalentPlayer.Level(p,"AutoReplantTree") > 0;
