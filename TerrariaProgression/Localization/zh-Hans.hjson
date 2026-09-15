@@ -380,6 +380,7 @@ Mods: {
         Limit: { Label: "等级上限（-1无限，0禁用）" }
       }
       ProgressionConfig: {
+        ShareExperienceServerWide: { Label: "全服经验共享", Tooltip: "默认关闭：按实际伤害贡献分配。开启：每次合法击杀结算时，所有在线且角色数据就绪的玩家各得完整经验，不平分、不重复领取。不限距离、队伍或是否参战，死亡等待复活也领取；离线无补发，不统一历史等级。" }
         GlobalTalentLevelLimit: { Label: "全局天赋等级上限", Tooltip: "-1无限；0禁购并暂停生效；正整数限级。不删除已购等级、不自动退款。单项覆盖优先。" }
         TalentLevelOverrides: { Label: "单项天赋等级覆盖", Tooltip: "添加条目，用天赋ID指定限制（面板可搜索ID）。-1无限、0禁用、正整数限级；未列出继承全局。重复ID取最后一项。" }
         RestoreDefaultTalentLimits: { Label: "恢复默认天赋等级限制", Tooltip: "点击后保存设置：只将全局恢复-1并清空单项覆盖。其他设置、角色数据和投入保持。" }
@@ -438,4 +439,3 @@ Mods: {
     }
   }
 }
-

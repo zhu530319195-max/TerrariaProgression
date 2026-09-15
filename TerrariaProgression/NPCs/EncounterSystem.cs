@@ -154,7 +154,23 @@ public sealed class EncounterSystem : ModSystem
         int maximumLife = group.Members.Max(n => n.LifeMax);
         decimal source = group.Members.Any(n => n.Statue) ? (decimal)config.StatueExperienceMultiplier : 1m;
         var xp = Experience.FromDecimal(maximumLife * (decimal)config.HpToXpMultiplier * source);
-        foreach (var (session, share) in group.Contributions.Allocate(xp)) {
+        var shares = group.Contributions.Allocate(xp);
+        if (config.ShareExperienceServerWide) {
+            // Only an eligible, player-attributed encounter creates a reward. Snapshot
+            // the ready online population at settlement; death, team and distance do
+            // not exclude a recipient. This replaces, never supplements, damage shares.
+            if (shares.Count == 0) return;
+            var recipients = Main.player.Where(p => p.active)
+                .Select(p => p.GetModPlayer<ProgressionPlayer>())
+                .Where(p => p.SessionReady).ToArray();
+            foreach (var recipient in recipients) {
+                recipient.Award(xp);
+                if (config.LogExperienceSettlements)
+                    ModContent.GetInstance<TerrariaProgression>().Logger.Info($"XP settlement: mode=server-wide, lifeMax={maximumLife}, members={group.Members.Count}, amount={Experience.Format(xp)}, recipient={recipient.Player.whoAmI}");
+            }
+            return;
+        }
+        foreach (var (session, share) in shares) {
             var recipient = Main.player.FirstOrDefault(p => p.active && p.GetModPlayer<ProgressionPlayer>().SessionReady && p.GetModPlayer<ProgressionPlayer>().SessionId == session);
             if (recipient is not null) recipient.GetModPlayer<ProgressionPlayer>().Award(share);
             if (config.LogExperienceSettlements)
@@ -169,4 +185,3 @@ public sealed class EncounterSystem : ModSystem
         AfflictionNpc.ResetWorld();
     }
 }
-

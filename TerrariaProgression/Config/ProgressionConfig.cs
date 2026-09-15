@@ -16,6 +16,8 @@ namespace TerrariaProgression.Config;
 public sealed class ProgressionConfig : ModConfig
 {
     public override ConfigScope Mode => ConfigScope.ServerSide;
+    [DefaultValue(false)]
+    public bool ShareExperienceServerWide;
     [DefaultValue(1f), Range(0.01f, 10f), Increment(0.01f)]
     public float HpToXpMultiplier = 1f;
     [DefaultValue(50000), Range(0, int.MaxValue)]
