@@ -8,9 +8,10 @@
 - 覆盖属性、恢复、战斗、资源获取、批量采集和农业。
 - 范围／矿脉挖矿、一键伐木、草药采收补种、范围拆墙与树苗补种。
 - 30种基础方块增产；人物周围50格内原版七种草药加速，保留开花条件。
+- 可选全服经验共享（默认关闭），每位在线玩家各得完整击杀经验，不平分、无离线补发。
 - 全局和单项服务器等级限制；降低限制保留已购等级和投入。
 
-**版本0.13.1**，目标tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET8。内部标识仍为`TerrariaProgression`；角色存档v3、联机协议17。
+**版本0.14.0（待验收）**，目标tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET8。内部标识仍为`TerrariaProgression`；角色存档v3、联机协议17。
 
 | 按键 | 功能 |
 |---|---|
@@ -23,9 +24,13 @@
 
 0.13.0本批功能已由用户实机验收；0.13.1统一正式名称与介绍。真实多人暂未实测；特殊／多阶段Boss和多人独立掉落增产仍未完成；药水病缩短、原有钓鱼产量仍待专项实机验收。不保证未知第三方MOD兼容。尚未在Steam创意工坊发布。
 
+0.14.0新增共享经验选项，等待实机验收；[本批操作步骤](docs/SHARED_XP_TEST_GUIDE_zh-CN.md)。
+
 ## English
 
 Earn experience from defeated enemies and shape your character with 100 talents for combat, gathering and farming. Numeric talents are uncapped by default, with adjustable active strength, bulk purchases and refunds based on actual investment. Servers can set global and per-talent caps without deleting purchased levels.
+
+Version0.14.0 adds optional full server-wide kill XP (off by default); playtesting is pending.
 
 Default controls: **P** talents, **Left Alt** batch gathering, **G** area/vein mining, **K** extra mining protection (off by default). Simplified Chinese and English are included.
 

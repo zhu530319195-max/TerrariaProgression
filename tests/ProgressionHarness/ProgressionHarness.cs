@@ -58,6 +58,7 @@ public sealed partial class RuntimeChecks : ModSystem
             Main.player[i].GetModPlayer<ProgressionPlayer>().SessionReady = true;
         }
         Config.TalentPointsPerLevel = "1";
+        Config.ShareExperienceServerWide = false;
         Config.HpToXpMultiplier = 1;
         Config.StatueExperienceMultiplier = 0;
         Config.ExperienceRequirementCap = 50000;
@@ -327,6 +328,7 @@ public sealed partial class RuntimeChecks : ModSystem
         try { RunFlexibleRange(); } catch (Exception e) { p3Errors.Add(e); }
         try { RunToolPowerBlast(); } catch (Exception e) { p3Errors.Add(e); }
         try { RunResourcesLimits(); } catch (Exception e) { p3Errors.Add(e); }
+        try { RunSharedExperience(); } catch (Exception e) { p3Errors.Add(e); }
         if (p3Errors.Count > 0) throw new AggregateException("P3 verification failed", p3Errors);
     }
     private void RunCopperMining()

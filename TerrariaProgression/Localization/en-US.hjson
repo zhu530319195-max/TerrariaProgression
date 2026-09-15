@@ -380,6 +380,7 @@ Mods: {
         Limit: { Label: "Level limit (-1 unlimited, 0 disabled)" }
       }
       ProgressionConfig: {
+        ShareExperienceServerWide: { Label: "Server-wide experience sharing", Tooltip: "Off by default: divide XP by effective damage contribution. On: each online player with initialized character data receives the full eligible kill reward once, regardless of distance, team, participation or death. No offline catch-up or historical level equalization." }
         GlobalTalentLevelLimit: { Label: "Global talent level limit", Tooltip: "-1 unlimited; 0 prevents purchase and effects; positive integer caps levels. Preserves purchased levels and paid costs. Per-talent overrides win." }
         TalentLevelOverrides: { Label: "Per-talent level overrides", Tooltip: "Add a stable talent ID and limit. -1 unlimited, 0 disabled, positive integer cap. Unlisted talents inherit global; last duplicate wins." }
         RestoreDefaultTalentLimits: { Label: "Restore default talent limits", Tooltip: "Click then save settings. Only resets global to -1 and clears per-talent overrides." }
@@ -438,4 +439,3 @@ Mods: {
     }
   }
 }
-

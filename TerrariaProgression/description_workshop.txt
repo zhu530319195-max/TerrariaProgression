@@ -8,6 +8,7 @@
 范围挖矿、矿脉连锁、一键伐木、草药收割与补种、范围拆墙，以及普通树／棕榈／宝石树自动补种。30种基础方块增产，天然和玩家放置均适用。七种原版草药可在人物周围50格内加速，保留各自开花条件。
 
 [h2]按自己的节奏游玩[/h2]
+可选“全服经验共享”：默认关闭，开启后每位在线玩家各得完整击杀经验，不平分，不追溯补发。
 服务器可设置每级获得天赋点、统一等级上限和单项覆盖。限制降低不会删除已购等级或实际投入；恢复默认按钮只重置等级限制。
 
 [h2]默认操作[/h2]
@@ -30,6 +31,7 @@ Earn experience from defeated enemies and build your own path through 100 talent
 [*]Numeric talents are uncapped by default, with adjustable active strength, bulk purchases and refunds of points actually spent.
 [*]Area and vein mining, tree felling, herb harvesting and replanting, area wall removal and automatic tree replanting.
 [*]Extra yield for 30 basic blocks, including player-placed blocks. Faster growth for seven vanilla herbs within 50 tiles, preserving native bloom conditions.
+[*]Optional full kill XP for every online player, off by default. No splitting or offline catch-up.
 [*]Server settings for talent points per level, global caps and per-talent overrides. Lowering a cap preserves purchased levels and investment.
 [/list]
 

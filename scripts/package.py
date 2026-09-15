@@ -27,9 +27,9 @@ info = (f"{build['displayName']} {version}\nInternal name: TerrariaProgression\n
         "Target: tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET 8\n"
         f"TerrariaProgression.tmod SHA256: {hashlib.sha256(mod).hexdigest()}\n"
         "P3-ResourcesLimits: 52 numeric entries plus 48 functional entries, 100 total. No CI harness in the player package.\n")
-with zipfile.ZipFile(output / f"BoundlessPotential_{version}_Release.zip", "w", zipfile.ZIP_DEFLATED) as archive:
+with zipfile.ZipFile(output / f"BoundlessPotential_{version}_Test.zip", "w", zipfile.ZIP_DEFLATED) as archive:
     archive.writestr("TerrariaProgression.tmod", mod)
-    archive.write(repo / "docs/RELEASE_0.13.1_zh-CN.md", "安装与发布说明.md")
+    archive.write(repo / "docs/SHARED_XP_TEST_GUIDE_zh-CN.md", "安装与测试说明.md")
     archive.write(repo / "docs/P3ResourcesLimits_TEST_GUIDE_zh-CN.md", "功能操作说明_0.13.0.md")
     archive.write(repo / "TerrariaProgression/description_workshop.txt", "创意工坊介绍_中英文.txt")
     archive.write(repo / "TerrariaProgression/changelog.txt", "更新说明.txt")
