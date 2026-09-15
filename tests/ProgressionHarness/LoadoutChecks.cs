@@ -82,7 +82,7 @@ public sealed partial class RuntimeChecks
             Receive(2,imported,padding:true);
             Check(A.State.Loadouts.Count==3 && A.State.ActiveLoadoutId==second,"actual snapshot receive preserves complete loadout state");
             Main.netMode=NetmodeID.Server;Config.ShareExperienceServerWide=true;
-            var npc=Spawn(100000);Kill(npc);Settle(npc);
+            var npc=Spawn(100000);ServerStrike(npc,0,npc.life);Settle(npc);
             Check(A.State.Loadouts.All(page=>page.AvailablePoints+page.SpentPoints==A.State.TotalTalentPointsEarned)
                 && A.State.TotalTalentPointsEarned>100,"shared experience increases every allocation allowance");
             // A pending real wall job must be cancelled before the next work frame.
