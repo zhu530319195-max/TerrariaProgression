@@ -1,0 +1,43 @@
+[h1]无尽潜能 · Boundless Potential[/h1]
+在冒险中积累经验，自由搭配天赋，让战斗、采集与生产能力不断成长。
+
+[h2]培养属于你的角色[/h2]
+击败敌人获得经验，升级获得天赋点。100项天赋覆盖属性与恢复、战斗能力、资源获取、批量采集和农业辅助。数值天赋默认无限升级，自由调节当前强度；支持批量加点和按实际投入退款。
+
+[h2]采集与生产[/h2]
+范围挖矿、矿脉连锁、一键伐木、草药收割与补种、范围拆墙，以及普通树／棕榈／宝石树自动补种。30种基础方块增产，天然和玩家放置均适用。七种原版草药可在人物周围50格内加速，保留各自开花条件。
+
+[h2]按自己的节奏游玩[/h2]
+服务器可设置每级获得天赋点、统一等级上限和单项覆盖。限制降低不会删除已购等级或实际投入；恢复默认按钮只重置等级限制。
+
+[h2]默认操作[/h2]
+[list]
+[*]P：打开／关闭天赋面板
+[*]左Alt：按一下开批量采集，再按一下关
+[*]G：范围挖矿／矿脉连锁
+[*]K：开关额外挖矿保护，默认关闭
+[/list]
+
+[h2]版本与当前边界[/h2]
+简体中文与英文；tModLoader v2026.07.3.0，Terraria 1.4.4.9。角色数据沿用原TerrariaProgression，不需重新练级。0.13.0本批功能通过作者实机验收，0.13.1统一正式名称与介绍。
+真实多人尚未实测；特殊／多阶段Boss和多人独立掉落增产仍未全面覆盖。药水病缩短、原有钓鱼产量仍待专项实机验收。未知第三方MOD兼容性不作保证。草药加速不含蘑菇、仙人掌、竹子和南瓜。
+
+[h1]Boundless Potential[/h1]
+Earn experience from defeated enemies and build your own path through 100 talents for combat, gathering and farming.
+
+[h2]Features[/h2]
+[list]
+[*]Numeric talents are uncapped by default, with adjustable active strength, bulk purchases and refunds of points actually spent.
+[*]Area and vein mining, tree felling, herb harvesting and replanting, area wall removal and automatic tree replanting.
+[*]Extra yield for 30 basic blocks, including player-placed blocks. Faster growth for seven vanilla herbs within 50 tiles, preserving native bloom conditions.
+[*]Server settings for talent points per level, global caps and per-talent overrides. Lowering a cap preserves purchased levels and investment.
+[/list]
+
+[h2]Controls[/h2]
+P: talent panel. Left Alt: toggle batch gathering. G: area/vein mode. K: toggle extra mining protection (off by default).
+
+[h2]Support and limitations[/h2]
+Simplified Chinese and English. Built for tModLoader v2026.07.3.0 / Terraria 1.4.4.9. Existing TerrariaProgression character data is retained.
+The 0.13.0 feature batch passed author playtesting; 0.13.1 changes branding and descriptions. Live multiplayer, arbitrary third-party mod compatibility, special/multi-stage bosses and player-instanced extra loot are not fully verified or implemented. Potion Sickness reduction and the older fishing-yield feature still await dedicated playtesting.
+
+[url=https://github.com/zhu530319195-max/TerrariaProgression/issues]反馈问题 / Report an issue[/url]

@@ -41,7 +41,7 @@ Mods: {
   "Digits": "位",
   "Remaining": "消耗概率／比例 ×{0}%",
   "PerSecond": " / 秒",
-  "Header": "天赋  ·  Lv.{0}   |   经验 {1} / {2}",
+  "Header": "无尽潜能  ·  Lv.{0}   |   经验 {1} / {2}",
   "Totals": "可用点数 {0}   ·   已投入 {1}   ·   累计经验 {2}",
   "Detail": "天赋等级：{0}（无限） · {1}\n当前效果：{2}\n下一级解锁效果：{3}\n升级花费：{4} 点\n累计投入：{5} 点",
   "Off": "已关闭",
@@ -387,7 +387,7 @@ Mods: {
         EnableAutoReplantTree: { Label: "允许自动补种树苗", Tooltip: "普通树、棕榈和宝石树，消耗对应种植材料。" }
         EnableAreaWallRemoval: { Label: "允许范围拆墙", Tooltip: "沿用原版拆墙条件与采集预算。" }
 
-        DisplayName: 成长规则（服务器）
+        DisplayName: 无尽潜能：成长规则（服务器）
         EnableWorldGathering: { Label: "允许批量采集", Tooltip: "P3世界操作总开关。仍须购买对应天赋；按一次采集键开启批量操作。自动补种也受此总许可控制。" }
         EnableAreaMining: { Label: "允许范围挖矿", Tooltip: "允许范围挖矿模式。" }
         EnableVeinMining: { Label: "允许矿脉连锁", Tooltip: "仅连接同种矿石，包括斜角。" }

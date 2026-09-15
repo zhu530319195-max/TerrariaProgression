@@ -41,7 +41,7 @@ Mods: {
   "Digits": " digits",
   "Remaining": "Consumption probability / ratio ×{0}%",
   "PerSecond": " / sec",
-  "Header": "Talents  ·  Lv.{0}   |   XP {1} / {2}",
+  "Header": "Boundless Potential  ·  Lv.{0}   |   XP {1} / {2}",
   "Totals": "Available {0}   ·   Invested {1}   ·   Lifetime XP {2}",
   "Detail": "Talent level: {0} (unlimited) · {1}\nActive effect: {2}\nNext unlocked effect: {3}\nUpgrade cost: {4} point\nTotal invested: {5} points",
   "Off": "Disabled",
@@ -387,7 +387,7 @@ Mods: {
         EnableAutoReplantTree: { Label: "Allow tree replanting", Tooltip: "Native trees, palms and gem trees; consumes matching seeds." }
         EnableAreaWallRemoval: { Label: "Allow area wall removal", Tooltip: "Uses native wall conditions and shared work budget." }
 
-        DisplayName: Progression rules (server)
+        DisplayName: "Boundless Potential: Progression rules (server)"
         EnableWorldGathering: { Label: "EnableWorldGathering", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
         EnableAreaMining: { Label: "EnableAreaMining", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }
         EnableVeinMining: { Label: "EnableVeinMining", Tooltip: "Server-controlled P3 gathering permission. See the gathering talent description." }

@@ -1,140 +1,36 @@
-## 0.13.0 已实现并通过自动检查，等待玩家实机验收
+# 无尽潜能 · Boundless Potential
 
-本批新增基础方块产量、植物生长加速、锤力增强、范围拆墙、自动补种树苗，并为全部天赋加入服务器等级限制。共100项（52数值＋48功能），存档仍为v3，联机协议升级为17；新旧客户端／服务器不能混用。[PR #16](https://github.com/zhu530319195-max/TerrariaProgression/pull/16) 未合并，尚未获实机验收或合并授权。
+在冒险中积累经验，自由搭配天赋，让战斗、采集与生产能力不断成长。
 
-用户确认的30种基础方块已全部实现，包含雪块、冰块、紫冰、红冰、粉冰、泥沙、雪泥、沙漠化石。草药加速固定人物周围50格圆形、不要求视线，多人取最高；宝石树使用对应宝石橡实。所有新数值天赋默认无限、可调强度、支持批量和实际投入退款。限级不会删已购等级／投入／强度选择，恢复按钮仅重置等级限制。
+一个独立的Terraria / tModLoader角色成长MOD。击败敌人获得经验，升级获得天赋点，以100项天赋培养自己的角色。
 
-功能提交`6567a4235c449936cfee673841859deaede004ff`；[PR CI 34896154496](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34896154496)成功：3454项核心、1682项原生检查，正式及测试MOD编译零警告、零错误。玩家包和源码包由该CI直接生成，BUILD_INFO提交`ff6176c8c7561153d8f191a4c65c11bc5f252836`是GitHub临时测试合并提交，139个源码文件逐一核对与功能提交相同，**不代表PR已合并**。本次交付记录仅改Markdown，复用上述功能证据。
+- 数值天赋默认无限升级，可调当前强度、批量加点，退款返还实际投入。
+- 覆盖属性、恢复、战斗、资源获取、批量采集和农业。
+- 范围／矿脉挖矿、一键伐木、草药采收补种、范围拆墙与树苗补种。
+- 30种基础方块增产；人物周围50格内原版七种草药加速，保留开花条件。
+- 全局和单项服务器等级限制；降低限制保留已购等级和投入。
 
-设计见[资源与等级限制设计](docs/P3_RESOURCES_LIMITS_DESIGN_zh-CN.md)，安装与操作见[中文验收说明](docs/P3ResourcesLimits_TEST_GUIDE_zh-CN.md)，精确证据及包校验见[自动验证记录](docs/P3_RESOURCES_LIMITS_VERIFICATION_zh-CN.md)。原工作区保留，main仍为已验收的`80266243fea02125394c8f5de7e063978c3929f2`。
+**版本0.13.1**，目标tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET8。内部标识仍为`TerrariaProgression`；角色存档v3、联机协议17。
 
-Alt／G／K、默认关闭的额外挖矿保护、即时原版整圆爆破和原生墙条件保留。药水病缩短、原有钓鱼产量仍未实机验收；真实多人暂缓；特殊／多阶段Boss和多人独立掉落增产未完成；分层暴击暂缓。取消与移出计划事项不恢复，蘑菇／仙人掌／竹子／南瓜不加入，不虚报第三方兼容。下文是历史阶段记录，以本节为准。
+| 按键 | 功能 |
+|---|---|
+| P | 天赋面板 |
+| 左Alt | 批量采集开／关 |
+| G | 范围挖矿／矿脉连锁 |
+| K | 额外挖矿保护开／关，默认关闭 |
 
-## 0.12.1 实机验收通过，PR #15 获准合并
+[安装与发布说明](docs/RELEASE_0.13.1_zh-CN.md) · [项目当前状态](PROJECT_STATUS.md) · [任务清单](docs/TASK_CHECKLIST_zh-CN.md) · [反馈问题](https://github.com/zhu530319195-max/TerrariaProgression/issues)
 
-2026-09-14：用户确认“测试通过，可以合并”，本批实机验收通过并明确授权合并 [PR #15](https://github.com/zhu530319195-max/TerrariaProgression/pull/15)。实际合并结果和 main 提交以 GitHub PR 记录为准。本记录覆盖下文历史“待复验／未获合并授权”措辞。
+0.13.0本批功能已由用户实机验收；0.13.1统一正式名称与介绍。真实多人暂未实测；特殊／多阶段Boss和多人独立掉落增产仍未完成；药水病缩短、原有钓鱼产量仍待专项实机验收。不保证未知第三方MOD兼容。尚未在Steam创意工坊发布。
 
-验收包提交 `5b2da240778ce47e68cd7bc64a34e11dabaed7a2`；功能提交 `03e66a42a5f4512e7ff2a5ef9f0c9c7fbaac08bc`。[最终分支 CI 34861970946](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34861970946) 和 [PR CI 34861975091](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34861975091) 均成功：3240 项核心、1103 项原生检查，正式及测试 MOD 编译零警告、零错误。本次仅追加 Markdown 验收记录，功能代码与验收包一致，复用以上有效证据。
+## English
 
-本批包括镐力／斧力增强、即时原版整圆地形爆破（背景墙沿用原版条件）、默认快捷键修复，以及默认关闭、可用 K／面板切换的额外挖矿保护。版本 0.12.1，共 95 项天赋，存档 v3、联机协议 16。MOD SHA256：`4b6fa3adf99ac7783bd550961adc7865520a53462f4c5ace4146841247f0a822`。
+Earn experience from defeated enemies and shape your character with 100 talents for combat, gathering and farming. Numeric talents are uncapped by default, with adjustable active strength, bulk purchases and refunds based on actual investment. Servers can set global and per-talent caps without deleting purchased levels.
 
-药水病缩短、原有钓鱼产量仍未实机验收；真实多人暂缓实测；特殊／多阶段 Boss 适配与实机覆盖、多人独立掉落增产／按玩家额外抽取尚未完成；分层暴击暂缓；特殊斧头自动种树等附带行为仍未适配。取消事项和第三方兼容边界保持原决定。
+Default controls: **P** talents, **Left Alt** batch gathering, **G** area/vein mining, **K** extra mining protection (off by default). Simplified Chinese and English are included.
 
-下一步仅讨论资源获取天赋的现有覆盖与缺口；本次不授权开发新天赋。
+Built for **tModLoader v2026.07.3.0 / Terraria 1.4.4.9 / .NET8**. The internal mod name remains `TerrariaProgression`, retaining existing character data. Save version3, network protocol17.
 
-## 0.12.1 修订：即时原版爆破与可选挖矿保护
+The 0.13.0 feature batch passed user playtesting. Version0.13.1 updates branding and release materials. Live multiplayer and arbitrary third-party mod compatibility are not verified. Special bosses and player-instanced extra loot remain incomplete. Potion Sickness reduction and older fishing yield still await dedicated playtesting. Steam Workshop publication is pending.
 
-功能提交`03e66a42a5f4512e7ff2a5ef9f0c9c7fbaac08bc`已通过[分支CI 34861643567](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34861643567)及[PR CI 34861649597](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34861649597)：3240项核心、1103项原生检查，正式及测试MOD编译零警告、零错误。此后的验证文档提交不改变功能代码；玩家实机待复验。
-
-用户反馈0.12.0基本通过，但要求改变爆破及挖矿保护体验，现已批准并授权修改PR #15；尚未授权合并。95项、存档v3、协议16。
-
-爆破整圆一次按原版规则处理，沙子、家具、线路及背景墙沿用原生判定。取消额外采集保护、分帧外圈和数量截断，改用服务器实际总半径上限（默认32格，7～128可调）。伤害保持原版。
-
-范围／矿脉额外保护默认关闭，K／面板／`/tpgather protect`可切换。关闭时原生逐格敲击，保留镐力和原生破坏限制、服务器许可、距离及分帧预算；农业和伐木保护不变。K单独迁移，不重填已清空的旧按键。新版自动成绩以修订版CI和BUILD_INFO为准，旧3237核心／1169原生不是新爆破规则验收证据；实机待复验，其他未验收／未完成／暂缓事项保持原状。
-
-规则见[原版地形修订](docs/P3_NATIVE_TERRAIN_REVISION_zh-CN.md)，操作见[中文验收说明](docs/P3ToolPowerBlast_TEST_GUIDE_zh-CN.md)。
-
-## 0.12.0 开发与验收批次：工具强度、地形爆破、默认快捷键
-
-2026-09-14：已核对PR #14合并，main为`a196415d158ca1a772fdf67ef994cf08e59a41ca`，0.11.1／92项已实机验收。本批用户另行确认规则并授权开发，独立分支`feat/p3-tool-power-blast`，新PR未经授权不得合并。下文旧版“获准合并／未合并／不包含下一批”是历史记录，不覆盖本条。
-
-0.12.0新增镐力、斧力（每级1点、+10个百分点）和爆破范围（每级1点、地形半径+1格），共95项，存档v3、协议15。全部无限升级、可调强度、实际投入退款；爆破限六种原版炸弹／雷管，只扩展地形外圈，共用保护和分帧预算。补齐P／左Alt／G默认键一次，保留已有改键和迁移后的主动清空。
-
-功能提交`305bec0700bdfba4b0c61f05c01ed3e1dcf52c8d`已通过[CI 34855726423](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34855726423)：3237项核心、1169项原生检查，正式及测试MOD编译零警告、零错误。后续验证文档提交不改功能代码，复用此证据；详见docs/P3_TOOL_POWER_BLAST_VERIFICATION_zh-CN.md。玩家实机待验收。药水病、旧钓鱼产量仍未实机验收；真实多人暂缓；特殊Boss覆盖、多人独立掉落增产未完成；分层暴击暂缓；特殊斧头批量种树未适配。
-
-设计见[工具与爆破规则](docs/P3_TOOL_POWER_BLAST_DESIGN_zh-CN.md)，验收见[中文操作步骤](docs/P3ToolPowerBlast_TEST_GUIDE_zh-CN.md)。
-
-## 0.11.1已实机验收，PR #14获准合并
-
-2026-09-14：用户确认“测试通过。开始合并”，本批实机验收通过并明确授权合并[PR #14](https://github.com/zhu530319195-max/TerrariaProgression/pull/14)。实际合并提交以PR记录为准。此记录覆盖下文历史“待验收／待复验／不执行合并”措辞。
-
-验收包及功能代码提交：`5695d484083bf97486eb4fbf9c31eec8bdf72038`。[分支CI 34848427906](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34848427906)和[PR CI 34848430955](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34848430955)均成功：3197项核心、966项原生检查，正式及测试MOD编译零警告、零错误。本次验收记录仅修改Markdown文档，功能代码与验收包一致，复用以上有效证据。
-
-当前基线0.11.1，共92项天赋，存档v3，联机协议14。本批涵盖范围收割、自动补种、Alt统一切换式采集、普通补挖／单株收割修复，以及一次+10／+100／+300／+1000级操作。保留实际投入退款、当前强度与批量公共保护规则。
-
-药水病缩短、原有钓鱼产量仍未实机验收；真实多人暂缓实测；特殊／多阶段Boss适配和实测未完成；多人独立掉落增产／按玩家额外抽取尚未实现；分层暴击暂缓修复；特殊斧头自动种树、生长法杖／再生之斧专用入口仍未适配。未知方块类型不因此新增兼容承诺，攻击破坏地形／拆墙建筑扩展仍为候选。本次授权不包含下一批开发。
-
-## 0.11.1 玩家反馈修复与批量升级（待复验）
-
-用户报告Alt开启后部分留块无法手动补挖、单株草药也被“批量未启动”提示拦住，并要求一次升10／100／300／1000级。本版在未合并的PR #14、feat/p3-agriculture继续修复；main仍为已验收0.10.0，不执行合并。
-
-- 批量模式不支持的直接目标改走原生工具入口；不能范围收割的成熟草药，有可用自动补种时走单株事务，否则正常单株采集。只放行鼠标明确指向的一格，其他草药不借此绕过范围幼苗保护。
-- 原有家具及支撑、电线、下落方块、特殊地形保护仍只限制批量操作；普通手动操作仍服从原生镐力、破坏许可等规则。范围结束有留块时提供原因类别提示。截图没有方块种类，不能据此宣称所有漏挖情形均已定位。
-- 天赋面板增加+10／+100／+300／+1000按钮及总价；点数不足整次不购买，一次性功能不可批量升级。保留已有开关、当前强度和实际付款退款，单请求直接记账，不循环发送千次点击。
-- 92项天赋，存档v3；升级数量改用16位字段，协议14，客户端与服务器须同版。1000是单次购买上限，不是天赋等级上限。
-- 旧0.11.0的3159核心／927原生证据属于旧包；修复版验证以本次CI及包内BUILD_INFO为准。玩家实机待复验，旧未验收／未完成／暂缓事项保持各自状态。
-
-## 0.10.0已实机验收：P3采集基础＋攻击范围补全
-
-## 当前开发：0.11.0 P3农业＋Alt切换式采集
-
-基于已验收并合并的0.10.0，main提交`f28559940bfef5217ecda36356c32268d0009e30`，PR #1～#13均已合并。PR #13最终分支／PR CI：34834854063／34834858202成功，3150核心／651原生；验收包`95e55b29156bad921e77d4d3bef1f1c701d9f359`与main功能代码一致。覆盖下文历史待验收、获准合并和旧main措辞。
-
-用户批准农业规则与Alt改为按一下开、再按一下关，并授权开发。本分支`feat/p3-agriculture`新增范围收割和自动补种，两项整批交付；改造既有范围挖矿／矿脉／伐木的输入。实现后92项天赋，存档v3，联机协议13。详见[农业设计](docs/P3_AGRICULTURE_DESIGN_zh-CN.md)和[中文验收说明](docs/P3Agriculture_TEST_GUIDE_zh-CN.md)。本批自动验证已通过，待玩家实机验收；未获新PR合并授权。
-
-功能代码`7db8aa1c8e4221ee704ea3888e99ad6e83094bb3`已通过[CI 34842171839](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/34842171839)：3159项核心、927项原生检查通过；正式MOD与测试MOD编译零警告、零错误。后续验证记录提交仅改文档，功能代码一致。玩家实机验收仍待反馈，新PR保持未合并。
-
-药水病缩短、原有钓鱼产量仍未实机验收；真实多人暂缓实测；特殊／多阶段Boss适配与实测未完成；多人独立掉落增产／按玩家额外抽取仍未完成；分层暴击暂缓修复；特殊斧头自动种树等行为本批不适配。取消事项及未知第三方兼容边界保持原决定。
-
-
-新增范围挖矿、矿脉连锁、一键伐木，共90项天赋。按住左Alt使用工具，G切换范围／矿脉；热键可修改。复用已有攻击范围天赋补齐原版鞭子和链锤。自动检查3150项核心、651项原生通过，本批实机验收已通过，PR #13获准合并；不代表P3农业或此前单列遗留项目完成。
-
-[规则与限制](docs/P3_GATHERING_DESIGN_zh-CN.md) · [安装和中文测试步骤](docs/P3Gathering_TEST_GUIDE_zh-CN.md)。存档v3，协议12，目标tModLoader v2026.07.3.0。
-
-# TerrariaProgression
-
-Terraria/tModLoader 独立角色成长系统。
-
-核心目标：
-
-- 无限角色等级；
-- 击杀经验按 NPC 最大生命动态计算；
-- 升级获得天赋点；
-- 数值天赋默认允许无限重复升级；
-- Lv.10 作为默认“非常强力”的第一阶段完成态，之后继续成长但不强制保持原版平衡；
-- 天赋可自由回退、返还实际投入点数，也可在不退款的情况下临时关闭；
-- 角色成长跨世界保留，并考虑单人/多人同步；
-- 高风险世界修改能力由服务器控制。
-
-默认天赋成本：
-
-- 普通数值成长：通常 1 天赋点 / Lv；
-- 一次性功能/饰品式能力：统一 2 天赋点解锁；
-- 洗点免费，返还实际支付点数。
-
-## Functional talents
-
-功能型/饰品式能力采用显式 `FunctionalTalentRegistry`，不把未知饰品自动转换成永久天赋。
-
-实现优先级：
-
-1. `NativeFlag` — 直接使用 Terraria/tModLoader 稳定状态；
-2. `NativeSystem` — 使用正式子系统（如额外跳跃等）；
-3. `AccessoryBridge` — 仅对白名单原版饰品复用效果；
-4. `Custom` — 无可靠原生入口时自行实现；
-5. `Composite` — 组合多个已注册子效果。
-
-`AccessoryTalentScanner` 只作为开发期候选发现工具：扫描未映射饰品并输出报告，不自动推断效果、不自动执行第三方饰品、不自动向玩家菜单添加未知能力。
-
-第三方饰品自动导入若未来实现，默认关闭并视为实验功能。
-
-## Documentation
-
-- `AGENTS.md` — 工程与协作规则
-- `PROJECT_STATUS.md` — 当前状态、已确认规则和下一步
-- [最新任务清单（中文）](docs/TASK_CHECKLIST_zh-CN.md) — 已完成、下一批、候选、遗留验证与取消事项
-- `ROADMAP.md` — P0–P3 开发路线
-- `DECISIONS.md` — 已接受的产品/架构决策
-- `docs/PROGRESSION_DESIGN_v0.1.md` — 等级、经验、数值天赋与世界能力总设计
-- `docs/FUNCTIONAL_TALENTS_v0.1.md` — 功能天赋正式目录、Registry、Scanner 与兼容策略
-- [下一批P2已确认规则](docs/P2_AFFLICTIONS_DESIGN_zh-CN.md) — 异常伤害、四种新异常、渔力与扫描维护（待开发）
-
-当前阶段：**0.8.2 二级天赋菜单、钓鱼与饰品扫描**。PR #1～#10已验收合并。本批新增鱼饵节约与宝匣概率，共81项；此前单列的未验收／未完成项目仍按各自状态保留。
-
-- 六类二级目录、全局搜索、已购买/已启用筛选，菜单重开保留当前会话选择。
-- 分组/分类退款明确显示范围与实际投入；旧角色数据保留。
-- 开发指令 `/tpscanaccessories` 导出被动候选报告；`/tpfishsample` 提供单人钓鱼测试物资。
-- 存档v3、协议10；所有端更新至0.8.2。
-- [中文安装与验收](docs/P2MenuFishing_TEST_GUIDE_zh-CN.md)
-- [实现、验证与限制](docs/P2MenuFishing_IMPLEMENTATION.md)
-- 本版已获用户实机验收并合并PR #10；下一批六项新天赋和两项扫描维护的规则已确认，整批开发尚未开始。
+Development records: [Decisions](DECISIONS.md), [Roadmap](ROADMAP.md), [Previous README history](docs/README_HISTORY_zh-CN.md).

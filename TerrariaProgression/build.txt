@@ -1,6 +1,6 @@
-displayName = Terraria Progression
+displayName = 无尽潜能 · Boundless Potential
 author = 四季华
-version = 0.13.0
+version = 0.13.1
 side = Both
 buildIgnore = bin/*, obj/*, *.csproj
 
