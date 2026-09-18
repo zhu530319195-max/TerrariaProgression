@@ -1,3 +1,23 @@
+# 0.15.1 名称输入与快捷键修订验证
+
+2026-09-18。设计提交466b64e7ad395a8a78fbc7a7d7a4e29af75eeb3d先记录D064，再实现；构建提交`444442add6a3faa32af0c3e66b6aa65b531713cc`，PR #18未合并。存档v4／协议18不变。用户报告的“可以删除不能输入”使0.15.0不能视为已实机通过，需使用本版复验。
+
+检查了固定版本原生Main、PlayerInput及UIFocusInputTextField：Mod UI.Update早于PlayerInput.UpdateInput，后者重置WritingText，随后聊天绘制会根据该标记开关IME。修复为绘制阶段读文本，在PostUpdateInput维持焦点并占用Main.CurrentInputTextTakerOverride，防止回车选字打开聊天、清掉字符缓冲。搜索使用同一规则。
+
+[CI35334035900](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/35334035900)成功：4013核心、1849原生（本次增加61项），正式及测试MOD编译均零警告、零错误。原生GetInputText检查使用实际字符队列，覆盖提交后的中文、字母数字、32字符长度、代理对安全截断和失焦保留；原生OpenPlayerChat验证输入占用时不抢走字符。快捷键验证涵盖格式解析、左右Shift/Ctrl、额外修饰键隔离、按住与先按主键不触发、新绑定持久化、清空不补回、重复列表优先、数字快捷栏拦截、当前／不存在方案不执行、删除序号前移、死亡／就绪／等待网络限制，以及11项输入与界面状态门禁。复用原方案全部保存、退款、切换不回复与采集停止的回归。
+
+这不等于Windows输入法候选窗、实际面板点击与真人多人已实测。请用户按新说明先复验改名，再试默认Shift+1／Shift+2和自定义Ctrl+F1。其他未验收／未完成／暂缓边界保持。
+
+[交付产物10542258727](https://github.com/zhu530319195-max/TerrariaProgression/actions/runs/35334035900/artifacts/10542258727)通过摘要与ZIP完整性校验。完整源码157个Git文件逐一与构建提交比对；玩家包不含测试Harness。BUILD_INFO中的`513bd5e07122c42e47d9b5404a54e961709d88ca`是GitHub临时PR测试提交，不是main合并。后续仅更改Markdown证据，代码和玩家包一致。
+
+| 文件 | SHA256 |
+|---|---|
+| BoundlessPotential_0.15.1_Test.zip | `2bd4a7a173efba21133e7add5f36ffef382fbbbbf973d442305c8c5ad2565572` |
+| BoundlessPotential_0.15.1_Source.zip | `20870b5578288103745695e186c96a2d1db7f8da982d300c4d08fdb9f44e2ff0` |
+| TerrariaProgression.tmod | `0642318095c8e65356510022ba96252711702ba4c95b01a0d3fb06863e905e4a` |
+
+以下保留0.15.0历史证据，不能替代本次修订成绩。
+
 # 0.15.0 天赋方案验证记录
 
 ## 提交与授权
