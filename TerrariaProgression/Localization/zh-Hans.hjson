@@ -10,6 +10,24 @@ Mods: {
   }
 }
     TalentsUI: {
+      LoadoutSwitched: "已切换天赋方案：{0}"
+      InvalidShortcuts: "以下快捷键条目无效，未启用：{0}。请按示例填写Shift+1、Ctrl+F1或F6。"
+
+      LoadoutCurrent: "当前方案：{0} ▾"
+      LoadoutChoose: "选择天赋方案（每套独立使用角色的全部天赋点）"
+      LoadoutEntry: "{0}　可用 {1}　已投入 {2}"
+      CreateLoadout: "新建"
+      CopyLoadout: "复制"
+      RenameLoadout: "改名"
+      DeleteLoadout: "删除"
+      LoadoutCancel: "取消"
+      LoadoutConfirm: "确认"
+      LoadoutDefault: "方案 {0}"
+      LoadoutNameHelp: "输入方案名称，最多32个字符。新建为空白方案；复制保留当前加点、开关和强度。完成后立即启用。改名仅修改当前方案的名称。"
+      LoadoutDeleteConfirm: "确定删除“{0}”吗？这只删除该方案，不增加角色总点数。删除当前方案后启用列表中的第一套。"
+      ResultInvalidLoadoutName: "名称不能为空，最多32个字符，不能包含控制字符或方括号。"
+      ResultLastLoadout: "至少保留一套方案。"
+
       RestoreTalentLimits: "恢复默认天赋等级限制"
       ServerLevels: "服务器上限：{0}级｜实际生效：{1}级"
       UnlimitedLimit: "无限"
@@ -375,6 +393,9 @@ Mods: {
       ServerConfigLocked: "请在开服前设置成长规则；专用服务器请修改配置文件后重启。"
     }
     Configs: {
+      LoadoutHotkeyConfig: {"DisplayName": "无尽潜能：天赋方案快捷键（本机）", "Enabled": {"Label": "启用方案快捷键", "Tooltip": "仅影响本机，输入文字、设置菜单和死亡时不触发。"}, "Shortcuts": {"Label": "自定义快捷键列表", "Tooltip": "默认Shift+1～9、Shift+0切换前10套。展开条目修改对应方案序号和组合键；按+增加，清空组合键停用。按方案列表顺序，删除后序号前移，改名不影响序号。重复组合只执行第一条。"}}
+      LoadoutShortcut: {"LoadoutNumber": {"Label": "方案序号", "Tooltip": "1代表列表第一套，2代表第二套；不会新建方案。"}, "Shortcut": {"Label": "按键或组合键", "Tooltip": "例如Shift+1、Ctrl+F1、Alt+Q、Ctrl+Shift+2或F6。左右修饰键均可。数字1～0是主键盘；小键盘写NumPad1。按下触发一次。避免与其他MOD快捷键冲突。空白停用；无效格式不触发。"}}
+
       TalentLevelOverride: {
         TalentId: { Label: "天赋ID" }
         Limit: { Label: "等级上限（-1无限，0禁用）" }

@@ -1,3 +1,11 @@
+0.15.1 — 输入修复与方案快捷键 / Input fix and loadout shortcuts
+修复天赋方案改名、新建、复制名称和搜索框只能退格、不能输入的问题；保护中文输入焦点。新增本机自定义组合键，默认Shift+1～9／Shift+0切换第1～10套，支持修改组合及方案序号，打字时禁用，按住不连发。识别组合时抑制同键原版快捷栏选择；方案序号显示在面板。存档v4、协议18不变，等待实机复验。
+Fixed name/search text input lifecycle and IME focus. Added configurable client-side loadout chords (Shift+1..9 / Shift+0 by default), ordinal labels, typing guards and single activation per press. Matching hotbar keys are suppressed. Save v4 and protocol18 unchanged; playtesting pending.
+
+0.15.0 — 天赋方案 / Talent loadouts
+新增天赋方案选择、新建、复制、改名和删除。每套方案独立分配角色累计获得的全部点数，只有当前方案生效；每次升级增加所有方案额度，退款仅返回当前方案。切换不回血回蓝、不重置冷却或跳数，停止旧采集作业。原角色加点自动保留为第一套。存档v4、联机协议18，100项天赋；安装前备份角色，联机双方同版。本批等待实机验收。
+Each loadout can independently spend your full earned point budget; only the selected one applies. Create, copy, rename, delete and switch from the talent panel. Level-ups increase every allowance; refunds affect only the current loadout. Switching does not restore resources or reset cooldowns/jump usage and stops old gathering jobs. Existing allocations migrate into the first loadout. Save v4, protocol18, 100 talents. Back up characters and use matching client/server versions. Playtesting pending.
+
 0.14.0 — 全服经验共享 / Server-wide experience sharing
 新增服务器开关“全服经验共享”，默认关闭。开启后所有在线且角色数据就绪的玩家各得完整合法击杀经验，不限距离、队伍或是否参战，死亡等待复活也可领取。无离线补发，参战者不重复领，关闭恢复伤害贡献分配。存档v3、协议17和100项天赋保持；本批待实机验收。
 Added optional server-wide experience sharing (off by default). Each online initialized player receives the full eligible kill reward once, regardless of team, distance, participation or death. No offline catch-up or extra contributor reward. Off retains damage-based allocation. Save v3, protocol17 and 100 talents retained; live playtesting pending.

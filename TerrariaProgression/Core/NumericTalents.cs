@@ -6,8 +6,8 @@ using System.Numerics;
 namespace TerrariaProgression.Core;
 
 public enum TalentCategory : byte { BaseStats, Recovery, Combat, Economy, Utility, World }
-public enum TalentOperation : byte { Upgrade, RefundOne, RefundTalent, Enable, Disable, RefundCategory, RefundEverything, EnableEverything, DisableEverything, DecreaseIntensity, IncreaseIntensity, MaximumIntensity, ToggleChild, RefundMenuGroup, RefundMenuCategory }
-public enum TalentResult : byte { Success, NotReady, UnknownTalent, InvalidRequest, NotEnoughPoints, NoChange, StaleRequest, Capacity }
+public enum TalentOperation : byte { Upgrade, RefundOne, RefundTalent, Enable, Disable, RefundCategory, RefundEverything, EnableEverything, DisableEverything, DecreaseIntensity, IncreaseIntensity, MaximumIntensity, ToggleChild, RefundMenuGroup, RefundMenuCategory, CreateLoadout, CopyLoadout, RenameLoadout, DeleteLoadout, ActivateLoadout }
+public enum TalentResult : byte { Success, NotReady, UnknownTalent, InvalidRequest, NotEnoughPoints, NoChange, StaleRequest, Capacity, InvalidLoadoutName, LastLoadout }
 public enum EffectUnit { Flat, Percent, PerSecond, RemainingMultiplier, Flag, Multiplier, Seconds }
 public sealed record TalentDefinition(string Id, TalentCategory Category, decimal PerLevel, EffectUnit Unit, bool Adjustable = false, int DefaultCost = 1, int MaxLevel = 0);
 

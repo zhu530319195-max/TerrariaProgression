@@ -4,6 +4,9 @@
 [h2]培养属于你的角色[/h2]
 击败敌人获得经验，升级获得天赋点。100项天赋覆盖属性与恢复、战斗能力、资源获取、批量采集和农业辅助。数值天赋默认无限升级，自由调节当前强度；支持批量加点和按实际投入退款。
 
+[h2]天赋方案[/h2]
+战斗、采矿分别保存加点。每套独立使用角色累计获得的全部点数，仅当前方案生效。支持新建、复制、改名和删除，切换免费。0.15.0等待实机验收；存档v4／协议18，升级前备份角色。
+
 [h2]采集与生产[/h2]
 范围挖矿、矿脉连锁、一键伐木、草药收割与补种、范围拆墙，以及普通树／棕榈／宝石树自动补种。30种基础方块增产，天然和玩家放置均适用。七种原版草药可在人物周围50格内加速，保留各自开花条件。
 
@@ -28,6 +31,7 @@ Earn experience from defeated enemies and build your own path through 100 talent
 
 [h2]Features[/h2]
 [list]
+[*]Independent talent loadouts, each with your full earned point budget. Only the active build applies. Version0.15.0 awaits playtesting; save v4 / protocol18; back up characters before upgrading.
 [*]Numeric talents are uncapped by default, with adjustable active strength, bulk purchases and refunds of points actually spent.
 [*]Area and vein mining, tree felling, herb harvesting and replanting, area wall removal and automatic tree replanting.
 [*]Extra yield for 30 basic blocks, including player-placed blocks. Faster growth for seven vanilla herbs within 50 tiles, preserving native bloom conditions.
@@ -43,3 +47,6 @@ Simplified Chinese and English. Built for tModLoader v2026.07.3.0 / Terraria 1.4
 The 0.13.0 feature batch passed author playtesting; 0.13.1 changes branding and descriptions. Live multiplayer, arbitrary third-party mod compatibility, special/multi-stage bosses and player-instanced extra loot are not fully verified or implemented. Potion Sickness reduction and the older fishing-yield feature still await dedicated playtesting.
 
 [url=https://github.com/zhu530319195-max/TerrariaProgression/issues]反馈问题 / Report an issue[/url]
+
+0.15.1修复方案名称和搜索输入；可在本机模组配置自定义方案快捷键，默认Shift+1～9／Shift+0。等待实机复验。
+0.15.1 fixes name/search input and adds configurable local loadout chords (Shift+1..9 / Shift+0). Playtesting pending.

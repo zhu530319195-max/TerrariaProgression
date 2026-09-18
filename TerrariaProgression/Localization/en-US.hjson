@@ -10,6 +10,24 @@ Mods: {
   }
 }
     TalentsUI: {
+      LoadoutSwitched: "Talent loadout: {0}"
+      InvalidShortcuts: "Invalid shortcut entries disabled: {0}. Use Shift+1, Ctrl+F1 or F6."
+
+      LoadoutCurrent: "Loadout: {0} ▾"
+      LoadoutChoose: "Choose a loadout (each gets your full earned point budget)"
+      LoadoutEntry: "{0}   Available {1}   Spent {2}"
+      CreateLoadout: "New"
+      CopyLoadout: "Copy"
+      RenameLoadout: "Rename"
+      DeleteLoadout: "Delete"
+      LoadoutCancel: "Cancel"
+      LoadoutConfirm: "Confirm"
+      LoadoutDefault: "Loadout {0}"
+      LoadoutNameHelp: "Enter up to 32 characters. New starts empty; Copy preserves talents, toggles and intensity. Both become active immediately. Rename changes only this name."
+      LoadoutDeleteConfirm: "Delete \"{0}\"? This removes only this loadout and does not add earned points. Deleting the active loadout activates the first remaining one."
+      ResultInvalidLoadoutName: "Use 1–32 characters without control characters or square brackets."
+      ResultLastLoadout: "Keep at least one loadout."
+
       RestoreTalentLimits: "Restore default talent level limits"
       ServerLevels: "Server cap: {0} | Effective level: {1}"
       UnlimitedLimit: "Unlimited"
@@ -375,6 +393,9 @@ Mods: {
       ServerConfigLocked: "Set progression rules before hosting, or edit the dedicated server config and restart."
     }
     Configs: {
+      LoadoutHotkeyConfig: {"DisplayName": "Boundless Potential: Loadout shortcuts (client)", "Enabled": {"Label": "Enable loadout shortcuts", "Tooltip": "Local settings only. Disabled while typing, in settings, or dead."}, "Shortcuts": {"Label": "Custom shortcuts", "Tooltip": "Defaults: Shift+1..9 and Shift+0 for the first ten loadouts. Expand to edit a number and chord; add entries with +, or clear a chord to disable it. Numbers follow list order and shift after deletion. First duplicate wins."}}
+      LoadoutShortcut: {"LoadoutNumber": {"Label": "Loadout number", "Tooltip": "1 is the first existing loadout, 2 is the second. Never creates loadouts."}, "Shortcut": {"Label": "Key or chord", "Tooltip": "Examples: Shift+1, Ctrl+F1, Alt+Q, Ctrl+Shift+2 or F6. Either side of a modifier works. 1..0 are top-row keys; use NumPad1 for the keypad. One activation per press. Avoid other mod bindings. Blank or invalid chords do nothing."}}
+
       TalentLevelOverride: {
         TalentId: { Label: "Talent ID" }
         Limit: { Label: "Level limit (-1 unlimited, 0 disabled)" }

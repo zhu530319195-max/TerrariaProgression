@@ -15,7 +15,8 @@ public sealed class TalentUISystem : ModSystem
     private TalentUIState? panel;
     private GameTime lastTime = new();
     internal static bool Visible;
-    internal static bool IsTyping => Visible && ModContent.GetInstance<TalentUISystem>().panel?.SearchFocused == true;
+    internal static bool IsTyping => Visible && ModContent.GetInstance<TalentUISystem>().panel?.IsTyping == true;
+    internal static bool HasLoadoutOverlay => Visible && ModContent.GetInstance<TalentUISystem>().panel?.HasLoadoutOverlay == true;
     internal static bool CanUseMenu => !Main.gameMenu && !Main.dedServ && !Main.LocalPlayer.dead
         && Main.LocalPlayer.TryGetModPlayer<ProgressionPlayer>(out _);
     public override void Load()
@@ -38,6 +39,7 @@ public sealed class TalentUISystem : ModSystem
         if (!Visible) system.panel?.EndSearch();
         system.userInterface?.SetState(Visible ? system.panel : null);
     }
+    public override void PostUpdateInput() { if (Visible && CanUseMenu) panel?.MaintainTextFocus(); }
     public override void UpdateUI(GameTime gameTime)
     {
         lastTime = gameTime;

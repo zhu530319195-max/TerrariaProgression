@@ -155,6 +155,6 @@ public sealed partial class RuntimeChecks
             int remaining=A.Player.inventory[1].stack;for(int n=0;n<20;n++){GatheringSystem.ProcessJobs();TreeReplantSystem.Process();}
             Check(Main.tile[x,y+4].TileType==TileID.Saplings&&A.Player.inventory[1].stack==remaining,"new sapling survives remaining updates and never charges twice");
         }
-        Init();Check(ProgressionNetwork.ProtocolVersion==17,"new catalog and wall intent require protocol seventeen");
+        Init();Check(ProgressionNetwork.ProtocolVersion==18,"new catalog and wall intent require protocol eighteen");
     }
 }
