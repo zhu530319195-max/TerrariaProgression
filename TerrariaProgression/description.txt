@@ -16,3 +16,6 @@ P: talents. Left Alt: toggle batch gathering. G: area/vein mode. K: extra mining
 简体中文 / English. tModLoader v2026.07.3.0 / Terraria 1.4.4.9.
 0.13.0功能已通过作者实机验收；0.13.1更新名称与介绍，0.14.0全服经验共享已授权合并，0.15.0天赋方案等待实机验收，存档v4／协议18，升级前备份角色。真实多人暂未实测，未知第三方MOD兼容性未作保证。特殊Boss及多人独立掉落增产尚未全面覆盖。
 The 0.13.0 feature batch passed author playtesting; 0.13.1 updates branding; 0.14.0 XP sharing was merged with author authorization; 0.15.0 loadouts await playtesting (save v4 / protocol18; back up characters before upgrading). Live multiplayer and compatibility with arbitrary third-party mods are not verified. Special bosses and player-instanced extra loot remain incomplete.
+
+0.15.1修复方案名称和搜索输入；可在本机模组配置自定义方案快捷键，默认Shift+1～9／Shift+0。等待实机复验。
+0.15.1 fixes name/search input and adds configurable local loadout chords (Shift+1..9 / Shift+0). Playtesting pending.

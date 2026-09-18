@@ -107,7 +107,7 @@ internal sealed partial class TalentUIState : UIState
         target.Width.Set(-20,1); target.Height.Set(0,1); target.ListPadding=5; target.ManualSortMethod=_=>{}; parent.Append(target);
         var scroll=new TalentScrollbar(target); scroll.Left.Set(-18,1); scroll.Height.Set(0,1); parent.Append(scroll); target.SetScrollbar(scroll);
     }
-    internal void EndSearch() { CloseLoadoutOverlay(); if(SearchFocused) {SearchFocused=false; Main.blockInput=false; PlayerInput.WritingText=false;} }
+    internal void EndSearch() { bool typing=IsTyping; CloseLoadoutOverlay(); SearchFocused=false; if(typing) ReleaseTextFocus(); }
     public override void OnDeactivate() { EndSearch(); base.OnDeactivate(); }
     private string ScopeLabel(bool group) => RefundScope(group).Length == 0 ? Text("NoSelection") : Text((group ? "MenuGroup" : "Menu") + RefundScope(group));
     private string RefundScope(bool group)
@@ -217,6 +217,7 @@ internal sealed partial class TalentUIState : UIState
     }
     public override void Draw(SpriteBatch spriteBatch)
     {
+        ReadFocusedText();
         base.Draw(spriteBatch);
         DrawLoadoutIME();
         if(SearchFocused && search!=null) Main.instance.DrawWindowsIMEPanel(search.GetDimensions().Position()+new Microsoft.Xna.Framework.Vector2(0,32),1);
@@ -252,16 +253,8 @@ internal sealed partial class TalentUIState : UIState
         if (width != lastWidth || height != lastHeight) {
             lastWidth = width; lastHeight = height; Resize(width, height);
         }
-        UpdateLoadoutInput();
-        if (SearchFocused) {
-            if (Main.mouseLeft && Main.mouseLeftRelease && search!=null && !search.ContainsPoint(Main.MouseScreen)) EndSearch();
-            else {
-                Main.blockInput=true; PlayerInput.WritingText=true; Main.instance.HandleIME();
-                string input=Main.GetInputText(query); if(input.Length>80)input=input[..80];
-                if(input!=query){query=input;RefreshTalents();}
-                if(Main.keyState.IsKeyDown(Keys.Enter)||Main.keyState.IsKeyDown(Keys.Escape)){EndSearch();base.Update(gameTime);return;}
-            }
-        }
+        if (IsTyping) MaintainTextFocus();
+        if (SearchFocused && Main.mouseLeft && Main.mouseLeftRelease && search!=null && !search.ContainsPoint(Main.MouseScreen)) EndSearch();
         if (!ReferenceEquals(filteredState,Player.State) || filteredLanguage!=Language.ActiveCulture.Name || filteredLimits!=TalentLimits.Revision) RefreshTalents();
         var location=TalentNavigation.Find(selected);
         pathLabel.SetText(query.Trim().Length>0?Text("GlobalResults",query):Text("Menu"+menuCategory)+" / "+(menuGroup.Length>0?Text("MenuGroup"+menuGroup):Text("AllInCategory")));

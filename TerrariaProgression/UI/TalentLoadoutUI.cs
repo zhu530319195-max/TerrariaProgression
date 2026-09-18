@@ -21,7 +21,7 @@ internal sealed partial class TalentUIState
 
     private void InitializeLoadouts()
     {
-        var choose = new TalentButton(() => Text("LoadoutCurrent", Player.State.ActiveLoadout.Name), OpenLoadoutList, () => CanAct);
+        var choose = new TalentButton(() => Text("LoadoutCurrent", "["+(Player.State.Pages.FindIndex(page => page.Id == Player.State.ActiveLoadoutId)+1)+"] "+Player.State.ActiveLoadout.Name), OpenLoadoutList, () => CanAct);
         choose.Left.Set(0,0); choose.Top.Set(62,0); choose.Width.Set(-8,.44f); panel.Append(choose);
         var operations = new[] { TalentOperation.CreateLoadout, TalentOperation.CopyLoadout, TalentOperation.RenameLoadout, TalentOperation.DeleteLoadout };
         for (int i = 0; i < operations.Length; i++) {
@@ -47,8 +47,9 @@ internal sealed partial class TalentUIState
         Place(caption,overlay,0,0,1,0,30);
         var area = new UIElement(); area.Top.Set(40,0); area.Width.Set(0,1); area.Height.Set(-90,1); overlay.Append(area);
         var rows = new UIList(); AttachList(area,rows);
-        foreach (var page in Player.State.Loadouts) {
-            var entry = new TalentButton(() => Text("LoadoutEntry",page.Name,Compact(page.AvailablePoints),Compact(page.SpentPoints)),
+        for (int index=0; index<Player.State.Loadouts.Count; index++) {
+            var page=Player.State.Loadouts[index]; int number=index+1;
+            var entry = new TalentButton(() => Text("LoadoutEntry","["+number+"] "+page.Name,Compact(page.AvailablePoints),Compact(page.SpentPoints)),
                 () => { Player.RequestTalent(TalentOperation.ActivateLoadout,page.Id.ToString("N")); CloseLoadoutOverlay(); },
                 () => CanManageLoadouts, () => page.Id == Player.State.ActiveLoadoutId);
             entry.Width.Set(0,1); entry.TextHAlign=0; rows.Add(entry);
@@ -86,22 +87,46 @@ internal sealed partial class TalentUIState
         Player.RequestTalent(loadoutOperation,loadoutOperation == TalentOperation.DeleteLoadout ? editedLoadout.ToString("N") : loadoutName.Trim());
         CloseLoadoutOverlay();
     }
+    internal bool HasLoadoutOverlay => loadoutOverlay != null;
     private void CloseLoadoutOverlay()
     {
         loadoutOverlay?.Remove(); loadoutOverlay=null; loadoutNameInput=null;
-        if (loadoutNameFocused) { loadoutNameFocused=false; Main.blockInput=false; PlayerInput.WritingText=false; }
+        if (loadoutNameFocused) { loadoutNameFocused=false; ReleaseTextFocus(); }
     }
-    private void UpdateLoadoutInput()
+    // UI.Update precedes PlayerInput.UpdateInput, which resets WritingText.
+    // Keep focus across that reset, then consume native characters during Draw,
+    // matching tModLoader's own UIFocusInputTextField lifecycle.
+    internal void MaintainTextFocus()
     {
-        if (!loadoutNameFocused) return;
-        Main.blockInput=true; PlayerInput.WritingText=true; Main.instance.HandleIME();
-        string input=Main.GetInputText(loadoutName);
-        if (input.Length > TalentLoadouts.MaxNameLength) {
-            input=input[..TalentLoadouts.MaxNameLength];
+        if (!IsTyping) return;
+        Main.CurrentInputTextTakerOverride=this;
+        PlayerInput.WritingText=true; Main.blockInput=true;
+    }
+    private void ReleaseTextFocus()
+    {
+        if (ReferenceEquals(Main.CurrentInputTextTakerOverride,this)) Main.CurrentInputTextTakerOverride=null;
+        Main.blockInput=false; PlayerInput.WritingText=false;
+    }
+    internal void ReadFocusedText()
+    {
+        if (!IsTyping || !Main.hasFocus) return;
+        MaintainTextFocus(); Main.instance.HandleIME();
+        if (loadoutNameFocused) loadoutName=ReadText(loadoutName,TalentLoadouts.MaxNameLength);
+        else {
+            string input=ReadText(query,80);
+            if (input!=query) {query=input;RefreshTalents();}
+            if (Main.inputTextEnter || Main.inputTextEscape) EndSearch();
+        }
+        // Explicit click confirms names; Enter remains available to Chinese IME.
+    }
+    internal static string ReadText(string current,int limit)
+    {
+        string input=Main.GetInputText(current);
+        if (input.Length>limit) {
+            input=input[..limit];
             if (char.IsHighSurrogate(input[^1])) input=input[..^1];
         }
-        loadoutName=input;
-        // Confirmation is an explicit click: Enter remains available to Chinese IME.
+        return input;
     }
     private void DrawLoadoutIME()
     {

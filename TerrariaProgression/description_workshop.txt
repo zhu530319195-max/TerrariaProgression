@@ -47,3 +47,6 @@ Simplified Chinese and English. Built for tModLoader v2026.07.3.0 / Terraria 1.4
 The 0.13.0 feature batch passed author playtesting; 0.13.1 changes branding and descriptions. Live multiplayer, arbitrary third-party mod compatibility, special/multi-stage bosses and player-instanced extra loot are not fully verified or implemented. Potion Sickness reduction and the older fishing-yield feature still await dedicated playtesting.
 
 [url=https://github.com/zhu530319195-max/TerrariaProgression/issues]反馈问题 / Report an issue[/url]
+
+0.15.1修复方案名称和搜索输入；可在本机模组配置自定义方案快捷键，默认Shift+1～9／Shift+0。等待实机复验。
+0.15.1 fixes name/search input and adds configurable local loadout chords (Shift+1..9 / Shift+0). Playtesting pending.
